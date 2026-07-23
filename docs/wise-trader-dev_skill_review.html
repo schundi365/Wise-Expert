@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "wise-trader-dev", "runs": [{"id": "eval-0-bugfix-release-checklist-with_skill", "prompt": "I just fixed a bug in Risk.mqh where the gap buffer was being applied twice to the stop distance. The fix is 3 lines. Can you tell me exactly what needs to happen before this goes into the live bot?", "eval_id": 0, "outputs": [{"name": "answer.md", "type": "text", "content": "# Before the Risk.mqh gap-buffer fix goes live\n\nThree lines or not, this touches stop distance in Risk.mqh \u2014 which means it changes position sizing (and possibly fills) on **every trade the bot takes**. Risk.mqh is also CODEOWNERS-guarded, so this goes through the full pipeline, not a quick push. Here is exactly what has to happen, in order.\n\n## 0. Preconditions\n\n- **Confirm no campaign is running** (check `results/campaign_status.json` / the dashboard on port 5088). Never edit, pull, or restructure mid-campaign.\n- **This is one change.** Nothing else rides along in the same version \u2014 the regression comparison only means something if the runs differ by exactly this fix.\n\n## 1. Branch correctly\n\n- Since this bug is in the live bot, treat it as a **hotfix branch from `main`** (features come from `develop`; hotfixes from `main`), e.g. `feature/fix-gap-buffer-double-apply` or `hotfix/...`.\n- Risk.mqh is guarded by CODEOWNERS, so the PR will require the owner's review \u2014 plan for that, don't try to bypass it.\n\n## 2. Version + changelog together\n\n- Bump `#property version` in `WiseTrader.mq5` **and** add a CHANGELOG.md entry (newest first) in the same commit. CI fails the build if they disagree.\n- The changelog entry needs a **Migration note**: spell out that stop distances (and therefore lot sizes) computed by all prior versions were wrong \u2014 stops were wider / sizes smaller (or the reverse) than configured. That matters for anyone comparing old and new results.\n\n## 3. Decide what this does to existing evidence \u2014 and say so\n\n- Every backtest in `results/regression_history.csv` to date was run **with the bug**. The current reference numbers (A1_full_v20: 68 trades, PF 1.29, expectancy $5.97, DD 3.84%) are the buggy baseline. After the fix, the A-series reference numbers will move \u2014 that is expected, and the new numbers become the baseline going forward. Record that explicitly in the regression matrix.\n- The B2 ablation (gap-buffer + vol-scaled sizing) and the open A2_tuned vs A3_tuned_nogap comparison were both measuring a **double-applied** gap buffer. Their verdicts about the gap buffer are now suspect and should be flagged for re-run \u2014 the fix may change whether the gap buffer is a keep or a drag.\n\n## 4. Regression \u2014 not just a smoke test\n\nA bug fix must re-run the configs that passed before the fix; that is how you prove nothing else broke.\n\nWith MT5 completely closed, from `tools/console` (or `Console/`):\n\n- **Reference:** the A-series reference config (A1), same fixed protocol as the last campaign \u2014 XAUUSD M15, same dates, 10k USD, 1:100, model 1.\n- **Same-module configs:** everything that exercises Risk.mqh \u2014 B2 (gap buffer/sizing ablation), A2_tuned / A3_tuned_nogap, and any risk-lock configs.\n- **Model choice:** model 1 for the sweep is fine, but because this changes *stop distance*, the final validation of the fixed build should be **model 4 (real ticks)** \u2014 stop placement interacts with fills, and M1 OHLC understates that.\n- Every run lands in `results/regression_history.csv`; use `scripts/parse_reports.py` for the comparison table \u2014 don't hand-parse the HTML.\n\n## 5. Journal evidence (prove the fix, not just the compile)\n\nOne short tester run, then grep `WiseTrader_<SYMBOL>_<MAGIC>.csv`:\n\n- `sizing: vol_ratio` evidence on every fill \u2014 verify the logged stop distance now includes the gap buffer **exactly once** (pick a trade, recompute by hand from the journaled numbers).\n- The standard smoke tags still present: `RECOVER init`, `DECISION setup`, `ORDER`, `breakeven`, `partial close`, `trail`, `TP capped`.\n- **Zero `ERROR` tags** \u2014 part of every pass criterion.\n\n## 6. Functional risk tests (this is Risk.mqh \u2014 do both)\n\n- **Risk locks:** tester run with `InpMaxDailyLoss=0.2`, `InpMaxConsecLosses=1`, `InpMaxTotalDD=0.5`; expect lock=1/2 entries blocked, lock=3 `FLATTEN ALL` + permanent lock. Restore the .set after.\n- **Restart safety:** demo chart, let a position reach BE, kill the terminal, restart. Expect fresh `RECOVER init`, stop unchanged (never regresses), no second partial close, orphan pendings cancelled on the next M15 bar.\n\n## 7. Verdict rules\n\n- Judge by **profit factor + expectancy/trade + max drawdown**, Sharpe as tiebreak, net profit last.\n- n < 30 trades proves nothing \u2014 widen the window, don't lower the bar.\n- The out-of-sample window (2025.07\u20132025.12) stays **read-only** \u2014 run it once to confirm the fixed build holds up, don't tune against it.\n- Record every run in the regression matrix and history \u2014 including anything that fails.\n\n## 8. PASS \u2192 merge \u2192 live gate\n\n- PASS: commit, push the branch, PR (owner reviews the Risk.mqh diff), merge; update the feature log and regression matrix with the run IDs as evidence.\n- FAIL / anomalous: revert, record the verdict **with the numbers** in the feature log, investigate. Do not tune-and-retry more than once against the same window.\n- **Before live:** the fixed build follows the same road as any winner \u2014 OOS window clean, model 4 real ticks within \u00b120% of the model-1 result, then a **demo period** confirming behavior (expect live to deliver 50\u201370% of backtest expectancy; a demo delivering \u226550% is the bar). Only then does it go to the live account, and because sizing behavior changed, run it at **0.25% risk for the first 20 trades** and watch the journal's sizing lines against hand calculations.\n\n## The short version\n\nHotfix branch off main \u2192 version bump + changelog (with migration note) in one commit \u2192 re-run A-reference + B2 + A2/A3 + risk-lock configs (model 1 sweep, model 4 final) \u2192 journal grep proving the buffer applies once, zero ERRORs \u2192 risk-lock and restart-safety functional tests \u2192 owner-reviewed PR (CODEOWNERS) \u2192 OOS + model-4 confirmation \u2192 demo \u2192 live at 0.25% risk for 20 trades. And flag in the matrix that all pre-fix gap-buffer verdicts need re-validation \u2014 the old numbers were measuring the bug.\n"}], "grading": {"expectations": [{"text": "Requires #property version bump AND CHANGELOG entry together", "passed": true, "evidence": "'Bump #property version ... AND add a CHANGELOG.md entry ... in the same commit. CI fails the build if they disagree' + Migration note requirement"}, {"text": "Requires re-running previously-passing configs (full regression), not just one new run", "passed": true, "evidence": "'A bug fix must re-run the configs that passed before the fix; that is how you prove nothing else broke' - re-runs A1 reference, B2, flags A2/A3 verdicts as suspect"}, {"text": "Specifies verdict metrics (PF/expectancy/DD) with a minimum trade count", "passed": true, "evidence": "cites A1 baseline (PF 1.29, expectancy $5.97, DD 3.84%), n>=30 rule, OOS read-only, model-4 confirmation"}, {"text": "Includes git flow (branch/review) and staged rollout or rollback plan", "passed": true, "evidence": "hotfix branch from main, CODEOWNERS review required, live gate with 0.25% risk for first 20 trades"}]}}, {"id": "eval-0-bugfix-release-checklist-without_skill", "prompt": "I just fixed a bug in Risk.mqh where the gap buffer was being applied twice to the stop distance. The fix is 3 lines. Can you tell me exactly what needs to happen before this goes into the live bot?", "eval_id": 0, "outputs": [{"name": "answer.md", "type": "text", "content": "# Before the Risk.mqh gap-buffer fix goes live\n\nFirst, a framing point: **this is not a 3-line change, it's a position-sizing change on every trade.** The gap buffer inflates the effective stop distance used for lot sizing (`eff_stop = stop_dist + gap_buf` in `Risk.mqh`). If the buffer was being added twice, every trade has been *undersized* (too-wide effective stop \u2192 smaller lots). Removing the double application means the live bot will start trading **larger positions** with the same inputs. Treat it with the same rigor as a behavioral change, because it is one. Here's the sequence.\n\n## 1. Verify the fix does what you think it does\n\n- Confirm the direction of the bug: double-applied buffer = smaller lots (conservative bug). If your fix somehow goes the other way, stop and re-check \u2014 an oversizing error is the v1.6 class of bug.\n- Check the journal evidence line still tells the truth: `sizing: vol_ratio=\u2026 scalar=\u2026 gap_buf=\u2026 eff_stop=\u2026` should now show `eff_stop = stop_dist + gap_buf` exactly once. Hand-verify one trade: pick a fill from a test run, recompute expected lots on paper from the 1% budget and the journaled `eff_stop`, and confirm they match.\n- Confirm the **sizing sanity clamp** (v1.6: worst-case loss > budget +20% \u2192 veto) still sits downstream of the fix. That's your last line of defense if the fix is wrong.\n\n## 2. Bump version + changelog together (CI will fail otherwise)\n\n- `#property version` in `WiseTrader.mq5`: `\"2.40\"` \u2192 `\"2.50\"`.\n- New top entry in `CHANGELOG.md`: `## WiseTrader EA v2.5 \u2014 <date>` under a `### Fixed` heading, describing the double-applied gap buffer and its effect (undersized lots). CI (`.github/scripts/validate_repo.py`) compares the two numerically and fails the build on mismatch.\n- **One behavioral change per version** \u2014 don't bundle anything else into this commit, or the regression delta stops being attributable.\n\n## 3. Recompile and run the regression campaign (per TESTING.md)\n\n- Close MT5 completely (system tray too), then from `Console\\`:\n  - Fast sweep: `python autotest.py --model 1` \u2014 at minimum `A1_full_v20` plus `B2_no_adaptive_sizing`.\n  - **B2 is your differential control**: with adaptive sizing disabled, B2 results should be *unchanged* by this fix. If B2 moved, your 3 lines touched more than the gap buffer.\n  - Confirm on real ticks: `python autotest.py --model 4 A1_full_v20`. Only model-4 numbers justify going live.\n- Judge by **expectancy** on the 6-month window (default 2026.01.01\u20132026.07.08), with the standard gates: PF \u2265 1.15, \u2265 50 trades, equity DD not worse than the pre-fix A1 by >25%.\n- Because this specifically changes size, also check:\n  - Per-trade losses still \u2264 ~1% of equity (no loss materially above budget).\n  - Max equity drawdown vs the pre-fix A1 report \u2014 larger lots means every DD number scales up; make sure the 3%/10% daily/total locks don't now trip in the backtest.\n  - `size < broker min` veto count should **drop** (smaller eff_stop funds min lots more often) \u2014 a nice confirming signal that the fix is real.\n- Keep the new reports/journals in `results/` \u2014 a result you can't trace to a version and config is not evidence.\n\n## 4. Ship it through the branch model\n\n- This is a fix to a released EA: `hotfix/<name>` branched from `main`, PR into `main`, CI green (Python syntax, .set shape, version-vs-changelog, includes), CODEOWNERS review. Merge back to `develop` too so the branches don't diverge.\n\n## 5. Staged live rollout\n\n- Recompile in MetaEditor (F7) on the live machine; attached charts reload automatically. Verify the init RECOVER journal line reports **v2.50**.\n- Watch the **first few live fills' `sizing:` lines** and confirm lot sizes are what the backtest predicted \u2014 ideally on demo or at reduced `InpRiskPct` for the first day or two, since realized position sizes are about to step up on every trade.\n- Monitor via the Console dashboard; any `sizing sanity clamp` or `modify \u2026 rejected` lines in the first sessions are an immediate stop-and-investigate.\n\n## 6. Have the rollback ready\n\n- Keep the v2.4 compiled `.ex5` (or the git tag) so you can revert in one recompile if live sizing looks wrong.\n\nShort version: fix \u2192 hand-verify one trade's math \u2192 bump 2.50 + changelog \u2192 model-1 sweep with B2 as control \u2192 model-4 confirm on A1 \u2192 hotfix PR with CI/review \u2192 live with journal-watched first fills and a rollback on standby.\n"}], "grading": {"expectations": [{"text": "Requires #property version bump AND CHANGELOG entry together", "passed": true, "evidence": "'2.40 -> 2.50' + CHANGELOG entry; cites CI validate_repo.py enforcing the match"}, {"text": "Requires re-running previously-passing configs (full regression), not just one new run", "passed": true, "evidence": "A1 + B2 as differential control ('B2 must be unchanged by this fix'), model-4 confirm - NOTE: baseline read the repo's own TESTING.md/CHANGELOG which encode the discipline"}, {"text": "Specifies verdict metrics (PF/expectancy/DD) with a minimum trade count", "passed": true, "evidence": "'PF >= 1.15, >= 50 trades, equity DD not worse than pre-fix A1 by >25%'"}, {"text": "Includes git flow (branch/review) and staged rollout or rollback plan", "passed": true, "evidence": "hotfix branch, PR to protected main, keep v2.4 .ex5 as rollback, demo first"}]}}, {"id": "eval-1-new-document-triage-with_skill", "prompt": "I dropped a new article into the Trading library folder about a VWAP mean-reversion strategy... Worth adding to WiseTrader?", "eval_id": 1, "outputs": [{"name": "answer.md", "type": "text", "content": "# VWAP mean-reversion article - triage verdict\n\n**Yes - it earns a Candidate row in the feature log. No - we don't build it now.** It queues behind the pipeline like everything else. Here's the triage against the three standard questions, plus one operational note before I touch any repo file.\n\n## Operational note first: your A2/A3 campaign may still be finishing\n\nBoth `report_A2_tuned.htm` and `report_A3_tuned_nogap.htm` exist and `results/regression_results.csv` has complete rows for both configs (A3's report landed within the last half hour). But `campaign_status.json` is a truncated, half-written file and **neither run has been appended to `regression_history.csv` yet** - so the runner is either still in its final phase or was interrupted mid-write. Per house rules (no file edits while a campaign runs), **I have not modified `docs/WiseTrader_Feature_Log.xlsx` yet.** Confirm terminal64/autotest.py has fully exited and I'll add the F07 row below verbatim.\n\n(Early read on that campaign, since the numbers are sitting there: A2_tuned - 106 trades, PF 1.44, expectancy $8.43, DD 2.94%, Sharpe 5.34; A3_tuned_nogap - 110 trades, PF 1.37, expectancy $9.26, DD 4.18%, Sharpe 4.52. A3 wins net profit, A2 wins everything risk-adjusted - by our metric precedence the gap buffer looks like a keeper. Verdict to be formalized once history/status files settle.)\n\n## 1. What is the edge hypothesis?\n\nPrice stretched more than 2 standard deviations from session VWAP is statistically extended relative to the volume-weighted fair value that institutional execution desks benchmark against; their VWAP-anchored flow creates reversion pressure, so fading the first pullback candle and targeting VWAP harvests the snap-back. Mechanically clean and testable: defined trigger (2-sigma touch + pullback candle), defined stop (beyond the extreme), defined target (VWAP).\n\n## 2. Orthogonal to what the bot has, or a duplicate?\n\n**Orthogonal - and it fills a known hole:**\n\n- The infrastructure already exists. `src/Vwap.mqh` (`CSessionVwap`) maintains session VWAP **and** volume-weighted deviation bands (`Deviation()`, `Upper(k)`, `Lower(k)`), incremental and O(1) per M1 bar. Implementation cost is essentially a new setup type in SignalEngine - no new math.\n- But it is NOT a duplicate of F11. Today VWAP is only a *confluence filter* (\"VWAP side\", worth 0.10 of score on breakout entries). Nothing in the bot trades *toward* VWAP; every signal family we have (BOS/CHoCH, Quasimodo, retest) is structure/momentum.\n- F15's six-label regime classifier has a **MeanRev regime with no strategy routed to it**. This article is exactly the missing tenant: something that earns in the conditions where the breakout engine sits out or bleeds.\n\nArchitecture invariants still apply: the fade must originate in SignalEngine and pass the full Discipline -> Risk gate chain; band math stays off the tick path (it already is).\n\n## 3. How would it be validated, and what priors must it beat?\n\nStandard protocol: dedicated `.set` in `tests/configs/`, run vs the A-series reference, XAUUSD M15, same 6-month window, 10k/1:100, verdict by PF + expectancy + max DD (net profit last), n >= 30 or widen the window. Two specifics for this feature:\n\n- **Tick model required, not model 1.** Entry is intrabar (\"first pullback candle\" after a 2-sigma breach) and the target is a moving level (VWAP). Worse, model 1 M1-OHLC *understates* adverse excursion on exactly the spike bars this strategy fades - a model-1 backtest of a fade strategy will flatter it. Model 0 for the sweep, model 4 for any winner.\n- **Journal-tag evidence**: its own tag (e.g. `VWAP-FADE`) so decisions are greppable in `WiseTrader_<sym>_<magic>.csv`.\n\nPriors from our own campaigns that this must beat (these go in the row):\n\n1. **Gold's 2-sigma breaches are often news bars.** F16 (outlier mask) exists precisely because news candles blow through every statistical band. Fading those is collecting pennies in front of the tail - the fade must never trigger on outlier-masked bars, and the no-calendar-in-tester caveat applies to any results summary.\n2. **The relative-volume gate cuts the other way here.** RelVol >= 1.0 \"in play\" days are the strongest feature *for breakouts* (B5: removing it flips PF to 0.90) - but high-participation days are trend days, plausibly the worst days to fade. Test the fade with the relvol gate off/inverted for this setup type rather than inherited.\n3. **Hours 03-10 were net losers for BOS** (why our session is 12-20). Encouraging prior, actually: the hours where momentum loses are mean reversion's natural habitat. Test the fade in 03-10 as a variant - it may be a session-complement, not a competitor.\n4. **Direction conflict is built in**: a 2-sigma stretch is frequently the very breakout the main engine wants to trade. Conflict resolution (F15 regime routing, or simple mutual-exclusion in Discipline) must be in the spec, not an afterthought.\n\n## Feature log row (to add once the campaign is confirmed done)\n\n| Field | Value |\n|---|---|\n| ID | **F07** (next free Signal ID) |\n| Feature | VWAP mean-reversion fade (>2-sigma stretch, first-pullback entry, target = session VWAP) |\n| Category | Signal |\n| Edge hypothesis | Price >2-sigma from session VWAP is stretched vs volume-weighted fair value; institutional VWAP-anchored flow creates reversion pressure - fade the first pullback candle, TP at VWAP. Earns in MeanRev regimes (F15) where the breakout engine loses; bands already computed in Vwap.mqh (F11) |\n| Source | VWAP mean-reversion article, Trading library - give me the exact filename and I'll point the Source column at it (the file isn't in the folder I can currently see) |\n| Status | Candidate |\n| How to validate | Dedicated .set vs A-series reference, XAUUSD M15 6-mo, **model 0/4 mandatory** (intrabar entry, moving TP), n>=30, PF/expectancy/DD precedence, `VWAP-FADE` journal tags. Priors to beat: never fade F16-masked outlier bars; high-relvol days are trend days (test gate off for this setup); hours 03-10 (BOS-losing) as candidate session; define conflict rule vs breakout engine |\n\nSummary sheet: `Candidate` already has a COUNTIF row, so it just recalculates - no new status string.\n\n**Bottom line:** worth adding. Genuinely orthogonal, near-zero infrastructure cost, and the first real candidate for the MeanRev regime. But per the log's own creed it's a hypothesis, not an edge, until a tick-model regression says otherwise - and it waits its turn: the A2/A3 verdict closes out first, then whatever is next in the queue, one change at a time.\n"}], "grading": {"expectations": [{"text": "States an edge hypothesis (why it would make/save money)", "passed": true, "evidence": "dedicated section: VWAP-anchored institutional flow creates reversion pressure; defined trigger/stop/target"}, {"text": "Checks orthogonality against existing VWAP/QM/structure features", "passed": true, "evidence": "explicitly contrasts with F11 confluence use, identifies unused MeanRev regime gap, notes Vwap.mqh bands already exist"}, {"text": "Proposes a Candidate feature-log row with a validation method", "passed": true, "evidence": "drafts F07 row verbatim with model-0/4 validation requirement and priors to beat"}, {"text": "Queues implementation behind the one-at-a-time pipeline instead of building now", "passed": true, "evidence": "'No - we don't build it now. It queues behind the pipeline'; also refused to edit the xlsx mid-campaign per house rules"}]}}, {"id": "eval-1-new-document-triage-without_skill", "prompt": "I dropped a new article into the Trading library folder about a VWAP mean-reversion strategy... Worth adding to WiseTrader?", "eval_id": 1, "outputs": [{"name": "answer.md", "type": "text", "content": "# VWAP Mean-Reversion Fade \u2014 Worth Adding to WiseTrader?\n\n**Short answer: yes, as a Candidate \u2014 but not as code yet.** Add it to the feature log, run a cheap data study first, and only implement it if the study survives. One caveat up front: I can't see the article itself \u2014 only the `Wise Trader` subfolder is attached to this session, not the parent `Trading library` folder. If you attach it or drop it into `Wise Trader\\docs`, I can cite it properly in the feature log's Source column.\n\n## The good news: it's almost free to build\n\n`src/WiseTrader/src/Vwap.mqh` already has everything the strategy needs. `CSessionVwap` computes session-anchored VWAP with volume-weighted standard deviation, and `Upper(k)` / `Lower(k)` band methods already exist \u2014 a 2\u03c3 band is literally `g_vwap.Upper(2.0)`. The detector would be a new signal type in `SignalEngine.mqh` plus an entry rule and a TP-at-VWAP exit. Maybe a day of work.\n\n## The real question: it trades *against* the bot's current DNA\n\nThis is the part that deserves scrutiny before writing any MQL:\n\n1. **It inverts F11.** The feature log's VWAP entry (F11, LIVE) exists because \"trading on the correct side avoids fading real money\" \u2014 the scorer pays +0.10 for VWAP-side *alignment*. This strategy is, by definition, fading. That's not disqualifying, but it means it can't just be scored through the existing confluence engine; it's a separate signal family with its own regime.\n\n2. **Regime conflict is the known failure mode.** F15 (six-label regime classifier, including a MeanRev label) is only \"Partial (lite live)\" precisely because momentum logic loses in chop and mean-reversion loses in trends. On XAUUSD, >2\u03c3 stretches from session VWAP are frequently news impulses that *keep going* \u2014 the exact bars F16's outlier mask was built to flag. A fade module without a regime/outlier gate would systematically catch those knives. Minimum viable gating: skip signals where the stretch bar is F16-masked, and require some trend-exhaustion condition beyond \"first pullback candle.\"\n\n3. **Early-session \u03c3 is degenerate.** Session VWAP deviation is near-zero in the first bars after reset, so \"2\u03c3\" triggers on noise. Needs a minimum-elapsed-bars gate (the `Ready()` warmup helps but isn't sufficient).\n\n4. **Exit management won't transfer.** Mean-reversion trades have inverted P&L dynamics vs your breakouts \u2014 high win rate, small targets (VWAP), and the campaign already showed early BE + profit-lock crushes winners even on the breakout side (D1: +$78 vs A1 +$406). The MR module would need its own exit config, not the shared trailing/BE logic. Also check R:R honestly: stop beyond the extreme vs target at VWAP is often sub-1R \u2014 the edge has to come from win rate, which only a backtest can confirm.\n\n5. **\"First pullback candle\" is underspecified.** Codify it before testing \u2014 e.g., first M15 candle that closes back inside the 2\u03c3 band \u2014 or the backtest won't match the article's claims anyway.\n\n## Recommended path (matches the project's own discipline)\n\n1. **Feature log first.** Add a row (F07 slot is free in the Signal block): edge hypothesis = \"2\u03c3 stretches from volume-weighted fair value are liquidity-driven overextensions that revert to VWAP\", source = the article, status = **Candidate**, validation = expectancy + PF, n\u226530, 6-month backtest vs A1 baseline.\n2. **Cheap study before code.** Use `Console/fetch_data.py` data to measure, on XAUUSD M15: how often price stretches >2\u03c3 from session VWAP, and what happens over the next N bars (revert-to-VWAP rate vs continuation). If the raw event stats don't show reversion tendency, stop there \u2014 zero MQL written.\n3. **If it survives:** implement as a separate signal type, `InpEnableVwapFade` **default OFF** (one behavioral change per version, defaults preserve prior behavior), own TP/SL inputs, F16-mask and min-session-age gates, and validate as a C-series config against A1 \u2014 same as the retest-entry rollout.\n4. **Timing:** you're mid-campaign (A2/A3 tuned runs, then OOS 2025H2). I'd slot the study now (it's read-only) but hold implementation until the current campaign verdicts land, so the baseline doesn't move under you.\n\nIf we do proceed to code, remember the house rule: CHANGELOG.md entry + `#property version` bump with the change.\n"}], "grading": {"expectations": [{"text": "States an edge hypothesis (why it would make/save money)", "passed": true, "evidence": "feature-log row: '2-sigma stretches from volume-weighted fair value are liquidity-driven overextensions that revert to VWAP'"}, {"text": "Checks orthogonality against existing VWAP/QM/structure features", "passed": true, "evidence": "'it inverts F11', F15 MeanRev conflict, F16 mask interaction - NOTE: baseline had repo access incl. the feature log"}, {"text": "Proposes a Candidate feature-log row with a validation method", "passed": true, "evidence": "F07 row with hypothesis/source/status/validation (expectancy+PF, n>=30, vs A1)"}, {"text": "Queues implementation behind the one-at-a-time pipeline instead of building now", "passed": true, "evidence": "'hold implementation until the current campaign verdicts land'; data study first"}]}}, {"id": "eval-2-failed-feature-verdict-with_skill", "prompt": "Backtest results for my new momentum-confirmation feature came back: PF 0.95, expectancy -0.4, 22 trades... What should I do?", "eval_id": 2, "outputs": [{"name": "answer.md", "type": "text", "content": "# Verdict on the momentum-confirmation feature\n\nShort version: the two days of coding are a sunk cost and must not influence the verdict. The numbers are pointing at FAIL, but with only 22 trades you don't yet have a result you're allowed to act on. Do one widening run to get n >= 30, then almost certainly roll back and record it.\n\n## 1. The two days don't matter\n\nThe job was never to write code -- it was to produce a verdict about whether the code earns money. \"Edge hypotheses are exactly that -- hypotheses. Nothing is edge until the backtest confirms it.\" A rejected feature that took two days is not two days wasted; it's two days spent buying knowledge. It only becomes waste if you keep it (or silently delete it) because of the effort invested.\n\n## 2. But 22 trades proves nothing -- widen, don't decide yet\n\nHouse rule: **n < 30 trades proves nothing; widen the date window, never lower the bar.** So the one legitimate next step before the final verdict:\n\n- Extend the window backwards into earlier data via `WT_FROM`/`WT_TO` (do not borrow from the reserved 2025.07-2025.12 out-of-sample period) and re-run **the new config AND the A1 reference** in the same campaign: same symbol, dates, 10k deposit, 1:100, same model. A number without its reference run beside it is uninterpretable.\n- One protocol check while you're at it: if the momentum confirmation reads anything intrabar or at M1 close, model 1 (M1 OHLC) can misrepresent it -- those features require `--model 0`.\n- This is a **widening** run, not a tuning run. Same inputs, longer window. Do not touch parameters, and keep the out-of-sample window (2025.07-2025.12 is earmarked read-only for the A2/A3 winner) untouched by any tuning.\n\n## 3. Read what the numbers are already saying\n\nEven before the wider run, the shape of this result is familiar:\n\n- Reference A1 over the same 6-month window: **68 trades, PF 1.29, expectancy +$5.97**. Your feature: **22 trades, PF 0.95, expectancy -$0.40**. If those are the same window, the confirmation gate is vetoing roughly two-thirds of entries -- and the trades it does let through are net losers.\n- This is exactly the **B4 / ADX chop gate pattern**: a plausible-sounding confirmation filter that mostly blocked winners, because the relative-volume gate + forced retest already do the \"is this move real?\" filtering. A momentum-confirmation gate is very likely non-orthogonal to those two pillars -- it re-asks a question the bot already answers.\n- The keep/remove test is symmetric: a feature stays only if removing it makes expectancy AND PF worse. Here, removing it (= plain A1) makes both dramatically *better*.\n\n## 4. If the widened run confirms it (expected): FAIL cleanly\n\n1. **Roll back**: `git revert` the commits on the feature branch or delete the branch. Defaults preserved old behavior, so nothing else moves.\n2. **Record the verdict** in `docs/WiseTrader_Feature_Log.xlsx`: Status = `Rejected`, **with the numbers** (PF 0.95 vs A1 1.29, expectancy -$0.40 vs +$5.97, trade count collapse 68 -> 22, window, model). Update the regression matrix; the runs are already in `regression_history.csv`. A failed experiment recorded is knowledge; one silently deleted is waste -- and this row is the prior that stops future-you (or a future document from the Trading library) from rebuilding the same gate.\n3. **Do not tune-and-retry more than once.** One re-parameterization is the absolute ceiling; iterating thresholds against the same 6-month window until PF crosses 1.0 is curve-fitting. Given the trade-count collapse I wouldn't even spend the one retry here -- the mechanism is blocking winners, not mistiming them.\n4. Move to the next Candidate in the feature log. The pipeline is one-at-a-time; the fastest way to make the two days pay off is to free the slot.\n\n## Bottom line\n\nRun one widened-window comparison (new config + A1, n >= 30). Unless it flips the picture -- and a PF 0.95 with a two-thirds trade cut almost never does -- revert the branch, log it as Rejected with the evidence, and move on. The bot's edge came from throwing away features like this one just as much as from keeping the two that worked.\n"}], "grading": {"expectations": [{"text": "Flags n=22 < 30 as insufficient and proposes widening the window", "passed": true, "evidence": "'n < 30 trades proves nothing; widen the date window, never lower the bar' + concrete WT_FROM/WT_TO widening run alongside A1, avoiding the OOS window"}, {"text": "On confirmed failure: roll back via git and record the rejected verdict with numbers", "passed": true, "evidence": "'revert the branch, log it as Rejected with the evidence' - 'a failed experiment recorded is knowledge; one silently deleted is waste'"}, {"text": "Warns against repeated tune-and-retry (curve fitting)", "passed": true, "evidence": "'Do not tune-and-retry more than once... iterating thresholds against the same 6-month window until PF crosses 1.0 is curve-fitting'"}, {"text": "Dismisses sunk cost as a reason to keep the feature", "passed": true, "evidence": "'the two days of coding are a sunk cost and must not influence the verdict'"}]}}, {"id": "eval-2-failed-feature-verdict-without_skill", "prompt": "Backtest results for my new momentum-confirmation feature came back: PF 0.95, expectancy -0.4, 22 trades... What should I do?", "eval_id": 2, "outputs": [{"name": "answer.md", "type": "text", "content": "# Verdict on the momentum-confirmation feature\n\n## Short answer\n\nDon't ship it. Set the feature's input to default **OFF**, keep the code in the repo behind that flag, log the negative result, and move on. The two days you spent are a sunk cost \u2014 they bought you a clean answer (\"this doesn't help\"), which is exactly what the backtest pipeline is for. Time spent is never a reason to enable a losing feature.\n\n## Why this is a fail, not a \"maybe\"\n\nMeasured against the validation discipline we agreed on (judge by expectancy + PF, n \u2265 30, compared to the A1 reference):\n\n| Metric | Feature run | Bar to clear |\n|---|---|---|\n| Profit factor | 0.95 | > 1.0 minimum; A1 reference is ~1.29 |\n| Expectancy | \u22120.4 | > 0, ideally \u2265 A1's per-trade expectancy |\n| Trades | 22 | \u2265 30 for a judgeable sample |\n\nTwo independent problems:\n\n1. **The point estimate is negative.** PF < 1 and negative expectancy means the config lost money outright \u2014 it's not merely \"worse than baseline,\" it's below breakeven.\n2. **The sample doesn't even qualify.** 22 trades in 6 months is under the n \u2265 30 threshold, so even a *positive* result here wouldn't have been trusted. A negative result on an undersized sample certainly doesn't earn default-ON status. The burden of proof is on the new feature; inconclusive = stays off.\n\nAlso note the pattern: this is the third \"confirmation/filter\" style feature to test poorly on this system. The ADX chop gate turned out to cost ~$977 of profit, vol-regime sizing cost ~$864, and the v2.2 early BE/profit-lock crushed winners. Breakout systems live on a few big winners; anything that adds a confirmation delay or vetoes marginal entries tends to skip or shrink exactly those trades. Momentum confirmation fits that failure mode precisely.\n\n## 30-minute autopsy before you archive it (worth doing, not skipping)\n\nYou don't need to rescue the feature, but you should understand *how* it lost \u2014 that knowledge is reusable:\n\n1. **Confirm apples-to-apples.** Same window, same symbol, same model, same .set deltas as the A1 reference except the one feature flag. If anything else differed, the run is void, not failed.\n2. **Check the trade count.** If baseline A1 takes meaningfully more trades over the same window, the feature is over-filtering. Diff the two trade lists: what did it *remove*, and what was the P&L of the removed trades? If it vetoed net-positive trades, that's your smoking gun.\n3. **Check for delayed entries.** If it doesn't remove trades but shifts entry to a later bar, measure the average entry slippage vs baseline \u2014 confirmation lag on breakouts usually means worse fills on the winners.\n4. **Look at winners vs losers separately.** If average win shrank while average loss held (the D1 early-lock signature), the feature is clipping the right tail.\n\nIf the autopsy shows one narrow, fixable cause (e.g., threshold far too strict \u2192 only 22 trades), you *may* queue one retest as a C-config \u2014 but only one, with a pre-registered pass bar (PF and expectancy \u2265 A1 on the same window, n \u2265 30). Do not iterate parameters until the backtest looks good; that's curve-fitting, and the OOS window stays read-only.\n\n## Housekeeping (per project discipline)\n\n- Keep the code, gated behind an input defaulting to OFF \u2014 deleting it invites re-writing it in six months.\n- Add the feature to `WiseTrader_Feature_Log.xlsx` with status **REJECTED** and the numbers (PF 0.95, exp \u22120.4, n=22, window, reference run).\n- Add a CHANGELOG.md entry and bump `#property version` in the affected .mq5, noting the feature exists but is default-OFF and why.\n- One behavioral change per version; defaults preserve prior behavior \u2014 this feature never becomes a default without a passing C/B-config campaign.\n\n## Bottom line\n\nA negative result from a controlled backtest is the pipeline working. Two days for a definitive \"no\" on a plausible idea is cheap \u2014 the expensive version is enabling it and finding out live. Archive it with the numbers attached, spend the autopsy half-hour so the lesson compounds, and put the next two days into the queue that's actually promising (A2_tuned vs A3_tuned_nogap, then the OOS 2025H2 run).\n"}], "grading": {"expectations": [{"text": "Flags n=22 < 30 as insufficient and proposes widening the window", "passed": false, "evidence": "flags n<30 correctly but concludes 'inconclusive = stays off' - never proposes widening the window to reach a real verdict"}, {"text": "On confirmed failure: roll back via git and record the rejected verdict with numbers", "passed": false, "evidence": "keeps the code in the repo behind a default-OFF flag instead of rolling back - violates project rule 5 (rollback and move on)"}, {"text": "Warns against repeated tune-and-retry (curve fitting)", "passed": true, "evidence": "'At most one pre-registered retest... no iterative curve-fitting, OOS stays read-only'"}, {"text": "Dismisses sunk cost as a reason to keep the feature", "passed": true, "evidence": "'Time spent is never a reason to enable a losing feature'"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "wise-trader-dev", "skill_path": "outputs/wise-trader-dev", "executor_model": "claude", "analyzer_model": "claude", "timestamp": "2026-07-16T11:40:00Z", "evals_run": [0, 1, 2], "runs_per_configuration": 1}, "runs": [{"eval_id": 0, "eval_name": "eval-0-bugfix-release-checklist", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 88.8, "tokens": 29934, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Requires #property version bump AND CHANGELOG entry together", "passed": true, "evidence": "'Bump #property version ... AND add a CHANGELOG.md entry ... in the same commit. CI fails the build if they disagree' + Migration note requirement"}, {"text": "Requires re-running previously-passing configs (full regression), not just one new run", "passed": true, "evidence": "'A bug fix must re-run the configs that passed before the fix; that is how you prove nothing else broke' - re-runs A1 reference, B2, flags A2/A3 verdicts as suspect"}, {"text": "Specifies verdict metrics (PF/expectancy/DD) with a minimum trade count", "passed": true, "evidence": "cites A1 baseline (PF 1.29, expectancy $5.97, DD 3.84%), n>=30 rule, OOS read-only, model-4 confirmation"}, {"text": "Includes git flow (branch/review) and staged rollout or rollback plan", "passed": true, "evidence": "hotfix branch from main, CODEOWNERS review required, live gate with 0.25% risk for first 20 trades"}], "notes": []}, {"eval_id": 0, "eval_name": "eval-0-bugfix-release-checklist", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 148.5, "tokens": 48220, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Requires #property version bump AND CHANGELOG entry together", "passed": true, "evidence": "'2.40 -> 2.50' + CHANGELOG entry; cites CI validate_repo.py enforcing the match"}, {"text": "Requires re-running previously-passing configs (full regression), not just one new run", "passed": true, "evidence": "A1 + B2 as differential control ('B2 must be unchanged by this fix'), model-4 confirm - NOTE: baseline read the repo's own TESTING.md/CHANGELOG which encode the discipline"}, {"text": "Specifies verdict metrics (PF/expectancy/DD) with a minimum trade count", "passed": true, "evidence": "'PF >= 1.15, >= 50 trades, equity DD not worse than pre-fix A1 by >25%'"}, {"text": "Includes git flow (branch/review) and staged rollout or rollback plan", "passed": true, "evidence": "hotfix branch, PR to protected main, keep v2.4 .ex5 as rollback, demo first"}], "notes": []}, {"eval_id": 1, "eval_name": "eval-1-new-document-triage", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 259.2, "tokens": 44773, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "States an edge hypothesis (why it would make/save money)", "passed": true, "evidence": "dedicated section: VWAP-anchored institutional flow creates reversion pressure; defined trigger/stop/target"}, {"text": "Checks orthogonality against existing VWAP/QM/structure features", "passed": true, "evidence": "explicitly contrasts with F11 confluence use, identifies unused MeanRev regime gap, notes Vwap.mqh bands already exist"}, {"text": "Proposes a Candidate feature-log row with a validation method", "passed": true, "evidence": "drafts F07 row verbatim with model-0/4 validation requirement and priors to beat"}, {"text": "Queues implementation behind the one-at-a-time pipeline instead of building now", "passed": true, "evidence": "'No - we don't build it now. It queues behind the pipeline'; also refused to edit the xlsx mid-campaign per house rules"}], "notes": []}, {"eval_id": 1, "eval_name": "eval-1-new-document-triage", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 141.7, "tokens": 39157, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "States an edge hypothesis (why it would make/save money)", "passed": true, "evidence": "feature-log row: '2-sigma stretches from volume-weighted fair value are liquidity-driven overextensions that revert to VWAP'"}, {"text": "Checks orthogonality against existing VWAP/QM/structure features", "passed": true, "evidence": "'it inverts F11', F15 MeanRev conflict, F16 mask interaction - NOTE: baseline had repo access incl. the feature log"}, {"text": "Proposes a Candidate feature-log row with a validation method", "passed": true, "evidence": "F07 row with hypothesis/source/status/validation (expectancy+PF, n>=30, vs A1)"}, {"text": "Queues implementation behind the one-at-a-time pipeline instead of building now", "passed": true, "evidence": "'hold implementation until the current campaign verdicts land'; data study first"}], "notes": []}, {"eval_id": 2, "eval_name": "eval-2-failed-feature-verdict", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 114.7, "tokens": 28311, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Flags n=22 < 30 as insufficient and proposes widening the window", "passed": true, "evidence": "'n < 30 trades proves nothing; widen the date window, never lower the bar' + concrete WT_FROM/WT_TO widening run alongside A1, avoiding the OOS window"}, {"text": "On confirmed failure: roll back via git and record the rejected verdict with numbers", "passed": true, "evidence": "'revert the branch, log it as Rejected with the evidence' - 'a failed experiment recorded is knowledge; one silently deleted is waste'"}, {"text": "Warns against repeated tune-and-retry (curve fitting)", "passed": true, "evidence": "'Do not tune-and-retry more than once... iterating thresholds against the same 6-month window until PF crosses 1.0 is curve-fitting'"}, {"text": "Dismisses sunk cost as a reason to keep the feature", "passed": true, "evidence": "'the two days of coding are a sunk cost and must not influence the verdict'"}], "notes": []}, {"eval_id": 2, "eval_name": "eval-2-failed-feature-verdict", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 2, "failed": 2, "total": 4, "time_seconds": 89.6, "tokens": 23895, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Flags n=22 < 30 as insufficient and proposes widening the window", "passed": false, "evidence": "flags n<30 correctly but concludes 'inconclusive = stays off' - never proposes widening the window to reach a real verdict"}, {"text": "On confirmed failure: roll back via git and record the rejected verdict with numbers", "passed": false, "evidence": "keeps the code in the repo behind a default-OFF flag instead of rolling back - violates project rule 5 (rollback and move on)"}, {"text": "Warns against repeated tune-and-retry (curve fitting)", "passed": true, "evidence": "'At most one pre-registered retest... no iterative curve-fitting, OOS stays read-only'"}, {"text": "Dismisses sunk cost as a reason to keep the feature", "passed": true, "evidence": "'Time spent is never a reason to enable a losing feature'"}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 154.233, "stddev": 74.972, "min": 88.8, "max": 259.2}, "tokens": {"mean": 34339.333, "stddev": 7407.41, "min": 28311, "max": 44773}}, "without_skill": {"pass_rate": {"mean": 0.833, "stddev": 0.236, "min": 0.5, "max": 1.0}, "time_seconds": {"mean": 126.6, "stddev": 26.31, "min": 89.6, "max": 148.5}, "tokens": {"mean": 37090.667, "stddev": 10037.553, "min": 23895, "max": 48220}}}, "analysis": {"observations": ["with_skill passed 12/12 assertions; without_skill passed 10/12 - both failures on the failed-feature workflow (no window-widening for n<30; kept dead code default-OFF instead of rolling back).", "Baselines are INFLATED: they ran with full repo access, and the repo's own docs (TESTING.md, CHANGELOG, feature log) encode much of the discipline. On a fresh machine or empty context the gap would be larger - the skill is the portable copy of that knowledge.", "Skill runs cited concrete campaign evidence (A1 baselines, B4 pattern) and refused to edit the feature log mid-campaign - behaviors the references enable.", "eval-1 with_skill spent extra time reading live results and caught an in-flight A2/A3 campaign - slower but operationally safer."]}}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

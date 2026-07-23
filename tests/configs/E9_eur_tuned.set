@@ -1,0 +1,61 @@
+; EURUSD combined config: every individual ablation (E3-E8) beat the
+; E2_eurusd baseline (PF 1.12), so combine all five winners and see if
+; they stack: ADX gate ON (E3: PF 1.23), vol-scaling ON (E4: PF 1.22),
+; retest-limit OFF (E5: PF 1.21), Friday-flatten OFF (E6: PF 1.25),
+; NY session 13-21 (E8: PF 1.24, best DD of the set at 2.43%).
+; E7 (London session) is NOT included - it was the one clear loser
+; (PF 0.75) of the whole EURUSD series.
+; Run: python autotest.py --model 1 --symbol EURUSD --from 2025.07.01 --to 2025.12.31 E9_eur_tuned
+; If it holds up, confirm on --model 4 same window, then OOS on a
+; DIFFERENT window before trusting it (this window IS the tuning window).
+
+InpSymbol=
+InpMagic=20260707
+InpTF=15
+InpUseSymbolOverrides=true
+InpRiskPerTrade=1.0
+InpMaxDailyLoss=3.0
+InpMaxTotalDD=10.0
+InpMaxConsecLosses=3
+InpMaxPositions=1
+InpMinRR=1.5
+InpAtrStopFloor=1.5
+InpBreakevenR=1.0
+InpTrailAtrMult=2.0
+InpTrailMode=0
+InpFallbackRR=2.0
+InpTpCapAtr=3.0
+InpPartialPct=50.0
+InpGapBufferAtr=0.5
+InpGapLookback=20
+InpVolFullRatio=1.0
+InpVolMinRatio=2.0
+InpVolRiskFloor=0.25
+InpMinScore=0.55
+InpSetupMaxAge=3
+InpSwingWing=3
+InpQmZoneAtr=0.5
+InpProfileBin=0.20
+InpSessionStart=13
+InpSessionEnd=21
+InpMaxChaseAtr=0.75
+InpRetestTolAtr=0.25
+InpRetestMaxBars=8
+InpMinAdx=22.0
+InpNewsFilter=true
+InpNewsBlockMin=30
+InpMinRelVol=1.0
+InpRelVolDays=20
+InpOutlierZ=3.5
+InpTickBudgetUs=3000
+InpTimerBudgetUs=50000
+InpResetRiskState=false
+InpBreakEntryMode=0
+InpRetestLimit=false
+InpStopBufferAtr=0.05
+InpBeAtrTrigger=0
+InpLockStartPct=0
+InpLockPct=50
+InpNewsFlattenMin=0
+InpFridayFlattenHour=0
+InpTestTag=E9_eur_tuned

@@ -1,0 +1,55 @@
+; WiseTrader v2.4 config: A3_tuned_nogap - A2 with the gap buffer ALSO off.
+; B2 disabled gap buffer AND vol-scaling together; A2 vs A3 separates them:
+;   A2 better  -> gap buffer earns its keep, vol-scaling was the drag
+;   A3 better  -> both sizing adaptations were drags; keep plain 1% sizing
+; (Gap buffer still recommended live for gap-slippage protection either way.)
+
+InpSymbol=
+InpMagic=20260707
+InpTF=15
+InpRiskPerTrade=1.0
+InpMaxDailyLoss=3.0
+InpMaxTotalDD=10.0
+InpMaxConsecLosses=3
+InpMaxPositions=1
+InpMinRR=1.5
+InpAtrStopFloor=1.5
+InpBreakevenR=1.0
+InpTrailAtrMult=2.0
+InpTrailMode=0
+InpFallbackRR=2.0
+InpTpCapAtr=3.0
+InpPartialPct=50.0
+InpGapBufferAtr=0
+InpGapLookback=0
+InpVolFullRatio=1.0
+InpVolMinRatio=2.0
+InpVolRiskFloor=1.0
+InpMinScore=0.55
+InpSetupMaxAge=3
+InpSwingWing=3
+InpQmZoneAtr=0.5
+InpProfileBin=0.20
+InpSessionStart=12
+InpSessionEnd=20
+InpMaxChaseAtr=0.75
+InpRetestTolAtr=0.25
+InpRetestMaxBars=8
+InpMinAdx=0
+InpNewsFilter=true
+InpNewsBlockMin=30
+InpMinRelVol=1.0
+InpRelVolDays=20
+InpOutlierZ=3.5
+InpTickBudgetUs=3000
+InpTimerBudgetUs=50000
+InpResetRiskState=false
+InpBreakEntryMode=0
+InpRetestLimit=true
+InpStopBufferAtr=0.05
+InpBeAtrTrigger=0
+InpLockStartPct=0
+InpLockPct=50
+InpNewsFlattenMin=0
+InpFridayFlattenHour=22
+InpTestTag=A3_tuned_nogap

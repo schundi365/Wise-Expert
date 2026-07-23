@@ -1,0 +1,29 @@
+# --- compiled / generated ---
+*.ex5
+*.log
+__pycache__/
+*.pyc
+
+# --- Claude / AI-assistant workspace files ---
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
+*.claude.json
+
+# --- Office temp & lock files ---
+~$*
+.~lock*
+
+# --- MT5 / tester local artifacts that must not travel ---
+WiseTrader_backup_*/
+*.ini
+
+# --- OS noise ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# NOTE: results/ (reports, journals, regression_results.csv,
+# campaign_status.json) IS tracked on purpose - campaign evidence returns
+# on results/* branches tied to the exact code version that produced it.

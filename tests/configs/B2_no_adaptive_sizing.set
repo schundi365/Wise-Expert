@@ -1,0 +1,49 @@
+; WiseTrader v2.0 regression config: B2_no_adaptive_sizing
+; A1 minus gap buffer + vol-regime scaling (flat 1% sizing)
+; Protocol: same symbol (XAUUSD), same period (2026.01.01-2026.07.08),
+;           same deposit (10000 USD), every-tick model. ONE run per file.
+
+InpSymbol=
+InpMagic=20260707
+InpTF=15
+InpRiskPerTrade=1.0
+InpMaxDailyLoss=3.0
+InpMaxTotalDD=10.0
+InpMaxConsecLosses=3
+InpMaxPositions=1
+InpMinRR=1.5
+InpAtrStopFloor=1.5
+InpBreakevenR=1.0
+InpTrailAtrMult=2.0
+InpTrailMode=0
+InpFallbackRR=2.0
+InpTpCapAtr=3.0
+InpPartialPct=50.0
+InpGapBufferAtr=0
+InpGapLookback=0
+InpVolFullRatio=1.0
+InpVolMinRatio=2.0
+InpVolRiskFloor=1.0
+InpMinScore=0.55
+InpSetupMaxAge=3
+InpSwingWing=3
+InpQmZoneAtr=0.5
+InpProfileBin=0.20
+InpSessionStart=12
+InpSessionEnd=20
+InpMaxChaseAtr=0.75
+InpRetestTolAtr=0.25
+InpRetestMaxBars=8
+InpMinAdx=22.0
+InpNewsFilter=true
+InpNewsBlockMin=30
+InpMinRelVol=1.0
+InpRelVolDays=20
+InpOutlierZ=3.5
+InpTickBudgetUs=3000
+InpTimerBudgetUs=50000
+InpResetRiskState=false
+InpBeAtrTrigger=0
+InpLockStartPct=0
+InpLockPct=50
+InpTestTag=B2_no_adaptive_sizing

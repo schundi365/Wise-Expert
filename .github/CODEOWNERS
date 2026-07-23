@@ -1,0 +1,5 @@
+# All changes require Sri's review by default
+*                   @schundi365
+# Risk & execution code is the money path - never merge without review
+/src/WiseTrader/src/Risk.mqh        @schundi365
+/src/WiseTrader/src/Execution.mqh   @schundi365

@@ -1,0 +1,49 @@
+; WiseTrader v2.0 regression config: A0_baseline_v16_like
+; Everything new OFF (approximates v1.6; scoring rebalance + CHoCH demotion are compiled in and NOT toggleable)
+; Protocol: same symbol (XAUUSD), same period (2026.01.01-2026.07.08),
+;           same deposit (10000 USD), every-tick model. ONE run per file.
+
+InpSymbol=
+InpMagic=20260707
+InpTF=15
+InpRiskPerTrade=1.0
+InpMaxDailyLoss=3.0
+InpMaxTotalDD=10.0
+InpMaxConsecLosses=3
+InpMaxPositions=1
+InpMinRR=1.5
+InpAtrStopFloor=1.5
+InpBreakevenR=1.0
+InpTrailAtrMult=2.0
+InpTrailMode=0
+InpFallbackRR=2.0
+InpTpCapAtr=0
+InpPartialPct=0
+InpGapBufferAtr=0
+InpGapLookback=0
+InpVolFullRatio=1.0
+InpVolMinRatio=2.0
+InpVolRiskFloor=1.0
+InpMinScore=0.45
+InpSetupMaxAge=3
+InpSwingWing=3
+InpQmZoneAtr=0.5
+InpProfileBin=0.20
+InpSessionStart=3
+InpSessionEnd=20
+InpMaxChaseAtr=0
+InpRetestTolAtr=0.25
+InpRetestMaxBars=8
+InpMinAdx=0
+InpNewsFilter=true
+InpNewsBlockMin=30
+InpMinRelVol=0
+InpRelVolDays=20
+InpOutlierZ=0
+InpTickBudgetUs=3000
+InpTimerBudgetUs=50000
+InpResetRiskState=false
+InpBeAtrTrigger=0
+InpLockStartPct=0
+InpLockPct=50
+InpTestTag=A0_baseline_v16_like

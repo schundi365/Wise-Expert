@@ -1,0 +1,13 @@
+{
+ "symbol": "XAGUSD",
+ "period": "2026.01.01-2026.07.08",
+ "model": 4,
+ "configs": [
+  "S5_silver_tuned"
+ ],
+ "current": "S5_silver_tuned",
+ "done": [],
+ "finished": false,
+ "started": "2026-07-23 15:43:14",
+ "updated": "2026-07-23 15:43:14"
+}

@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "results/**", "hotfix/**"]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python syntax (console tools)
+        run: python -m py_compile tools/console/*.py
+
+      - name: Repo validation (configs, version consistency)
+        run: python .github/scripts/validate_repo.py
+
+  # MQL5 compilation requires MetaEditor on Windows. Enable this job when a
+  # self-hosted Windows runner with MT5 installed is registered to the org.
+  # compile-mql5:
+  #   runs-on: [self-hosted, windows, mt5]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Compile EA
+  #       run: |
+  #         & "C:\Program Files\MetaTrader 5\metaeditor64.exe" /compile:src\WiseTrader\WiseTrader.mq5 /log
+  #         Get-Content src\WiseTrader\WiseTrader.log

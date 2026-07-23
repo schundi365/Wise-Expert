@@ -1,0 +1,2325 @@
+time;tag;message
+2026.01.01 00:00:00;RECOVER;init: v2.30 test_case=C2_m1_close lock=0 streak=0 positions=0 equity=10000.00 day_eq=10000.00 peak_eq=10000.00
+2026.01.02 01:01:00;VETO;M1 break rejected: regime: chop ADX 17.1 < 22.0
+2026.01.02 04:51:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.01.02 07:11:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.01.02 09:57:00;DECISION;M1 setup LONG score=0.75 entry=4382.27 inv=4371.13 [BOS long lvl=4381.74|RelVol=1.32|VPnode d=0.47|VWAPside|ADX=34]
+2026.01.02 09:57:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.02 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.02 10:15:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.02 10:30:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.02 12:52:00;DECISION;M1 setup LONG score=0.75 entry=4398.05 inv=4383.32 [BOS long lvl=4397.65|RelVol=1.38|VPnode d=0.25|VWAPside|ADX=39]
+2026.01.02 12:52:00;DECISION;TP capped 29.60000 -> 22.20000 (3.0xATR)
+2026.01.02 12:52:00;ORDER;filled BUY 0.05 lots sl=4383.32 tp=4420.32 [WT|BOS|0.75]
+2026.01.02 12:52:00;RISK;sizing: vol_ratio=0.77 scalar=1.00 gap_buf=3.20821 eff_stop=18.00821
+2026.01.02 12:52:00;ORDER;entry fill deal #2 BUY 0.05 @ 4398.12000
+2026.01.02 15:14:00;DECISION;M1 setup LONG score=0.65 entry=4399.37 inv=4383.32 [BOS long lvl=4399.30|RelVol=1.53|VPnode d=0.97|VWAPside]
+2026.01.02 15:14:00;DECISION;TP capped 32.18000 -> 24.13500 (3.0xATR)
+2026.01.02 15:14:00;VETO;risk veto: max positions
+2026.01.02 15:24:40;RISK;deal closed pnl=-74.00 streak=1 lock=0
+2026.01.02 15:25:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.01.02 15:30:00;VETO;outlier bar masked, z=7.0
+2026.01.02 16:45:00;VETO;outlier bar masked, z=4.4
+2026.01.02 17:15:00;VETO;outlier bar masked, z=4.5
+2026.01.02 20:11:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4315.03|RelVol=1.75|VWAPside|ADX=38]
+2026.01.05 01:01:00;VETO;M1 break rejected: score 0.30 < 0.55 [CHoCH long lvl=4333.47|RelVol=1.29|Retest@4334.89]
+2026.01.05 01:15:00;VETO;outlier bar masked, z=10.0
+2026.01.05 03:15:00;VETO;outlier bar masked, z=5.5
+2026.01.05 08:02:00;DECISION;M1 setup LONG score=0.75 entry=4416.05 inv=4397.33 [BOS long lvl=4414.01|RelVol=1.59|VPnode d=4.05|VWAPside|ADX=39]
+2026.01.05 08:02:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.05 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.05 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.05 08:45:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.05 10:16:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.01.05 12:52:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.01.05 13:30:00;VETO;outlier bar masked, z=3.8
+2026.01.05 14:43:00;VETO;M1 break rejected: score 0.30 < 0.55 [CHoCH short lvl=4411.07|RelVol=1.36|Retest@4409.62]
+2026.01.05 16:01:00;DECISION;M1 setup LONG score=0.85 entry=4421.42 inv=4406.62 AWAIT-RETEST [CHoCH long lvl=4418.95|RelVol=1.12|Retest@4421.42|StopFloored|VPnode d=4.58|VWAPside|CycleTurn w=-0.99<--1.00]
+2026.01.05 16:01:00;DECISION;TP capped 29.58857 -> 29.58857 (3.0xATR)
+2026.01.05 16:01:00;ERROR;limit BUY 0.04 @ 4421.42 sl=4406.62 tp=4451.00 rc=10015 [WT|CHOCH|0.85|RL]
+2026.01.05 16:15:00;DECISION;TP capped 39.35714 -> 30.74786 (3.0xATR)
+2026.01.05 16:15:00;ORDER;filled BUY 0.03 lots sl=4406.62 tp=4457.05 [WT|CHOCH|0.85]
+2026.01.05 16:15:00;RISK;sizing: vol_ratio=1.07 scalar=0.95 gap_buf=5.12464 eff_stop=24.80321
+2026.01.05 16:15:00;ORDER;entry fill deal #4 BUY 0.03 @ 4426.30000
+2026.01.05 17:02:40;MANAGE;#4 SL 4406.62 -> 4426.34 breakeven
+2026.01.05 17:02:40;MANAGE;#4 partial close 0.01 of 0.03 lots
+2026.01.05 17:02:40;RISK;deal closed pnl=20.81 streak=0 lock=0
+2026.01.05 17:03:40;MANAGE;#4 SL 4426.34 -> 4431.20 trail
+2026.01.05 17:04:40;MANAGE;#4 SL 4431.20 -> 4432.95 trail
+2026.01.05 17:05:40;MANAGE;#4 SL 4432.95 -> 4433.43 trail
+2026.01.05 17:06:20;MANAGE;#4 SL 4433.43 -> 4434.27 trail
+2026.01.05 17:07:40;MANAGE;#4 SL 4434.27 -> 4435.03 trail
+2026.01.05 19:03:40;RISK;deal closed pnl=17.46 streak=0 lock=0
+2026.01.06 01:01:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.01.06 02:02:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.01.06 03:54:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.01.06 07:05:00;DECISION;M1 setup LONG score=0.65 entry=4469.02 inv=4427.96 [BOS long lvl=4468.47|RelVol=1.05|VPnode d=0.42|VWAPside]
+2026.01.06 07:05:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.06 07:15:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.06 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.06 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.06 07:48:00;DECISION;M1 setup SHORT score=0.60 entry=4460.35 inv=4469.45 AWAIT-RETEST [CHoCH short lvl=4461.87|RelVol=1.19|Retest@4460.35|StopFloored|VPnear|CycleTurn w=0.96<-0.97]
+2026.01.06 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.06 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.06 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.06 08:45:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.06 10:26:00;VETO;M1 break rejected: regime: chop ADX 20.5 < 22.0
+2026.01.06 11:12:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.01.06 16:35:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.01.06 20:14:00;DECISION;M1 setup LONG score=0.60 entry=4490.96 inv=4463.08 [BOS long lvl=4490.93|RelVol=1.04|VPnear|VWAPside|ADX=34]
+2026.01.06 20:14:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.01.06 20:15:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.01.06 20:30:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.01.06 20:45:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.01.06 21:16:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.01.06 22:58:00;VETO;M1 break rejected: regime: chop ADX 21.8 < 22.0
+2026.01.06 23:50:00;VETO;M1 break rejected: volume: relVol 0.64 < 1.00
+2026.01.07 03:07:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH short lvl=4477.44|RelVol=1.13|Retest@4476.23|VWAPside]
+2026.01.07 03:15:00;VETO;outlier bar masked, z=6.2
+2026.01.07 07:34:00;DECISION;M1 setup SHORT score=0.60 entry=4458.71 inv=4480.23 [BOS short lvl=4459.69|RelVol=1.16|VPnear|VWAPside|ADX=37]
+2026.01.07 07:34:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.07 07:45:00;VETO;outlier bar masked, z=4.9
+2026.01.07 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.07 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.07 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.07 10:38:00;VETO;M1 break rejected: volume: relVol 0.28 < 1.00
+2026.01.07 12:31:00;VETO;M1 break rejected: volume: relVol 0.32 < 1.00
+2026.01.07 13:26:00;VETO;M1 break rejected: regime: chop ADX 20.5 < 22.0
+2026.01.07 15:15:00;VETO;outlier bar masked, z=5.4
+2026.01.07 15:30:00;VETO;outlier bar masked, z=3.7
+2026.01.07 17:15:00;VETO;outlier bar masked, z=3.9
+2026.01.07 17:30:00;VETO;outlier bar masked, z=3.9
+2026.01.07 18:23:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.01.07 21:17:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.01.08 01:03:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.01.08 02:46:00;DECISION;M1 setup SHORT score=0.60 entry=4448.38 inv=4461.55 AWAIT-RETEST [CHoCH short lvl=4449.74|RelVol=1.15|Retest@4448.38|VWAPside|CycleTurn w=0.93<-1.00]
+2026.01.08 03:00:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.08 03:15:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.08 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.08 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.08 06:44:00;VETO;M1 break rejected: volume: relVol 0.96 < 1.00
+2026.01.08 14:00:00;VETO;signal rejected: volume: relVol 0.97 < 1.00
+2026.01.08 15:44:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.01.08 16:48:00;DECISION;M1 setup LONG score=0.75 entry=4437.33 inv=4407.73 [BOS long lvl=4436.03|RelVol=1.13|VPnode d=2.07|VWAPside|ADX=34]
+2026.01.08 16:48:00;DECISION;TP capped 59.28000 -> 44.46000 (3.0xATR)
+2026.01.08 16:48:00;ORDER;filled BUY 0.02 lots sl=4407.73 tp=4481.83 [WT|BOS|0.75]
+2026.01.08 16:48:00;RISK;sizing: vol_ratio=1.19 scalar=0.85 gap_buf=4.90143 eff_stop=34.54143
+2026.01.08 16:48:00;ORDER;entry fill deal #7 BUY 0.02 @ 4437.37000
+2026.01.08 17:15:00;VETO;outlier bar masked, z=4.3
+2026.01.08 22:25:40;MANAGE;#7 SL 4407.73 -> 4437.41 breakeven
+2026.01.08 22:25:40;MANAGE;#7 partial close 0.01 of 0.02 lots
+2026.01.08 22:25:40;RISK;deal closed pnl=30.63 streak=0 lock=0
+2026.01.08 22:25:59;MANAGE;#7 SL 4437.41 -> 4456.09 trail
+2026.01.08 22:26:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.01.08 22:26:40;MANAGE;#7 SL 4456.09 -> 4457.15 trail
+2026.01.08 22:27:40;MANAGE;#7 SL 4457.15 -> 4461.60 trail
+2026.01.08 22:28:20;MANAGE;#7 SL 4461.60 -> 4461.93 trail
+2026.01.08 22:31:40;MANAGE;#7 SL 4461.93 -> 4463.02 trail
+2026.01.08 22:33:40;MANAGE;#7 SL 4463.02 -> 4463.66 trail
+2026.01.08 22:34:20;MANAGE;#7 SL 4463.66 -> 4464.43 trail
+2026.01.08 22:35:40;MANAGE;#7 SL 4464.43 -> 4464.66 trail
+2026.01.08 22:36:40;MANAGE;#7 SL 4464.66 -> 4464.90 trail
+2026.01.08 23:00:40;ERROR;modify #7 sl=4465.86 tp=4481.83 rejected rc=10018
+2026.01.08 23:02:40;ERROR;modify #7 sl=4465.46 tp=4481.83 rejected rc=10018
+2026.01.08 23:03:40;ERROR;modify #7 sl=4465.78 tp=4481.83 rejected rc=10018
+2026.01.08 23:04:20;ERROR;modify #7 sl=4465.45 tp=4481.83 rejected rc=10018
+2026.01.08 23:05:20;ERROR;modify #7 sl=4465.28 tp=4481.83 rejected rc=10018
+2026.01.08 23:07:40;ERROR;modify #7 sl=4465.05 tp=4481.83 rejected rc=10018
+2026.01.08 23:08:20;ERROR;modify #7 sl=4465.41 tp=4481.83 rejected rc=10018
+2026.01.08 23:09:40;ERROR;modify #7 sl=4465.73 tp=4481.83 rejected rc=10018
+2026.01.08 23:10:20;ERROR;modify #7 sl=4465.99 tp=4481.83 rejected rc=10018
+2026.01.08 23:10:59;ERROR;modify #7 sl=4465.22 tp=4481.83 rejected rc=10018
+2026.01.08 23:15:20;ERROR;modify #7 sl=4465.25 tp=4481.83 rejected rc=10018
+2026.01.08 23:52:40;ERROR;modify #7 sl=4465.58 tp=4481.83 rejected rc=10018
+2026.01.08 23:53:20;ERROR;modify #7 sl=4465.34 tp=4481.83 rejected rc=10018
+2026.01.08 23:53:59;ERROR;modify #7 sl=4465.88 tp=4481.83 rejected rc=10018
+2026.01.08 23:55:20;ERROR;modify #7 sl=4465.38 tp=4481.83 rejected rc=10018
+2026.01.08 23:58:40;ERROR;modify #7 sl=4465.61 tp=4481.83 rejected rc=10018
+2026.01.08 23:59:40;ERROR;modify #7 sl=4465.62 tp=4481.83 rejected rc=10018
+2026.01.09 01:00:00;MANAGE;#7 SL 4464.90 -> 4465.69 trail
+2026.01.09 01:00:40;RISK;deal closed pnl=44.33 streak=0 lock=0
+2026.01.09 01:01:00;VETO;M1 break rejected: volume: relVol 0.91 < 1.00
+2026.01.09 07:24:00;VETO;M1 break rejected: regime: chop ADX 21.7 < 22.0
+2026.01.09 14:01:00;VETO;M1 break rejected: regime: chop ADX 13.4 < 22.0
+2026.01.09 14:32:00;VETO;M1 break rejected: regime: chop ADX 13.0 < 22.0
+2026.01.09 15:33:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.01.09 15:45:00;VETO;outlier bar masked, z=9.6
+2026.01.09 20:00:00;VETO;outlier bar masked, z=5.8
+2026.01.09 22:14:00;VETO;M1 break rejected: volume: relVol 0.73 < 1.00
+2026.01.12 01:15:00;VETO;outlier bar masked, z=6.0
+2026.01.12 02:15:00;VETO;outlier bar masked, z=4.4
+2026.01.12 02:45:00;VETO;outlier bar masked, z=9.2
+2026.01.12 03:15:00;VETO;outlier bar masked, z=3.5
+2026.01.12 07:46:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.01.12 09:18:00;VETO;M1 break rejected: regime: chop ADX 19.5 < 22.0
+2026.01.12 10:48:00;DECISION;M1 setup LONG score=0.85 entry=4592.86 inv=4569.79 [BOS long lvl=4589.64|RelVol=1.11|VPnode d=5.26|VWAPside|CycleTurn w=-0.97<--0.99]
+2026.01.12 10:48:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.12 11:00:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.12 11:15:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.12 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.12 13:26:00;VETO;M1 break rejected: regime: chop ADX 17.2 < 22.0
+2026.01.12 15:05:00;DECISION;M1 setup LONG score=0.85 entry=4597.09 inv=4586.06 AWAIT-RETEST [CHoCH long lvl=4595.46|RelVol=1.07|Retest@4597.09|VPnode d=1.69|VWAPside|CycleTurn w=-1.00<--1.00]
+2026.01.12 15:05:00;DECISION;TP capped 22.05714 -> 19.54286 (3.0xATR)
+2026.01.12 15:05:00;ERROR;limit BUY 0.07 @ 4597.09 sl=4586.06 tp=4616.63 rc=10015 [WT|CHOCH|0.85|RL]
+2026.01.12 15:15:00;VETO;outlier bar masked, z=3.9
+2026.01.12 16:15:00;VETO;outlier bar masked, z=4.8
+2026.01.12 16:30:00;ORDER;filled BUY 0.16 lots sl=4586.06 tp=4587.68 [WT|CHOCH|0.85]
+2026.01.12 16:30:00;RISK;sizing: vol_ratio=1.09 scalar=0.94 gap_buf=5.03321 eff_stop=5.57321
+2026.01.12 16:30:00;ORDER;entry fill deal #10 BUY 0.16 @ 4586.60000
+2026.01.12 16:30:20;RISK;deal closed pnl=-8.64 streak=1 lock=0
+2026.01.12 16:45:00;VETO;outlier bar masked, z=5.1
+2026.01.12 17:34:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.01.12 20:16:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.01.12 22:42:00;VETO;M1 break rejected: regime: chop ADX 19.6 < 22.0
+2026.01.13 01:15:00;VETO;outlier bar masked, z=6.7
+2026.01.13 03:32:00;DECISION;M1 setup SHORT score=0.65 entry=4577.19 inv=4607.74 [BOS short lvl=4578.11|RelVol=1.06|VPnode d=6.01|VWAPside]
+2026.01.13 03:32:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.13 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.13 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.13 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.13 07:29:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.01.13 07:32:00;VETO;M1 break rejected: volume: relVol 0.68 < 1.00
+2026.01.13 14:24:00;VETO;M1 break rejected: regime: chop ADX 18.7 < 22.0
+2026.01.13 14:56:00;VETO;M1 break rejected: regime: chop ADX 21.9 < 22.0
+2026.01.13 15:45:00;VETO;outlier bar masked, z=4.8
+2026.01.13 17:30:00;VETO;outlier bar masked, z=4.5
+2026.01.13 18:28:00;VETO;M1 break rejected: volume: relVol 1.00 < 1.00
+2026.01.13 18:30:00;VETO;outlier bar masked, z=3.5
+2026.01.13 19:59:00;VETO;M1 break rejected: regime: chop ADX 16.9 < 22.0
+2026.01.13 20:00:00;VETO;outlier bar masked, z=4.4
+2026.01.13 22:33:00;DECISION;M1 setup SHORT score=0.65 entry=4580.59 inv=4601.97 [BOS short lvl=4581.11|RelVol=1.36|VPnode d=2.79|VWAPside]
+2026.01.13 22:33:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.01.13 22:45:00;VETO;outlier bar masked, z=3.6
+2026.01.13 23:00:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.01.13 23:15:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.01.13 23:30:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.01.14 02:02:00;DECISION;M1 setup LONG score=0.65 entry=4600.66 inv=4569.58 AWAIT-RETEST [CHoCH long lvl=4598.99|RelVol=1.24|Retest@4600.66|VPnode d=3.66|VWAPside]
+2026.01.14 02:15:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.14 02:30:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.14 02:45:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.14 03:00:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.14 08:00:00;VETO;outlier bar masked, z=4.8
+2026.01.14 13:53:00;VETO;M1 break rejected: regime: chop ADX 17.4 < 22.0
+2026.01.14 14:25:00;VETO;M1 break rejected: regime: chop ADX 17.5 < 22.0
+2026.01.14 16:40:00;VETO;M1 break rejected: regime: chop ADX 13.3 < 22.0
+2026.01.14 16:45:00;VETO;outlier bar masked, z=4.0
+2026.01.14 20:17:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.01.15 01:15:00;VETO;outlier bar masked, z=5.2
+2026.01.15 03:25:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH short lvl=4602.82|RelVol=1.13|Retest@4600.83|VPnear|VWAPside]
+2026.01.15 03:45:00;VETO;outlier bar masked, z=4.0
+2026.01.15 05:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4583.60|RelVol=1.56|VWAPside|ADX=41]
+2026.01.15 11:38:00;VETO;M1 break rejected: regime: chop ADX 19.1 < 22.0
+2026.01.15 15:34:00;DECISION;M1 setup SHORT score=0.65 entry=4596.54 inv=4622.94 AWAIT-RETEST [CHoCH short lvl=4597.81|RelVol=1.20|Retest@4596.54|VPnode d=1.46|VWAPside]
+2026.01.15 15:34:00;DECISION;TP capped 52.80107 -> 39.60080 (3.0xATR)
+2026.01.15 15:34:00;ORDER;limit SELL 0.03 @ 4596.54 sl=4622.94 tp=4556.94 rc=10009 [WT|CHOCH|0.65|RL]
+2026.01.15 15:34:00;RISK;sizing: vol_ratio=0.59 scalar=1.00 gap_buf=2.54107 eff_stop=28.94161
+2026.01.15 15:34:40;ORDER;entry fill deal #12 SELL 0.03 @ 4596.54000
+2026.01.15 18:11:40;RISK;deal closed pnl=-79.20 streak=1 lock=0
+2026.01.15 18:12:00;VETO;M1 break rejected: regime: chop ADX 20.5 < 22.0
+2026.01.15 22:02:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.01.16 02:48:00;VETO;M1 break rejected: regime: chop ADX 21.5 < 22.0
+2026.01.16 04:37:00;DECISION;M1 setup SHORT score=0.60 entry=4593.71 inv=4608.58 [BOS short lvl=4593.86|RelVol=1.26|VPnear|VWAPside|ADX=34]
+2026.01.16 04:37:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.16 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.16 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.16 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.16 07:48:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.01.16 09:15:00;VETO;outlier bar masked, z=3.5
+2026.01.16 13:30:00;VETO;signal rejected: regime: chop ADX 18.1 < 22.0
+2026.01.16 14:53:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.01.16 15:30:00;VETO;outlier bar masked, z=3.6
+2026.01.16 15:45:00;VETO;outlier bar masked, z=3.8
+2026.01.16 17:06:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.01.16 17:29:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.01.16 17:30:00;VETO;outlier bar masked, z=16.7
+2026.01.16 17:45:00;VETO;outlier bar masked, z=9.8
+2026.01.16 18:00:00;VETO;outlier bar masked, z=4.9
+2026.01.16 18:15:00;VETO;outlier bar masked, z=6.8
+2026.01.16 23:19:00;VETO;M1 break rejected: regime: chop ADX 16.9 < 22.0
+2026.01.19 01:15:00;VETO;outlier bar masked, z=17.7
+2026.01.19 01:30:00;VETO;outlier bar masked, z=7.1
+2026.01.19 01:45:00;VETO;outlier bar masked, z=5.6
+2026.01.19 03:17:00;DECISION;M1 setup SHORT score=0.70 entry=4658.94 inv=4690.69 AWAIT-RETEST [CHoCH short lvl=4661.18|RelVol=1.22|Retest@4658.94|VPnear|VWAPside|CycleTurn w=0.98<-0.99]
+2026.01.19 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.19 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.19 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.19 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.19 07:07:00;VETO;M1 break rejected: regime: chop ADX 16.6 < 22.0
+2026.01.19 08:33:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.01.19 12:45:00;VETO;signal rejected: regime: chop ADX 15.3 < 22.0
+2026.01.19 13:42:00;VETO;M1 break rejected: volume: relVol 0.41 < 1.00
+2026.01.19 14:19:00;VETO;M1 break rejected: volume: relVol 0.55 < 1.00
+2026.01.19 17:55:00;VETO;M1 break rejected: regime: chop ADX 17.6 < 22.0
+2026.01.19 19:45:00;VETO;signal rejected: volume: relVol 0.38 < 1.00
+2026.01.19 21:22:00;VETO;M1 break rejected: volume: relVol 0.60 < 1.00
+2026.01.20 05:38:00;VETO;M1 break rejected: regime: chop ADX 16.5 < 22.0
+2026.01.20 09:21:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.01.20 15:22:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.01.20 15:45:00;VETO;outlier bar masked, z=5.2
+2026.01.20 16:00:00;DECISION;setup LONG score=0.85 entry=4736.72 inv=4721.65 tgt=0.00 AWAIT-RETEST [CHoCH long lvl=4735.25|RelVol=1.14|Retest@4736.72|VPnode d=1.68|VWAPside|CycleTurn w=-0.99<--1.00]
+2026.01.20 16:00:00;DECISION;TP capped 30.13143 -> 22.59857 (3.0xATR)
+2026.01.20 16:00:00;ORDER;limit BUY 0.05 @ 4736.72 sl=4721.65 tp=4759.31 rc=10009 [WT|CHOCH|0.85|RL]
+2026.01.20 16:00:00;RISK;sizing: vol_ratio=1.09 scalar=0.93 gap_buf=3.27643 eff_stop=18.34214
+2026.01.20 16:00:20;ORDER;entry fill deal #14 BUY 0.05 @ 4736.72000
+2026.01.20 16:15:00;VETO;outlier bar masked, z=5.7
+2026.01.20 16:45:00;VETO;outlier bar masked, z=9.0
+2026.01.20 17:30:00;VETO;outlier bar masked, z=7.4
+2026.01.20 18:15:00;VETO;outlier bar masked, z=3.8
+2026.01.20 18:55:40;MANAGE;#14 SL 4721.65 -> 4736.76 breakeven
+2026.01.20 18:55:40;MANAGE;#14 partial close 0.02 of 0.05 lots
+2026.01.20 18:55:40;RISK;deal closed pnl=33.12 streak=0 lock=0
+2026.01.20 18:56:00;VETO;M1 break rejected: regime: chop ADX 17.1 < 22.0
+2026.01.20 19:55:40;RISK;deal closed pnl=67.77 streak=0 lock=0
+2026.01.20 22:22:00;VETO;M1 break rejected: volume: relVol 0.66 < 1.00
+2026.01.21 01:45:00;VETO;signal rejected: volume: relVol 0.68 < 1.00
+2026.01.21 03:15:00;VETO;outlier bar masked, z=6.9
+2026.01.21 03:30:00;VETO;outlier bar masked, z=5.6
+2026.01.21 03:45:00;VETO;outlier bar masked, z=5.0
+2026.01.21 04:00:00;VETO;outlier bar masked, z=6.2
+2026.01.21 04:15:00;VETO;outlier bar masked, z=4.1
+2026.01.21 05:04:00;DECISION;M1 setup LONG score=0.75 entry=4844.52 inv=4747.47 [BOS long lvl=4844.13|RelVol=1.10|VPnode d=0.32|VWAPside|ADX=61]
+2026.01.21 05:04:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.21 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.21 05:30:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.21 05:45:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.21 06:20:00;DECISION;M1 setup LONG score=0.75 entry=4850.20 inv=4747.47 [BOS long lvl=4849.75|RelVol=1.20|VPnode d=1.80|VWAPside|ADX=56]
+2026.01.21 06:20:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.01.21 06:30:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.01.21 06:45:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.01.21 07:00:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.21 08:45:00;VETO;outlier bar masked, z=5.2
+2026.01.21 11:49:00;DECISION;M1 setup LONG score=0.85 entry=4870.55 inv=4832.58 [BOS long lvl=4869.56|RelVol=1.23|VPnode d=5.45|VWAPside|CycleTurn w=-0.99<--1.00]
+2026.01.21 11:49:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.21 12:00:00;DECISION;TP capped 66.26000 -> 49.69500 (3.0xATR)
+2026.01.21 12:00:00;ORDER;filled BUY 0.01 lots sl=4832.58 tp=4915.41 [WT|BOS|0.85]
+2026.01.21 12:00:00;RISK;sizing: vol_ratio=1.34 scalar=0.75 gap_buf=6.76107 eff_stop=39.89107
+2026.01.21 12:00:00;ORDER;entry fill deal #17 BUY 0.01 @ 4865.71000
+2026.01.21 15:36:00;VETO;M1 break rejected: regime: chop ADX 12.4 < 22.0
+2026.01.21 16:05:00;VETO;M1 break rejected: regime: chop ADX 14.3 < 22.0
+2026.01.21 16:15:00;VETO;outlier bar masked, z=6.9
+2026.01.21 17:19:40;RISK;deal closed pnl=-33.13 streak=1 lock=0
+2026.01.21 17:20:00;VETO;M1 break rejected: regime: chop ADX 10.1 < 22.0
+2026.01.21 17:30:00;VETO;outlier bar masked, z=8.1
+2026.01.21 19:32:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4812.84|RelVol=1.84|VPnear|VWAPside]
+2026.01.21 21:30:00;VETO;outlier bar masked, z=6.6
+2026.01.21 21:45:00;VETO;outlier bar masked, z=7.6
+2026.01.22 03:04:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.01.22 07:06:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.01.22 11:39:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.01.22 15:43:00;VETO;M1 break rejected: regime: chop ADX 19.2 < 22.0
+2026.01.22 16:33:00;VETO;M1 break rejected: regime: chop ADX 16.6 < 22.0
+2026.01.22 22:15:00;VETO;signal rejected: volume: relVol 0.80 < 1.00
+2026.01.22 23:33:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.01.23 03:15:00;VETO;outlier bar masked, z=4.6
+2026.01.23 07:47:00;VETO;M1 break rejected: volume: relVol 0.55 < 1.00
+2026.01.23 09:50:00;DECISION;M1 setup SHORT score=0.65 entry=4943.91 inv=4967.30 AWAIT-RETEST [CHoCH short lvl=4945.59|RelVol=1.07|Retest@4943.91|VPnode d=4.49|VWAPside]
+2026.01.23 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.23 10:15:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.23 10:30:00;VETO;outlier bar masked, z=8.3
+2026.01.23 10:45:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.01.23 11:00:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.23 14:06:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.01.23 16:42:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.01.23 20:49:00;DECISION;M1 setup SHORT score=0.75 entry=4958.89 inv=4988.06 AWAIT-RETEST [CHoCH short lvl=4962.05|RelVol=1.45|Retest@4958.89|VPnode d=5.79|CycleTurn w=-0.11<-0.72]
+2026.01.23 21:00:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.01.23 21:15:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.01.23 21:30:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.01.23 21:45:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.01.23 21:55:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.01.26 01:01:00;VETO;M1 break rejected: regime: chop ADX 16.4 < 22.0
+2026.01.26 01:15:00;VETO;outlier bar masked, z=6.3
+2026.01.26 03:15:00;VETO;outlier bar masked, z=3.6
+2026.01.26 08:46:00;DECISION;M1 setup LONG score=0.85 entry=5098.32 inv=5052.39 [BOS long lvl=5093.05|RelVol=1.20|VPnode d=7.92|VWAPside|CycleTurn w=-0.97<--0.99]
+2026.01.26 08:46:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.26 09:00:00;VETO;outlier bar masked, z=3.5
+2026.01.26 09:15:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.26 09:30:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.26 09:45:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.26 11:52:00;VETO;M1 break rejected: regime: chop ADX 20.9 < 22.0
+2026.01.26 14:23:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.01.26 14:57:00;VETO;M1 break rejected: regime: chop ADX 16.7 < 22.0
+2026.01.26 18:04:00;VETO;M1 break rejected: regime: chop ADX 18.6 < 22.0
+2026.01.26 18:30:00;VETO;outlier bar masked, z=3.6
+2026.01.26 20:42:00;VETO;M1 break rejected: regime: chop ADX 12.6 < 22.0
+2026.01.26 21:15:00;VETO;outlier bar masked, z=3.6
+2026.01.26 21:30:00;VETO;outlier bar masked, z=4.8
+2026.01.26 23:33:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS short lvl=5008.51|RelVol=3.17|VWAPside]
+2026.01.27 03:12:00;DECISION;M1 setup LONG score=0.65 entry=5066.60 inv=4989.86 AWAIT-RETEST [CHoCH long lvl=5061.54|RelVol=1.76|Retest@5066.60|VPnode d=13.00|VWAPside]
+2026.01.27 03:15:00;VETO;outlier bar masked, z=6.5
+2026.01.27 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.27 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.27 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.27 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.27 04:41:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.01.27 07:12:00;VETO;M1 break rejected: regime: chop ADX 12.7 < 22.0
+2026.01.27 07:48:00;VETO;M1 break rejected: regime: chop ADX 16.5 < 22.0
+2026.01.27 13:48:00;VETO;M1 break rejected: regime: chop ADX 20.2 < 22.0
+2026.01.27 14:47:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.01.27 16:06:00;VETO;M1 break rejected: regime: chop ADX 18.2 < 22.0
+2026.01.27 17:38:00;DECISION;M1 setup LONG score=0.85 entry=5086.41 inv=5046.65 AWAIT-RETEST [CHoCH long lvl=5082.29|RelVol=1.41|Retest@5086.41|VPnode d=0.31|VWAPside|CycleTurn w=-1.00<--1.00]
+2026.01.27 17:38:00;DECISION;TP capped 79.52679 -> 59.64509 (3.0xATR)
+2026.01.27 17:38:00;ERROR;limit BUY 0.01 @ 5086.41 sl=5046.65 tp=5146.06 rc=10015 [WT|CHOCH|0.85|RL]
+2026.01.27 17:45:00;DECISION;TP capped 68.14000 -> 51.76286 (3.0xATR)
+2026.01.27 17:45:00;ORDER;filled BUY 0.02 lots sl=5046.65 tp=5132.48 [WT|CHOCH|0.85]
+2026.01.27 17:45:00;RISK;sizing: vol_ratio=1.11 scalar=0.92 gap_buf=8.62714 eff_stop=42.69714
+2026.01.27 17:45:00;ORDER;entry fill deal #19 BUY 0.02 @ 5080.72000
+2026.01.27 21:56:00;VETO;M1 break rejected: regime: chop ADX 16.4 < 22.0
+2026.01.27 22:03:40;MANAGE;#19 SL 5046.65 -> 5080.76 breakeven
+2026.01.27 22:03:40;MANAGE;#19 partial close 0.01 of 0.02 lots
+2026.01.27 22:03:40;RISK;deal closed pnl=40.02 streak=0 lock=0
+2026.01.27 22:03:59;MANAGE;#19 SL 5080.76 -> 5094.84 trail
+2026.01.27 22:04:40;MANAGE;#19 SL 5094.84 -> 5100.58 trail
+2026.01.27 22:05:40;MANAGE;#19 SL 5100.58 -> 5104.49 trail
+2026.01.27 22:07:40;MANAGE;#19 SL 5104.49 -> 5105.87 trail
+2026.01.27 22:09:40;MANAGE;#19 SL 5105.87 -> 5107.85 trail
+2026.01.27 22:10:40;RISK;deal closed pnl=51.76 streak=0 lock=0
+2026.01.27 22:15:00;VETO;outlier bar masked, z=5.5
+2026.01.27 23:00:00;VETO;outlier bar masked, z=4.7
+2026.01.28 03:07:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=5190.46|RelVol=1.24|VWAPside|ADX=36]
+2026.01.28 03:15:00;VETO;outlier bar masked, z=4.4
+2026.01.28 07:05:00;DECISION;M1 setup LONG score=0.75 entry=5247.97 inv=5157.31 [BOS long lvl=5247.63|RelVol=1.45|VPnode d=0.17|VWAPside|ADX=53]
+2026.01.28 07:05:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.28 07:15:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.28 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.28 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.28 08:52:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=5266.49|RelVol=1.32|VWAPside|ADX=55]
+2026.01.28 13:05:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH short lvl=5262.95|RelVol=1.28|Retest@5259.57|VPnear]
+2026.01.28 13:15:00;VETO;outlier bar masked, z=3.8
+2026.01.28 15:05:00;VETO;M1 break rejected: regime: chop ADX 21.3 < 22.0
+2026.01.28 16:45:00;VETO;outlier bar masked, z=4.8
+2026.01.28 17:01:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.01.28 17:10:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.01.28 17:15:00;VETO;outlier bar masked, z=11.3
+2026.01.28 19:00:00;DECISION;setup LONG score=0.65 entry=5302.31 inv=5235.23 tgt=0.00 AWAIT-RETEST [CHoCH long lvl=5298.29|RelVol=1.28|Retest@5302.31|VPnode d=2.71|VWAPside]
+2026.01.28 19:00:00;VETO;retest limit risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.01.28 19:15:00;DECISION;TP capped 120.92000 -> 90.69000 (3.0xATR)
+2026.01.28 19:15:00;ORDER;filled BUY 0.01 lots sl=5235.23 tp=5386.38 [WT|CHOCH|0.65]
+2026.01.28 19:15:00;RISK;sizing: vol_ratio=1.39 scalar=0.71 gap_buf=10.47214 eff_stop=70.93214
+2026.01.28 19:15:00;ORDER;entry fill deal #22 BUY 0.01 @ 5295.69000
+2026.01.28 20:19:00;DECISION;M1 setup LONG score=0.65 entry=5308.59 inv=5235.23 [BOS long lvl=5307.01|RelVol=1.39|VPnode d=3.79|VWAPside]
+2026.01.28 20:19:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.01.28 20:30:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.01.28 20:45:00;VETO;outlier bar masked, z=6.1
+2026.01.28 21:00:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.01.28 21:15:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.01.28 21:45:00;VETO;outlier bar masked, z=3.9
+2026.01.28 22:01:00;DECISION;M1 setup LONG score=0.70 entry=5333.14 inv=5268.78 [BOS long lvl=5326.02|RelVol=2.06|VWAPside|CycleTurn w=-0.61<--0.99|ADX=30]
+2026.01.28 22:01:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.01.28 22:15:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.01.28 22:30:00;VETO;outlier bar masked, z=4.2
+2026.01.28 22:30:40;MANAGE;#22 SL 5235.23 -> 5295.73 breakeven
+2026.01.28 22:30:59;MANAGE;#22 SL 5295.73 -> 5313.65 trail
+2026.01.28 22:31:20;MANAGE;#22 SL 5313.65 -> 5317.48 trail
+2026.01.28 22:34:20;MANAGE;#22 SL 5317.48 -> 5318.44 trail
+2026.01.28 22:35:40;MANAGE;#22 SL 5318.44 -> 5320.54 trail
+2026.01.28 22:36:40;MANAGE;#22 SL 5320.54 -> 5324.81 trail
+2026.01.28 22:37:40;MANAGE;#22 SL 5324.81 -> 5328.30 trail
+2026.01.28 22:38:40;MANAGE;#22 SL 5328.30 -> 5332.01 trail
+2026.01.28 22:39:20;MANAGE;#22 SL 5332.01 -> 5332.53 trail
+2026.01.28 22:40:20;MANAGE;#22 SL 5332.53 -> 5335.39 trail
+2026.01.28 22:41:40;MANAGE;#22 SL 5335.39 -> 5338.85 trail
+2026.01.28 22:42:40;RISK;deal closed pnl=90.69 streak=0 lock=0
+2026.01.28 22:45:00;VETO;outlier bar masked, z=5.0
+2026.01.28 23:00:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.01.28 23:15:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.01.29 01:00:00;VETO;outlier bar masked, z=4.3
+2026.01.29 01:15:00;VETO;outlier bar masked, z=8.7
+2026.01.29 01:45:00;VETO;outlier bar masked, z=18.4
+2026.01.29 02:00:00;VETO;outlier bar masked, z=8.5
+2026.01.29 02:15:00;VETO;outlier bar masked, z=8.7
+2026.01.29 02:30:00;VETO;outlier bar masked, z=4.4
+2026.01.29 02:45:00;VETO;outlier bar masked, z=3.6
+2026.01.29 03:10:00;DECISION;M1 setup SHORT score=0.70 entry=5447.45 inv=5598.03 AWAIT-RETEST [CHoCH short lvl=5453.04|RelVol=1.80|Retest@5447.45|VPnear|VWAPside|CycleTurn w=0.97<-0.98]
+2026.01.29 03:15:00;VETO;outlier bar masked, z=11.2
+2026.01.29 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.29 03:45:00;VETO;outlier bar masked, z=4.8
+2026.01.29 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.29 04:15:00;VETO;outlier bar masked, z=4.1
+2026.01.29 04:30:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.29 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.29 05:15:00;VETO;outlier bar masked, z=3.7
+2026.01.29 06:34:00;DECISION;M1 setup LONG score=0.65 entry=5556.23 inv=5508.32 AWAIT-RETEST [CHoCH long lvl=5550.19|RelVol=1.42|Retest@5556.23|VPnode d=6.43|VWAPside]
+2026.01.29 06:45:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.01.29 07:00:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.29 07:15:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.29 07:30:00;VETO;outlier bar masked, z=3.8
+2026.01.29 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.29 08:01:00;DECISION;M1 setup LONG score=0.75 entry=5569.94 inv=5508.32 [BOS long lvl=5564.55|RelVol=1.25|VPnode d=9.54|VWAPside|ADX=34]
+2026.01.29 08:01:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.29 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.29 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.29 08:45:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.29 10:40:00;DECISION;M1 setup SHORT score=0.65 entry=5511.06 inv=5595.54 AWAIT-RETEST [CHoCH short lvl=5516.27|RelVol=2.08|Retest@5511.06|VPnode d=5.46|VWAPside]
+2026.01.29 10:45:00;VETO;outlier bar masked, z=4.1
+2026.01.29 11:00:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.29 11:15:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.29 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.29 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.29 13:04:00;DECISION;M1 setup SHORT score=0.60 entry=5473.55 inv=5529.64 [BOS short lvl=5474.48|RelVol=1.87|VPnear|VWAPside|ADX=35]
+2026.01.29 13:04:00;DECISION;TP capped 112.18000 -> 84.13500 (3.0xATR)
+2026.01.29 13:04:00;ORDER;filled SELL 0.01 lots sl=5529.64 tp=5389.41 [WT|BOS|0.60]
+2026.01.29 13:04:00;RISK;sizing: vol_ratio=0.96 scalar=1.00 gap_buf=11.57893 eff_stop=67.66893
+2026.01.29 13:04:00;ORDER;entry fill deal #24 SELL 0.01 @ 5473.55000
+2026.01.29 14:13:40;RISK;deal closed pnl=-56.09 streak=1 lock=0
+2026.01.29 14:14:00;DECISION;M1 setup LONG score=0.70 entry=5535.37 inv=5470.82 AWAIT-RETEST [CHoCH long lvl=5529.64|RelVol=1.64|Retest@5535.37|VPnear|VWAPside|CycleTurn w=-0.94<--0.98]
+2026.01.29 14:14:00;DECISION;TP capped 129.10143 -> 96.82607 (3.0xATR)
+2026.01.29 14:14:00;ORDER;limit BUY 0.01 @ 5535.37 sl=5470.82 tp=5632.20 rc=10009 [WT|CHOCH|0.70|RL]
+2026.01.29 14:14:00;RISK;sizing: vol_ratio=0.95 scalar=1.00 gap_buf=11.46143 eff_stop=76.01214
+2026.01.29 14:14:40;ORDER;entry fill deal #26 BUY 0.01 @ 5535.37000
+2026.01.29 16:28:00;VETO;M1 break rejected: regime: chop ADX 19.9 < 22.0
+2026.01.29 16:48:00;VETO;M1 break rejected: regime: chop ADX 17.1 < 22.0
+2026.01.29 17:01:40;RISK;deal closed pnl=-64.55 streak=2 lock=0
+2026.01.29 17:15:00;VETO;outlier bar masked, z=10.4
+2026.01.29 17:30:00;VETO;outlier bar masked, z=24.9
+2026.01.29 17:45:00;VETO;outlier bar masked, z=12.7
+2026.01.29 18:00:00;VETO;outlier bar masked, z=6.7
+2026.01.29 18:15:00;VETO;outlier bar masked, z=7.9
+2026.01.29 18:30:00;VETO;outlier bar masked, z=3.7
+2026.01.29 18:45:00;VETO;outlier bar masked, z=4.1
+2026.01.29 19:30:00;VETO;outlier bar masked, z=4.4
+2026.01.29 22:47:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH long lvl=5362.06|RelVol=1.42|Retest@5371.93|VPnear]
+2026.01.30 02:11:00;DECISION;M1 setup LONG score=0.75 entry=5449.50 inv=5369.60 [BOS long lvl=5448.52|RelVol=1.50|VPnode d=2.50|VWAPside|ADX=32]
+2026.01.30 02:11:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.30 02:15:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.30 02:30:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.30 02:45:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.01.30 03:10:00;DECISION;M1 setup SHORT score=0.60 entry=5360.64 inv=5450.96 AWAIT-RETEST [CHoCH short lvl=5369.60|RelVol=1.58|Retest@5360.64|VWAPside|CycleTurn w=0.96<-0.99]
+2026.01.30 03:15:00;VETO;outlier bar masked, z=5.1
+2026.01.30 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.30 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.01.30 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.01.30 04:15:00;VETO;outlier bar masked, z=5.5
+2026.01.30 04:30:00;VETO;outlier bar masked, z=4.6
+2026.01.30 04:45:00;VETO;outlier bar masked, z=3.8
+2026.01.30 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.01.30 07:17:00;DECISION;M1 setup LONG score=0.75 entry=5241.82 inv=5151.34 AWAIT-RETEST [CHoCH long lvl=5230.78|RelVol=1.52|Retest@5241.82|VPnode d=30.72|CycleTurn w=0.32<--0.65]
+2026.01.30 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.30 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.01.30 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.30 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.01.30 08:58:00;DECISION;M1 setup SHORT score=0.70 entry=5142.84 inv=5241.39 AWAIT-RETEST [CHoCH short lvl=5151.34|RelVol=1.61|Retest@5142.84|VPnear|VWAPside|CycleTurn w=0.70<-0.92]
+2026.01.30 09:00:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.30 09:15:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.30 09:30:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.30 09:45:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.01.30 10:34:00;DECISION;M1 setup SHORT score=0.75 entry=5108.83 inv=5241.39 AWAIT-RETEST [BOS short lvl=5117.94|RelVol=2.13|Retest@5108.83|VPnode d=3.37|VWAPside|ADX=40]
+2026.01.30 10:45:00;VETO;outlier bar masked, z=3.7
+2026.01.30 11:00:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.30 11:15:00;VETO;outlier bar masked, z=4.8
+2026.01.30 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.30 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.01.30 12:00:00;DECISION;TP capped 455.54000 -> 341.65500 (3.0xATR)
+2026.01.30 12:00:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.01.30 14:47:00;DECISION;M1 setup SHORT score=0.85 entry=5078.87 inv=5241.39 [BOS short lvl=5090.11|RelVol=1.46|VPnode d=30.67|VWAPside|CycleTurn w=0.99<-1.00]
+2026.01.30 14:47:00;DECISION;TP capped 325.04000 -> 243.78000 (3.0xATR)
+2026.01.30 14:47:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.01.30 17:03:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.01.30 18:36:00;VETO;M1 break rejected: regime: chop ADX 21.3 < 22.0
+2026.01.30 20:30:00;VETO;outlier bar masked, z=4.3
+2026.01.30 21:00:00;VETO;outlier bar masked, z=4.1
+2026.02.02 01:01:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4809.23|RelVol=1.81|CycleTurn w=0.96<-0.97]
+2026.02.02 01:15:00;VETO;outlier bar masked, z=7.2
+2026.02.02 03:10:00;VETO;M1 break rejected: regime: chop ADX 19.0 < 22.0
+2026.02.02 03:15:00;VETO;outlier bar masked, z=7.0
+2026.02.02 07:43:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.02.02 11:49:00;DECISION;M1 setup LONG score=0.65 entry=4729.12 inv=4402.14 AWAIT-RETEST [CHoCH long lvl=4713.46|RelVol=1.76|Retest@4729.12|VPnode d=0.98|VWAPside]
+2026.02.02 12:00:00;DECISION;TP capped 634.96000 -> 476.22000 (3.0xATR)
+2026.02.02 12:00:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.02.02 13:14:00;VETO;M1 break rejected: regime: chop ADX 21.5 < 22.0
+2026.02.02 17:31:00;VETO;M1 break rejected: regime: chop ADX 17.9 < 22.0
+2026.02.03 01:09:00;VETO;M1 break rejected: regime: chop ADX 17.3 < 22.0
+2026.02.03 04:27:00;DECISION;M1 setup SHORT score=0.85 entry=4756.49 inv=4856.59 AWAIT-RETEST [CHoCH short lvl=4766.57|RelVol=1.54|Retest@4756.49|VPnode d=23.31|VWAPside|CycleTurn w=0.99<-1.00]
+2026.02.03 04:30:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.03 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.03 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.02.03 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.02.03 08:20:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH long lvl=4856.59|RelVol=1.12|Retest@4862.91|VPnear|VWAPside]
+2026.02.03 14:03:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.02.03 15:38:00;VETO;M1 break rejected: regime: chop ADX 17.0 < 22.0
+2026.02.03 18:17:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.02.03 20:33:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH short lvl=4893.75|RelVol=1.65|Retest@4885.40|VPnear]
+2026.02.03 22:35:00;VETO;M1 break rejected: regime: chop ADX 17.1 < 22.0
+2026.02.04 01:01:00;VETO;M1 break rejected: regime: chop ADX 17.2 < 22.0
+2026.02.04 02:14:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.02.04 03:15:00;VETO;outlier bar masked, z=3.9
+2026.02.04 05:36:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.02.04 10:01:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.02.04 11:33:00;DECISION;M1 setup SHORT score=0.55 entry=5046.69 inv=5091.94 AWAIT-RETEST [CHoCH short lvl=5051.10|RelVol=1.33|Retest@5046.69|VPnode d=10.69]
+2026.02.04 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.02.04 12:00:00;DECISION;TP capped 63.84000 -> 52.04571 (3.0xATR)
+2026.02.04 12:00:00;ORDER;filled SELL 0.02 lots sl=5091.94 tp=5007.97 [WT|CHOCH|0.55]
+2026.02.04 12:00:00;RISK;sizing: vol_ratio=0.74 scalar=1.00 gap_buf=8.67429 eff_stop=40.59429
+2026.02.04 12:00:00;ORDER;entry fill deal #28 SELL 0.02 @ 5060.02000
+2026.02.04 13:16:00;VETO;M1 break rejected: volume: relVol 1.00 < 1.00
+2026.02.04 13:16:40;MANAGE;#28 SL 5091.94 -> 5059.98 breakeven
+2026.02.04 13:16:40;MANAGE;#28 partial close 0.01 of 0.02 lots
+2026.02.04 13:16:40;RISK;deal closed pnl=35.80 streak=0 lock=0
+2026.02.04 13:16:59;MANAGE;#28 SL 5059.98 -> 5058.69 trail
+2026.02.04 13:17:40;MANAGE;#28 SL 5058.69 -> 5045.80 trail
+2026.02.04 13:18:20;MANAGE;#28 SL 5045.80 -> 5045.12 trail
+2026.02.04 13:53:40;RISK;deal closed pnl=14.90 streak=0 lock=0
+2026.02.04 16:33:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.02.04 16:45:00;VETO;outlier bar masked, z=5.8
+2026.02.04 17:45:00;VETO;outlier bar masked, z=5.6
+2026.02.04 18:47:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4887.71|RelVol=1.47|VWAPside|ADX=50]
+2026.02.04 23:29:00;VETO;M1 break rejected: regime: chop ADX 21.5 < 22.0
+2026.02.05 03:03:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.02.05 04:15:00;VETO;outlier bar masked, z=4.2
+2026.02.05 05:00:00;VETO;outlier bar masked, z=7.9
+2026.02.05 05:15:00;VETO;outlier bar masked, z=5.2
+2026.02.05 05:30:00;VETO;outlier bar masked, z=3.6
+2026.02.05 07:45:00;VETO;outlier bar masked, z=3.8
+2026.02.05 08:00:00;DECISION;setup LONG score=0.60 entry=4899.53 inv=4788.86 tgt=0.00 AWAIT-RETEST [CHoCH long lvl=4891.14|RelVol=1.68|Retest@4899.53|VPnear|CycleTurn w=0.33<--0.75]
+2026.02.05 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.02.05 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.02.05 08:45:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.02.05 09:00:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.02.05 11:02:00;DECISION;M1 setup SHORT score=0.70 entry=4888.97 inv=4931.08 AWAIT-RETEST [CHoCH short lvl=4895.99|RelVol=1.25|Retest@4888.97|StopFloored|VPnear|VWAPside|CycleTurn w=0.99<-1.00]
+2026.02.05 11:15:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.02.05 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.02.05 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.02.05 12:00:00;DECISION;TP capped 152.24036 -> 114.18027 (3.0xATR)
+2026.02.05 12:00:00;ORDER;filled SELL 0.01 lots sl=4931.08 tp=4740.78 [WT|CHOCH|0.70]
+2026.02.05 12:00:00;RISK;sizing: vol_ratio=0.95 scalar=1.00 gap_buf=13.79857 eff_stop=89.91875
+2026.02.05 12:00:00;ORDER;entry fill deal #31 SELL 0.01 @ 4854.96000
+2026.02.05 14:11:00;DECISION;M1 setup SHORT score=0.65 entry=4847.16 inv=4943.62 [BOS short lvl=4847.78|RelVol=1.10|VPnode d=12.76|VWAPside]
+2026.02.05 14:11:00;DECISION;TP capped 192.94000 -> 144.70500 (3.0xATR)
+2026.02.05 14:11:00;VETO;risk veto: max positions
+2026.02.05 17:47:00;DECISION;M1 setup SHORT score=0.85 entry=4805.24 inv=4869.99 [BOS short lvl=4806.04|RelVol=1.46|VPnode d=5.76|VWAPside|CycleTurn w=0.86<-0.98]
+2026.02.05 17:47:00;DECISION;TP capped 129.52000 -> 112.34143 (3.0xATR)
+2026.02.05 17:47:00;VETO;risk veto: max positions
+2026.02.05 18:44:00;DECISION;M1 setup LONG score=0.55 entry=4879.27 inv=4806.04 AWAIT-RETEST [CHoCH long lvl=4869.99|RelVol=1.44|Retest@4879.27|VPnode d=22.17]
+2026.02.05 18:44:00;VETO;retest limit risk veto: max positions
+2026.02.05 18:45:00;DECISION;TP capped 146.16000 -> 109.62000 (3.0xATR)
+2026.02.05 18:45:00;VETO;risk veto: max positions
+2026.02.05 23:27:00;DECISION;M1 setup SHORT score=0.65 entry=4794.94 inv=4906.91 AWAIT-RETEST [CHoCH short lvl=4800.53|RelVol=1.14|Retest@4794.94|VPnode d=12.86|VWAPside]
+2026.02.05 23:30:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.02.05 23:34:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:35:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:35:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:36:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:37:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:38:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:39:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:39:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:40:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:41:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:41:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:42:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:43:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:43:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:44:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:45:00;VETO;authorization denied: outside session window (server hour 23, window 12-20)
+2026.02.05 23:45:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:45:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:46:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:47:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:47:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:48:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:49:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:49:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:50:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:51:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:51:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:52:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:53:20;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:53:59;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:54:40;ERROR;modify #31 sl=4854.92 tp=4740.78 rejected rc=10018
+2026.02.05 23:55:40;ERROR;modify #31 sl=4854.52 tp=4740.78 rejected rc=10018
+2026.02.05 23:56:40;ERROR;modify #31 sl=4854.62 tp=4740.78 rejected rc=10018
+2026.02.05 23:57:20;ERROR;modify #31 sl=4854.52 tp=4740.78 rejected rc=10018
+2026.02.05 23:57:59;ERROR;modify #31 sl=4854.52 tp=4740.78 rejected rc=10018
+2026.02.05 23:59:40;ERROR;modify #31 sl=4854.69 tp=4740.78 rejected rc=10018
+2026.02.06 01:00:00;MANAGE;#31 SL 4931.08 -> 4854.69 breakeven
+2026.02.06 01:00:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.02.06 01:00:20;MANAGE;#31 SL 4854.69 -> 4841.51 trail
+2026.02.06 01:00:40;MANAGE;#31 SL 4841.51 -> 4810.45 trail
+2026.02.06 01:01:40;MANAGE;#31 SL 4810.45 -> 4806.80 trail
+2026.02.06 01:15:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.02.06 01:24:40;MANAGE;#31 SL 4806.80 -> 4805.31 trail
+2026.02.06 01:26:40;MANAGE;#31 SL 4805.31 -> 4800.73 trail
+2026.02.06 01:27:40;MANAGE;#31 SL 4800.73 -> 4800.33 trail
+2026.02.06 01:28:20;MANAGE;#31 SL 4800.33 -> 4798.92 trail
+2026.02.06 01:30:20;MANAGE;#31 SL 4798.92 -> 4798.77 trail
+2026.02.06 01:35:40;MANAGE;#31 SL 4798.77 -> 4798.58 trail
+2026.02.06 01:36:20;MANAGE;#31 SL 4798.58 -> 4797.19 trail
+2026.02.06 01:38:40;RISK;deal closed pnl=114.13 streak=0 lock=0
+2026.02.06 02:30:00;VETO;outlier bar masked, z=4.9
+2026.02.06 03:15:00;VETO;outlier bar masked, z=4.0
+2026.02.06 03:55:00;DECISION;M1 setup LONG score=0.65 entry=4772.85 inv=4655.27 AWAIT-RETEST [CHoCH long lvl=4764.68|RelVol=1.47|Retest@4772.85|VPnode d=12.25|VWAPside]
+2026.02.06 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.06 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.06 04:30:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.06 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.06 07:27:00;DECISION;M1 setup LONG score=0.65 entry=4846.76 inv=4801.20 [BOS long lvl=4846.61|RelVol=1.04|VPnode d=3.56|VWAPside]
+2026.02.06 07:27:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.02.06 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.02.06 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.02.06 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.02.06 13:02:00;VETO;M1 break rejected: regime: chop ADX 9.5 < 22.0
+2026.02.06 15:01:00;VETO;M1 break rejected: volume: relVol 0.96 < 1.00
+2026.02.06 16:38:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.02.06 19:31:00;VETO;M1 break rejected: volume: relVol 0.64 < 1.00
+2026.02.06 22:34:00;VETO;M1 break rejected: volume: relVol 0.53 < 1.00
+2026.02.09 01:01:00;VETO;M1 break rejected: volume: relVol 0.63 < 1.00
+2026.02.09 07:35:00;VETO;M1 break rejected: regime: chop ADX 20.2 < 22.0
+2026.02.09 09:23:00;VETO;M1 break rejected: regime: chop ADX 19.4 < 22.0
+2026.02.09 12:28:00;VETO;M1 break rejected: regime: chop ADX 20.9 < 22.0
+2026.02.09 16:32:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.02.09 22:21:00;VETO;M1 break rejected: volume: relVol 0.47 < 1.00
+2026.02.10 01:10:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.02.10 01:15:00;VETO;outlier bar masked, z=15.1
+2026.02.10 04:23:00;VETO;M1 break rejected: regime: chop ADX 17.4 < 22.0
+2026.02.10 07:28:00;VETO;M1 break rejected: regime: chop ADX 18.2 < 22.0
+2026.02.10 10:42:00;VETO;M1 break rejected: regime: chop ADX 15.1 < 22.0
+2026.02.10 14:44:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.02.10 15:34:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.02.10 17:00:00;VETO;outlier bar masked, z=4.7
+2026.02.10 17:38:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.02.10 17:45:00;VETO;outlier bar masked, z=5.4
+2026.02.10 22:49:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.02.11 01:21:00;VETO;M1 break rejected: volume: relVol 0.41 < 1.00
+2026.02.11 03:55:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.02.11 07:38:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.02.11 09:00:00;VETO;signal rejected: regime: chop ADX 19.4 < 22.0
+2026.02.11 11:48:00;VETO;M1 break rejected: regime: chop ADX 17.0 < 22.0
+2026.02.11 12:45:00;VETO;outlier bar masked, z=4.5
+2026.02.11 14:45:00;VETO;outlier bar masked, z=7.4
+2026.02.11 15:31:00;DECISION;M1 setup SHORT score=0.65 entry=5048.59 inv=5119.13 AWAIT-RETEST [CHoCH short lvl=5052.13|RelVol=1.10|Retest@5048.59|VPnode d=5.11|VWAPside]
+2026.02.11 15:31:00;VETO;retest limit risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.02.11 15:45:00;VETO;outlier bar masked, z=10.1
+2026.02.11 16:00:00;DECISION;TP capped 106.66000 -> 79.99500 (3.0xATR)
+2026.02.11 16:00:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.02.11 16:45:00;VETO;outlier bar masked, z=5.2
+2026.02.11 23:33:00;VETO;M1 break rejected: regime: chop ADX 15.2 < 22.0
+2026.02.12 01:01:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.02.12 01:15:00;VETO;outlier bar masked, z=6.9
+2026.02.12 02:13:00;VETO;M1 break rejected: volume: relVol 0.59 < 1.00
+2026.02.12 03:09:00;VETO;M1 break rejected: volume: relVol 0.61 < 1.00
+2026.02.12 07:07:00;VETO;M1 break rejected: volume: relVol 0.60 < 1.00
+2026.02.12 08:33:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.02.12 11:08:00;VETO;M1 break rejected: regime: chop ADX 14.5 < 22.0
+2026.02.12 14:47:00;VETO;M1 break rejected: regime: chop ADX 14.7 < 22.0
+2026.02.12 15:57:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.02.12 16:57:00;VETO;M1 break rejected: regime: chop ADX 14.0 < 22.0
+2026.02.12 18:11:00;VETO;M1 break rejected: regime: chop ADX 12.2 < 22.0
+2026.02.12 18:15:00;VETO;outlier bar masked, z=20.6
+2026.02.12 18:30:00;VETO;outlier bar masked, z=14.4
+2026.02.12 18:45:00;VETO;outlier bar masked, z=12.1
+2026.02.12 19:00:00;VETO;outlier bar masked, z=3.9
+2026.02.12 20:00:00;VETO;outlier bar masked, z=3.9
+2026.02.12 21:49:00;VETO;M1 break rejected: regime: chop ADX 19.3 < 22.0
+2026.02.13 01:01:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.02.13 01:15:00;VETO;outlier bar masked, z=6.2
+2026.02.13 02:07:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.02.13 02:15:00;VETO;outlier bar masked, z=3.9
+2026.02.13 03:03:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.02.13 03:15:00;VETO;outlier bar masked, z=4.7
+2026.02.13 06:17:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.02.13 07:31:00;VETO;M1 break rejected: regime: chop ADX 19.2 < 22.0
+2026.02.13 12:57:00;VETO;M1 break rejected: regime: chop ADX 19.9 < 22.0
+2026.02.13 15:31:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.02.13 16:45:00;VETO;outlier bar masked, z=6.0
+2026.02.13 18:00:00;VETO;outlier bar masked, z=3.6
+2026.02.13 18:30:00;VETO;outlier bar masked, z=3.7
+2026.02.13 21:02:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.02.16 01:02:00;VETO;M1 break rejected: score 0.30 < 0.55 [CHoCH short lvl=5021.51|RelVol=1.46|Retest@5019.10]
+2026.02.16 01:15:00;VETO;outlier bar masked, z=4.0
+2026.02.16 02:04:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.02.16 04:42:00;VETO;M1 break rejected: regime: chop ADX 17.7 < 22.0
+2026.02.16 09:43:00;VETO;M1 break rejected: volume: relVol 0.33 < 1.00
+2026.02.16 11:04:00;VETO;M1 break rejected: volume: relVol 0.54 < 1.00
+2026.02.16 14:13:00;VETO;M1 break rejected: volume: relVol 0.45 < 1.00
+2026.02.16 15:48:00;VETO;M1 break rejected: volume: relVol 0.40 < 1.00
+2026.02.17 01:18:00;VETO;M1 break rejected: regime: chop ADX 17.4 < 22.0
+2026.02.17 03:00:00;VETO;outlier bar masked, z=8.1
+2026.02.17 03:15:00;VETO;outlier bar masked, z=5.4
+2026.02.17 07:07:00;VETO;M1 break rejected: volume: relVol 0.55 < 1.00
+2026.02.17 07:15:00;VETO;outlier bar masked, z=5.4
+2026.02.17 07:30:00;VETO;outlier bar masked, z=8.8
+2026.02.17 07:45:00;VETO;outlier bar masked, z=9.7
+2026.02.17 08:00:00;VETO;outlier bar masked, z=4.5
+2026.02.17 08:45:00;VETO;outlier bar masked, z=3.9
+2026.02.17 12:12:00;VETO;M1 break rejected: regime: chop ADX 21.7 < 22.0
+2026.02.17 12:52:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.02.17 14:16:00;VETO;M1 break rejected: regime: chop ADX 18.3 < 22.0
+2026.02.17 15:57:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.02.17 16:00:00;VETO;outlier bar masked, z=11.5
+2026.02.17 16:15:00;VETO;outlier bar masked, z=12.5
+2026.02.17 16:45:00;VETO;outlier bar masked, z=6.9
+2026.02.17 20:41:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.02.18 01:02:00;VETO;M1 break rejected: regime: chop ADX 18.4 < 22.0
+2026.02.18 03:04:00;VETO;M1 break rejected: volume: relVol 0.58 < 1.00
+2026.02.18 10:21:00;VETO;M1 break rejected: volume: relVol 0.48 < 1.00
+2026.02.18 12:41:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4912.94|RelVol=1.02|VPnear|ADX=39]
+2026.02.18 13:46:00;VETO;M1 break rejected: volume: relVol 0.50 < 1.00
+2026.02.18 14:11:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.02.18 16:33:00;VETO;M1 break rejected: volume: relVol 0.61 < 1.00
+2026.02.18 16:45:00;VETO;outlier bar masked, z=4.2
+2026.02.18 18:48:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.02.18 20:26:00;VETO;M1 break rejected: volume: relVol 0.57 < 1.00
+2026.02.19 01:02:00;VETO;M1 break rejected: regime: chop ADX 18.5 < 22.0
+2026.02.19 01:15:00;VETO;outlier bar masked, z=4.8
+2026.02.19 05:46:00;VETO;M1 break rejected: regime: chop ADX 19.1 < 22.0
+2026.02.19 11:29:00;VETO;M1 break rejected: volume: relVol 0.45 < 1.00
+2026.02.19 11:30:00;VETO;outlier bar masked, z=5.1
+2026.02.19 15:03:00;VETO;M1 break rejected: regime: chop ADX 21.4 < 22.0
+2026.02.19 15:39:00;VETO;M1 break rejected: volume: relVol 0.24 < 1.00
+2026.02.19 15:45:00;VETO;outlier bar masked, z=4.7
+2026.02.19 16:15:00;VETO;outlier bar masked, z=4.5
+2026.02.19 16:45:00;VETO;outlier bar masked, z=6.3
+2026.02.19 17:00:00;VETO;outlier bar masked, z=4.0
+2026.02.20 01:08:00;VETO;M1 break rejected: volume: relVol 0.46 < 1.00
+2026.02.20 01:57:00;VETO;M1 break rejected: volume: relVol 0.33 < 1.00
+2026.02.20 03:01:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.02.20 05:06:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.02.20 08:02:00;VETO;M1 break rejected: volume: relVol 0.52 < 1.00
+2026.02.20 10:55:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.02.20 13:49:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.02.20 15:50:00;VETO;M1 break rejected: volume: relVol 0.94 < 1.00
+2026.02.20 17:06:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.02.20 17:15:00;VETO;outlier bar masked, z=17.4
+2026.02.20 17:30:00;VETO;outlier bar masked, z=6.3
+2026.02.20 17:45:00;VETO;outlier bar masked, z=5.2
+2026.02.20 18:33:00;DECISION;M1 setup LONG score=0.70 entry=5067.26 inv=4989.40 AWAIT-RETEST [CHoCH long lvl=5064.24|RelVol=1.12|Retest@5067.26|VPnear|VWAPside|CycleTurn w=-0.21<--0.91]
+2026.02.20 18:33:00;VETO;retest limit risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.02.20 18:45:00;DECISION;TP capped 147.54000 -> 110.65500 (3.0xATR)
+2026.02.20 18:45:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.02.20 21:57:00;VETO;M1 break rejected: volume: relVol 0.53 < 1.00
+2026.02.23 01:15:00;VETO;outlier bar masked, z=9.5
+2026.02.23 02:15:00;VETO;outlier bar masked, z=6.1
+2026.02.23 02:30:00;VETO;outlier bar masked, z=3.6
+2026.02.23 04:42:00;VETO;M1 break rejected: volume: relVol 0.73 < 1.00
+2026.02.23 08:44:00;VETO;M1 break rejected: volume: relVol 0.42 < 1.00
+2026.02.23 12:58:00;VETO;M1 break rejected: volume: relVol 0.91 < 1.00
+2026.02.23 14:45:00;VETO;signal rejected: regime: chop ADX 18.9 < 22.0
+2026.02.23 16:01:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.02.23 16:31:00;VETO;M1 break rejected: regime: chop ADX 19.7 < 22.0
+2026.02.23 18:15:00;VETO;outlier bar masked, z=3.5
+2026.02.23 21:45:00;VETO;signal rejected: regime: chop ADX 15.2 < 22.0
+2026.02.24 01:03:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.02.24 01:15:00;VETO;outlier bar masked, z=3.5
+2026.02.24 02:02:00;VETO;M1 break rejected: volume: relVol 0.53 < 1.00
+2026.02.24 03:01:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.02.24 03:15:00;VETO;outlier bar masked, z=5.7
+2026.02.24 03:30:00;VETO;outlier bar masked, z=6.4
+2026.02.24 08:36:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.02.24 12:37:00;VETO;M1 break rejected: regime: chop ADX 17.0 < 22.0
+2026.02.24 14:18:00;VETO;M1 break rejected: regime: chop ADX 14.3 < 22.0
+2026.02.24 15:45:00;VETO;outlier bar masked, z=3.8
+2026.02.24 16:00:00;VETO;outlier bar masked, z=6.3
+2026.02.24 16:15:00;VETO;outlier bar masked, z=5.8
+2026.02.24 16:45:00;VETO;outlier bar masked, z=4.1
+2026.02.24 19:11:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.02.24 22:35:00;VETO;M1 break rejected: regime: chop ADX 16.4 < 22.0
+2026.02.24 23:38:00;VETO;M1 break rejected: regime: chop ADX 15.1 < 22.0
+2026.02.25 01:15:00;VETO;outlier bar masked, z=3.8
+2026.02.25 03:15:00;VETO;outlier bar masked, z=5.2
+2026.02.25 07:19:00;VETO;M1 break rejected: regime: chop ADX 14.6 < 22.0
+2026.02.25 12:24:00;VETO;M1 break rejected: regime: chop ADX 15.4 < 22.0
+2026.02.25 16:45:00;VETO;outlier bar masked, z=3.6
+2026.02.25 17:02:00;VETO;M1 break rejected: regime: chop ADX 19.0 < 22.0
+2026.02.25 18:24:00;VETO;M1 break rejected: regime: chop ADX 12.8 < 22.0
+2026.02.25 20:50:00;VETO;M1 break rejected: regime: chop ADX 18.9 < 22.0
+2026.02.25 22:16:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.02.25 23:00:00;VETO;outlier bar masked, z=7.5
+2026.02.26 01:15:00;VETO;outlier bar masked, z=3.9
+2026.02.26 02:29:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.02.26 04:36:00;DECISION;M1 setup SHORT score=0.85 entry=5175.35 inv=5198.32 AWAIT-RETEST [CHoCH short lvl=5178.81|RelVol=1.01|Retest@5175.35|VPnode d=3.85|VWAPside|CycleTurn w=0.99<-1.00]
+2026.02.26 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.02.26 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.02.26 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.02.26 05:30:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.02.26 06:08:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.02.26 07:16:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.02.26 09:03:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.02.26 12:58:00;DECISION;M1 setup SHORT score=0.60 entry=5167.71 inv=5190.85 [BOS short lvl=5167.74|RelVol=1.03|VPnear|VWAPside|ADX=34]
+2026.02.26 12:58:00;DECISION;TP capped 46.28000 -> 34.71000 (3.0xATR)
+2026.02.26 12:58:00;ORDER;filled SELL 0.03 lots sl=5190.85 tp=5133.00 [WT|BOS|0.60]
+2026.02.26 12:58:00;RISK;sizing: vol_ratio=0.89 scalar=1.00 gap_buf=4.45250 eff_stop=27.59250
+2026.02.26 12:58:00;ORDER;entry fill deal #33 SELL 0.03 @ 5167.71000
+2026.02.26 13:54:00;VETO;M1 break rejected: volume: relVol 0.61 < 1.00
+2026.02.26 16:30:40;MANAGE;#33 SL 5190.85 -> 5167.67 breakeven
+2026.02.26 16:30:40;MANAGE;#33 partial close 0.01 of 0.03 lots
+2026.02.26 16:30:40;RISK;deal closed pnl=25.93 streak=0 lock=0
+2026.02.26 16:30:59;MANAGE;#33 SL 5167.67 -> 5165.32 trail
+2026.02.26 16:31:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.02.26 16:31:20;MANAGE;#33 SL 5165.32 -> 5159.83 trail
+2026.02.26 16:34:40;RISK;deal closed pnl=15.76 streak=0 lock=0
+2026.02.26 16:45:00;VETO;outlier bar masked, z=6.5
+2026.02.26 17:30:00;VETO;outlier bar masked, z=5.2
+2026.02.26 17:45:00;VETO;outlier bar masked, z=5.9
+2026.02.27 03:17:00;VETO;signal rejected: regime: chop ADX 18.1 < 22.0
+2026.02.27 07:27:00;VETO;M1 break rejected: regime: chop ADX 15.5 < 22.0
+2026.02.27 09:17:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.02.27 11:55:00;VETO;M1 break rejected: volume: relVol 0.53 < 1.00
+2026.02.27 13:56:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.02.27 15:02:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.02.27 15:15:00;VETO;outlier bar masked, z=6.1
+2026.02.27 15:30:00;VETO;outlier bar masked, z=5.8
+2026.02.27 15:45:00;VETO;outlier bar masked, z=5.9
+2026.02.27 17:30:00;VETO;outlier bar masked, z=4.6
+2026.02.27 17:58:00;VETO;M1 break rejected: volume: relVol 0.91 < 1.00
+2026.02.27 18:30:00;VETO;outlier bar masked, z=6.5
+2026.02.27 22:22:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.03.02 01:15:00;VETO;outlier bar masked, z=25.5
+2026.03.02 01:45:00;VETO;outlier bar masked, z=9.0
+2026.03.02 02:15:00;VETO;outlier bar masked, z=4.3
+2026.03.02 02:30:00;VETO;outlier bar masked, z=5.1
+2026.03.02 03:00:00;VETO;outlier bar masked, z=4.6
+2026.03.02 03:15:00;VETO;outlier bar masked, z=5.9
+2026.03.02 03:30:00;VETO;outlier bar masked, z=8.9
+2026.03.02 03:45:00;VETO;outlier bar masked, z=6.4
+2026.03.02 08:06:00;VETO;M1 break rejected: regime: chop ADX 20.9 < 22.0
+2026.03.02 13:46:00;VETO;M1 break rejected: regime: chop ADX 19.0 < 22.0
+2026.03.02 15:05:00;VETO;M1 break rejected: regime: chop ADX 13.0 < 22.0
+2026.03.02 16:05:00;VETO;M1 break rejected: regime: chop ADX 13.8 < 22.0
+2026.03.02 16:30:00;VETO;outlier bar masked, z=9.3
+2026.03.02 16:45:00;VETO;outlier bar masked, z=5.9
+2026.03.02 18:00:00;VETO;outlier bar masked, z=3.6
+2026.03.02 18:15:00;VETO;outlier bar masked, z=6.2
+2026.03.02 21:02:00;DECISION;M1 setup LONG score=0.75 entry=5325.76 inv=5289.61 AWAIT-RETEST [CHoCH long lvl=5320.64|RelVol=1.01|Retest@5325.76|VPnode d=3.24|CycleTurn w=0.62<--0.40]
+2026.03.02 21:15:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.02 21:30:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.02 21:45:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.02 22:00:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.03.03 02:15:00;VETO;signal rejected: volume: relVol 0.52 < 1.00
+2026.03.03 06:28:00;VETO;M1 break rejected: volume: relVol 0.86 < 1.00
+2026.03.03 07:01:00;DECISION;M1 setup SHORT score=0.85 entry=5356.08 inv=5374.68 AWAIT-RETEST [CHoCH short lvl=5359.18|RelVol=1.48|Retest@5356.08|StopFloored|VPnode d=6.68|VWAPside|CycleTurn w=0.64<-0.90]
+2026.03.03 07:15:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.03.03 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.03.03 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.03.03 08:00:00;VETO;outlier bar masked, z=4.7
+2026.03.03 08:15:00;VETO;outlier bar masked, z=4.8
+2026.03.03 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.03.03 11:26:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5278.99|RelVol=1.98|Retest@5274.48|VWAPside|ADX=32]
+2026.03.03 11:30:00;VETO;outlier bar masked, z=8.9
+2026.03.03 13:08:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5226.29|RelVol=2.51|Retest@5221.61|VWAPside|ADX=35]
+2026.03.03 13:15:00;VETO;outlier bar masked, z=11.5
+2026.03.03 13:30:00;VETO;outlier bar masked, z=9.9
+2026.03.03 13:45:00;VETO;outlier bar masked, z=6.3
+2026.03.03 14:15:00;VETO;outlier bar masked, z=4.4
+2026.03.03 15:15:00;VETO;outlier bar masked, z=6.0
+2026.03.03 16:45:00;VETO;outlier bar masked, z=5.9
+2026.03.03 17:00:00;VETO;outlier bar masked, z=3.6
+2026.03.03 20:44:00;VETO;M1 break rejected: regime: chop ADX 19.3 < 22.0
+2026.03.03 22:52:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.03.04 02:42:00;VETO;M1 break rejected: regime: chop ADX 17.5 < 22.0
+2026.03.04 08:02:00;VETO;M1 break rejected: regime: chop ADX 19.1 < 22.0
+2026.03.04 09:06:00;DECISION;M1 setup LONG score=0.65 entry=5172.46 inv=5122.39 AWAIT-RETEST [CHoCH long lvl=5168.32|RelVol=1.29|Retest@5172.46|VPnode d=5.54|VWAPside]
+2026.03.04 09:15:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.03.04 09:30:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.03.04 09:45:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.03.04 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.03.04 10:46:00;VETO;M1 break rejected: regime: chop ADX 19.8 < 22.0
+2026.03.04 14:04:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.03.04 16:49:00;VETO;M1 break rejected: regime: chop ADX 17.0 < 22.0
+2026.03.04 19:24:00;VETO;M1 break rejected: regime: chop ADX 12.1 < 22.0
+2026.03.05 01:01:00;VETO;M1 break rejected: regime: chop ADX 13.6 < 22.0
+2026.03.05 04:54:00;VETO;M1 break rejected: volume: relVol 0.93 < 1.00
+2026.03.05 08:12:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH short lvl=5129.52|RelVol=1.00|Retest@5126.75|VWAPside]
+2026.03.05 08:15:00;VETO;outlier bar masked, z=4.8
+2026.03.05 11:07:00;DECISION;M1 setup LONG score=0.65 entry=5176.18 inv=5120.65 AWAIT-RETEST [CHoCH long lvl=5172.78|RelVol=1.30|Retest@5176.18|VPnode d=1.12|VWAPside]
+2026.03.05 11:15:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.03.05 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.03.05 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.03.05 12:00:00;DECISION;TP capped 80.70000 -> 60.52500 (3.0xATR)
+2026.03.05 12:00:00;ORDER;filled BUY 0.02 lots sl=5120.65 tp=5221.53 [WT|CHOCH|0.65]
+2026.03.05 12:00:00;RISK;sizing: vol_ratio=0.93 scalar=1.00 gap_buf=6.69964 eff_stop=47.04964
+2026.03.05 12:00:00;ORDER;entry fill deal #36 BUY 0.02 @ 5161.00000
+2026.03.05 14:07:00;VETO;M1 break rejected: regime: chop ADX 16.1 < 22.0
+2026.03.05 15:17:00;VETO;M1 break rejected: regime: chop ADX 13.6 < 22.0
+2026.03.05 15:20:40;RISK;deal closed pnl=-80.70 streak=1 lock=0
+2026.03.05 15:30:00;VETO;outlier bar masked, z=12.5
+2026.03.05 16:45:00;VETO;outlier bar masked, z=3.8
+2026.03.05 17:09:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5083.30|RelVol=1.26|Retest@5080.19|VWAPside|ADX=42]
+2026.03.05 17:15:00;VETO;outlier bar masked, z=8.1
+2026.03.05 18:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5060.45|RelVol=1.14|VWAPside|ADX=52]
+2026.03.05 22:17:00;VETO;M1 break rejected: regime: chop ADX 21.0 < 22.0
+2026.03.06 01:20:00;VETO;M1 break rejected: regime: chop ADX 18.1 < 22.0
+2026.03.06 03:36:00;VETO;M1 break rejected: regime: chop ADX 17.0 < 22.0
+2026.03.06 09:09:00;VETO;M1 break rejected: volume: relVol 0.56 < 1.00
+2026.03.06 10:28:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.03.06 13:56:00;DECISION;M1 setup SHORT score=0.75 entry=5069.43 inv=5123.25 [BOS short lvl=5075.72|RelVol=1.33|VPnode d=5.77|VWAPside|ADX=32]
+2026.03.06 13:56:00;DECISION;TP capped 107.74000 -> 80.80500 (3.0xATR)
+2026.03.06 13:56:00;ORDER;filled SELL 0.01 lots sl=5123.25 tp=4988.58 [WT|BOS|0.75]
+2026.03.06 13:56:00;RISK;sizing: vol_ratio=0.92 scalar=1.00 gap_buf=6.62893 eff_stop=60.49893
+2026.03.06 13:56:00;ORDER;entry fill deal #38 SELL 0.01 @ 5069.38000
+2026.03.06 15:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH long lvl=5099.82|RelVol=1.14|Retest@5103.45|VPnear|VWAPside]
+2026.03.06 15:31:20;RISK;deal closed pnl=-53.87 streak=1 lock=0
+2026.03.06 15:45:00;VETO;outlier bar masked, z=5.6
+2026.03.06 16:00:00;VETO;outlier bar masked, z=5.6
+2026.03.06 17:00:00;VETO;outlier bar masked, z=4.8
+2026.03.06 17:15:00;VETO;signal rejected: score 0.50 < 0.55 [BOS long lvl=5131.07|RelVol=1.36|Retest@5135.68|VPnear|VWAPside]
+2026.03.06 20:38:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.03.09 01:01:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.03.09 01:15:00;VETO;outlier bar masked, z=11.7
+2026.03.09 01:45:00;VETO;outlier bar masked, z=8.8
+2026.03.09 02:15:00;VETO;outlier bar masked, z=7.0
+2026.03.09 03:01:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5028.44|RelVol=1.43|VPnear|VWAPside]
+2026.03.09 03:15:00;VETO;outlier bar masked, z=7.9
+2026.03.09 04:15:00;VETO;outlier bar masked, z=4.4
+2026.03.09 07:34:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.03.09 10:47:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.03.09 11:11:00;VETO;M1 break rejected: regime: chop ADX 19.2 < 22.0
+2026.03.09 13:21:00;VETO;M1 break rejected: regime: chop ADX 18.5 < 22.0
+2026.03.09 15:43:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.03.09 15:45:00;VETO;outlier bar masked, z=3.6
+2026.03.09 16:45:00;VETO;signal rejected: regime: chop ADX 20.4 < 22.0
+2026.03.09 20:36:00;VETO;M1 break rejected: regime: chop ADX 19.3 < 22.0
+2026.03.10 01:01:00;VETO;M1 break rejected: volume: relVol 0.00 < 1.00
+2026.03.10 02:01:00;VETO;M1 break rejected: volume: relVol 0.57 < 1.00
+2026.03.10 03:21:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.03.10 10:00:00;VETO;signal rejected: regime: chop ADX 20.6 < 22.0
+2026.03.10 12:40:00;DECISION;M1 setup SHORT score=0.65 entry=5156.15 inv=5195.15 AWAIT-RETEST [CHoCH short lvl=5158.58|RelVol=1.12|Retest@5156.15|VPnode d=4.05|VWAPside]
+2026.03.10 12:40:00;DECISION;TP capped 77.99929 -> 58.49946 (3.0xATR)
+2026.03.10 12:40:00;ERROR;limit SELL 0.02 @ 5156.15 sl=5195.15 tp=5097.65 rc=10015 [WT|CHOCH|0.65|RL]
+2026.03.10 12:45:00;DECISION;TP capped 51.94000 -> 38.95500 (3.0xATR)
+2026.03.10 12:45:00;ORDER;filled SELL 0.03 lots sl=5195.15 tp=5130.23 [WT|CHOCH|0.65]
+2026.03.10 12:45:00;RISK;sizing: vol_ratio=0.85 scalar=1.00 gap_buf=5.28429 eff_stop=31.25429
+2026.03.10 12:45:00;ORDER;entry fill deal #40 SELL 0.03 @ 5169.18000
+2026.03.10 15:00:40;RISK;deal closed pnl=-77.91 streak=1 lock=0
+2026.03.10 15:01:00;VETO;M1 break rejected: regime: chop ADX 21.2 < 22.0
+2026.03.10 15:30:00;VETO;outlier bar masked, z=4.6
+2026.03.10 17:32:00;VETO;M1 break rejected: volume: relVol 0.59 < 1.00
+2026.03.10 20:19:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.03.10 20:30:00;VETO;outlier bar masked, z=12.2
+2026.03.11 07:31:00;VETO;M1 break rejected: regime: chop ADX 16.9 < 22.0
+2026.03.11 09:34:00;VETO;M1 break rejected: regime: chop ADX 19.4 < 22.0
+2026.03.11 14:37:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5177.21|RelVol=1.01|VPnear|VWAPside]
+2026.03.11 16:00:00;VETO;outlier bar masked, z=4.1
+2026.03.11 19:37:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.03.11 21:41:00;VETO;M1 break rejected: regime: chop ADX 19.2 < 22.0
+2026.03.12 00:27:00;VETO;M1 break rejected: regime: chop ADX 17.0 < 22.0
+2026.03.12 01:00:00;VETO;outlier bar masked, z=7.2
+2026.03.12 02:01:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.03.12 06:40:00;VETO;M1 break rejected: regime: chop ADX 21.9 < 22.0
+2026.03.12 09:43:00;VETO;M1 break rejected: regime: chop ADX 18.4 < 22.0
+2026.03.12 12:02:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.03.12 13:20:00;VETO;M1 break rejected: regime: chop ADX 21.0 < 22.0
+2026.03.12 15:30:00;VETO;outlier bar masked, z=4.2
+2026.03.12 15:45:00;VETO;signal rejected: regime: chop ADX 20.2 < 22.0
+2026.03.12 17:15:00;VETO;outlier bar masked, z=6.1
+2026.03.12 19:42:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=5109.91|RelVol=1.07|VWAPside|ADX=45]
+2026.03.12 22:21:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.03.13 05:37:00;VETO;M1 break rejected: volume: relVol 0.61 < 1.00
+2026.03.13 13:58:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.03.13 16:41:00;DECISION;M1 setup SHORT score=0.85 entry=5076.96 inv=5121.84 AWAIT-RETEST [CHoCH short lvl=5079.88|RelVol=1.15|Retest@5076.96|VPnode d=5.64|VWAPside|CycleTurn w=-0.07<-0.78]
+2026.03.13 16:41:00;DECISION;TP capped 89.75750 -> 67.31812 (3.0xATR)
+2026.03.13 16:41:00;ERROR;limit SELL 0.01 @ 5076.96 sl=5121.84 tp=5009.64 rc=10015 [WT|CHOCH|0.85|RL]
+2026.03.13 16:45:00;DECISION;TP capped 84.82000 -> 63.61500 (3.0xATR)
+2026.03.13 16:45:00;ORDER;filled SELL 0.01 lots sl=5121.84 tp=5015.82 [WT|CHOCH|0.85]
+2026.03.13 16:45:00;RISK;sizing: vol_ratio=1.11 scalar=0.92 gap_buf=6.04679 eff_stop=48.45679
+2026.03.13 16:45:00;ORDER;entry fill deal #42 SELL 0.01 @ 5079.43000
+2026.03.13 16:57:20;MANAGE;#42 SL 5121.84 -> 5079.39 breakeven
+2026.03.13 16:57:40;MANAGE;#42 SL 5079.39 -> 5069.86 trail
+2026.03.13 16:57:59;MANAGE;#42 SL 5069.86 -> 5067.28 trail
+2026.03.13 16:58:20;MANAGE;#42 SL 5067.28 -> 5067.15 trail
+2026.03.13 16:59:40;MANAGE;#42 SL 5067.15 -> 5065.54 trail
+2026.03.13 17:00:00;VETO;outlier bar masked, z=7.3
+2026.03.13 17:10:20;RISK;deal closed pnl=13.89 streak=0 lock=0
+2026.03.13 17:15:00;VETO;outlier bar masked, z=4.9
+2026.03.13 18:00:00;VETO;signal rejected: score 0.50 < 0.55 [BOS short lvl=5035.97|RelVol=1.10|VWAPside|ADX=44]
+2026.03.13 21:48:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.03.16 00:19:00;DECISION;M1 setup SHORT score=0.75 entry=5007.18 inv=5049.81 [BOS short lvl=5009.66|VPnode d=8.42|VWAPside|ADX=42]
+2026.03.16 00:19:00;VETO;authorization denied: outside session window (server hour 00, window 12-20)
+2026.03.16 00:30:00;VETO;authorization denied: outside session window (server hour 00, window 12-20)
+2026.03.16 00:45:00;VETO;authorization denied: outside session window (server hour 00, window 12-20)
+2026.03.16 01:00:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.03.16 01:21:00;DECISION;M1 setup SHORT score=0.75 entry=4997.46 inv=5030.27 AWAIT-RETEST [BOS short lvl=5000.88|RelVol=1.06|Retest@4997.46|VPnode d=7.14|VWAPside|ADX=42]
+2026.03.16 01:30:00;VETO;outlier bar masked, z=6.6
+2026.03.16 02:00:00;VETO;outlier bar masked, z=3.5
+2026.03.16 02:15:00;VETO;outlier bar masked, z=4.5
+2026.03.16 02:30:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.03.16 02:34:00;DECISION;M1 setup LONG score=0.85 entry=5029.90 inv=4967.62 AWAIT-RETEST [CHoCH long lvl=5026.13|RelVol=1.03|Retest@5029.90|VPnode d=1.10|VWAPside|CycleTurn w=-0.61<--0.97]
+2026.03.16 02:45:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.03.16 03:00:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.03.16 03:15:00;VETO;outlier bar masked, z=6.3
+2026.03.16 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.03.16 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.03.16 05:48:00;VETO;M1 break rejected: regime: chop ADX 20.8 < 22.0
+2026.03.16 08:15:00;VETO;signal rejected: regime: chop ADX 19.9 < 22.0
+2026.03.16 09:24:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.03.16 14:29:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.03.16 16:49:00;VETO;M1 break rejected: volume: relVol 0.54 < 1.00
+2026.03.16 20:28:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.03.17 03:04:00;VETO;M1 break rejected: regime: chop ADX 16.3 < 22.0
+2026.03.17 03:37:00;VETO;M1 break rejected: regime: chop ADX 17.1 < 22.0
+2026.03.17 05:25:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.03.17 06:31:00;VETO;M1 break rejected: volume: relVol 0.62 < 1.00
+2026.03.17 12:07:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.03.17 15:33:00;VETO;M1 break rejected: regime: chop ADX 17.6 < 22.0
+2026.03.17 16:00:00;VETO;outlier bar masked, z=3.7
+2026.03.17 17:29:00;VETO;M1 break rejected: regime: chop ADX 11.9 < 22.0
+2026.03.17 17:45:00;VETO;outlier bar masked, z=4.9
+2026.03.17 20:23:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.03.18 00:45:00;VETO;signal rejected: regime: chop ADX 19.5 < 22.0
+2026.03.18 02:05:00;VETO;M1 break rejected: volume: relVol 0.19 < 1.00
+2026.03.18 03:11:00;VETO;M1 break rejected: volume: relVol 0.40 < 1.00
+2026.03.18 05:05:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.03.18 06:37:00;VETO;M1 break rejected: volume: relVol 0.46 < 1.00
+2026.03.18 12:36:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.03.18 12:45:00;VETO;outlier bar masked, z=5.1
+2026.03.18 13:00:00;VETO;outlier bar masked, z=3.6
+2026.03.18 13:30:00;VETO;outlier bar masked, z=5.1
+2026.03.18 13:45:00;VETO;outlier bar masked, z=4.7
+2026.03.18 14:15:00;VETO;outlier bar masked, z=4.3
+2026.03.18 14:45:00;VETO;outlier bar masked, z=4.3
+2026.03.18 15:15:00;VETO;outlier bar masked, z=5.2
+2026.03.18 15:30:00;VETO;outlier bar masked, z=5.2
+2026.03.18 15:45:00;VETO;outlier bar masked, z=5.7
+2026.03.18 18:28:00;VETO;M1 break rejected: volume: relVol 0.46 < 1.00
+2026.03.18 20:58:00;DECISION;M1 setup SHORT score=0.60 entry=4857.98 inv=4880.07 AWAIT-RETEST [CHoCH short lvl=4860.86|RelVol=1.31|Retest@4857.98|VWAPside|CycleTurn w=0.99<-1.00]
+2026.03.18 21:00:00;VETO;outlier bar masked, z=3.8
+2026.03.18 21:15:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.18 21:30:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.18 21:45:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.18 22:00:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.03.19 07:47:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.03.19 08:45:00;VETO;outlier bar masked, z=4.2
+2026.03.19 09:00:00;VETO;outlier bar masked, z=4.2
+2026.03.19 12:21:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4686.85|RelVol=1.18|VWAPside|ADX=69]
+2026.03.19 14:45:00;VETO;outlier bar masked, z=3.7
+2026.03.19 15:15:00;VETO;outlier bar masked, z=5.0
+2026.03.19 15:30:00;VETO;outlier bar masked, z=3.7
+2026.03.19 16:00:00;VETO;outlier bar masked, z=6.0
+2026.03.19 21:01:00;VETO;M1 break rejected: regime: chop ADX 17.6 < 22.0
+2026.03.20 00:07:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.03.20 03:08:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.03.20 04:50:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.03.20 12:02:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH short lvl=4661.50|RelVol=1.27|Retest@4657.10|VPnear|VWAPside]
+2026.03.20 15:52:00;DECISION;M1 setup SHORT score=0.70 entry=4631.01 inv=4695.44 [BOS short lvl=4637.22|RelVol=1.07|VPnear|VWAPside|CycleTurn w=0.44<-0.88]
+2026.03.20 15:52:00;DECISION;TP capped 128.86000 -> 96.64500 (3.0xATR)
+2026.03.20 15:52:00;ORDER;filled SELL 0.01 lots sl=4695.44 tp=4534.37 [WT|BOS|0.70]
+2026.03.20 15:52:00;RISK;sizing: vol_ratio=0.86 scalar=1.00 gap_buf=9.75571 eff_stop=74.18571
+2026.03.20 15:52:00;ORDER;entry fill deal #44 SELL 0.01 @ 4631.01000
+2026.03.20 16:00:00;VETO;outlier bar masked, z=3.8
+2026.03.20 16:18:40;MANAGE;#44 SL 4695.44 -> 4630.97 breakeven
+2026.03.20 16:18:59;MANAGE;#44 SL 4630.97 -> 4609.41 trail
+2026.03.20 16:19:00;MANAGE;#44 SL 4609.41 -> 4609.21 trail
+2026.03.20 16:19:20;MANAGE;#44 SL 4609.21 -> 4608.93 trail
+2026.03.20 16:24:40;MANAGE;#44 SL 4608.93 -> 4606.45 trail
+2026.03.20 16:25:40;MANAGE;#44 SL 4606.45 -> 4600.86 trail
+2026.03.20 16:27:40;MANAGE;#44 SL 4600.86 -> 4600.09 trail
+2026.03.20 16:28:40;MANAGE;#44 SL 4600.09 -> 4597.39 trail
+2026.03.20 16:55:20;MANAGE;#44 SL 4597.39 -> 4595.73 trail
+2026.03.20 17:26:40;MANAGE;#44 SL 4595.73 -> 4593.04 trail
+2026.03.20 18:17:40;RISK;deal closed pnl=37.97 streak=0 lock=0
+2026.03.20 20:23:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.03.20 21:00:00;VETO;outlier bar masked, z=4.6
+2026.03.23 00:02:00;VETO;M1 break rejected: volume: relVol 0.68 < 1.00
+2026.03.23 00:15:00;VETO;outlier bar masked, z=6.3
+2026.03.23 02:04:00;DECISION;M1 setup SHORT score=0.70 entry=4435.84 inv=4536.29 [BOS short lvl=4449.59|RelVol=1.54|VWAPside|CycleTurn w=0.91<-0.96|ADX=46]
+2026.03.23 02:04:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.03.23 02:15:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.03.23 02:30:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.03.23 02:45:00;VETO;outlier bar masked, z=10.1
+2026.03.23 03:00:00;VETO;outlier bar masked, z=3.6
+2026.03.23 03:15:00;VETO;outlier bar masked, z=7.9
+2026.03.23 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.03.23 04:00:00;VETO;outlier bar masked, z=3.6
+2026.03.23 07:31:00;DECISION;M1 setup SHORT score=0.75 entry=4331.58 inv=4381.65 [BOS short lvl=4335.18|RelVol=1.38|VPnode d=3.42|VWAPside|ADX=32]
+2026.03.23 07:31:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.03.23 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.03.23 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.03.23 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.03.23 08:30:00;VETO;outlier bar masked, z=4.4
+2026.03.23 08:45:00;VETO;outlier bar masked, z=4.1
+2026.03.23 09:00:00;VETO;outlier bar masked, z=4.0
+2026.03.23 09:15:00;VETO;outlier bar masked, z=6.5
+2026.03.23 09:30:00;VETO;outlier bar masked, z=3.6
+2026.03.23 09:45:00;VETO;outlier bar masked, z=5.9
+2026.03.23 11:45:00;VETO;outlier bar masked, z=4.7
+2026.03.23 13:06:00;VETO;M1 break rejected: regime: chop ADX 20.8 < 22.0
+2026.03.23 13:15:00;VETO;outlier bar masked, z=12.3
+2026.03.23 13:30:00;VETO;outlier bar masked, z=5.9
+2026.03.23 14:52:00;DECISION;M1 setup LONG score=0.65 entry=4474.25 inv=4223.64 [BOS long lvl=4462.75|RelVol=1.54|VPnode d=3.85|VWAPside]
+2026.03.23 14:52:00;DECISION;TP capped 501.30000 -> 375.97500 (3.0xATR)
+2026.03.23 14:52:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.03.23 16:19:00;DECISION;M1 setup LONG score=0.65 entry=4495.32 inv=4336.87 [BOS long lvl=4492.43|RelVol=1.15|VPnode d=16.28|VWAPside]
+2026.03.23 16:19:00;DECISION;TP capped 316.98000 -> 237.73500 (3.0xATR)
+2026.03.23 16:19:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.03.23 17:48:00;DECISION;M1 setup SHORT score=0.75 entry=4390.20 inv=4512.81 AWAIT-RETEST [CHoCH short lvl=4401.63|RelVol=1.08|Retest@4390.20|VPnode d=21.91|CycleTurn w=0.54<-0.92]
+2026.03.23 17:48:00;VETO;retest limit risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.03.23 18:00:00;DECISION;TP capped 298.06000 -> 223.54500 (3.0xATR)
+2026.03.23 18:00:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.03.23 20:35:00;DECISION;M1 setup LONG score=0.60 entry=4447.47 inv=4350.99 AWAIT-RETEST [CHoCH long lvl=4438.86|RelVol=1.04|Retest@4447.47|VWAPside|CycleTurn w=-0.57<--0.81]
+2026.03.23 20:45:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.03.23 21:00:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.23 21:15:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.23 21:30:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.03.24 00:05:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.03.24 02:39:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.03.24 08:23:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.03.24 12:56:00;VETO;M1 break rejected: volume: relVol 0.96 < 1.00
+2026.03.24 14:40:00;DECISION;M1 setup SHORT score=0.65 entry=4368.75 inv=4442.08 AWAIT-RETEST [CHoCH short lvl=4374.64|RelVol=1.25|Retest@4368.75|VPnode d=11.95|VWAPside]
+2026.03.24 14:40:00;DECISION;TP capped 146.66786 -> 110.00089 (3.0xATR)
+2026.03.24 14:40:00;ORDER;limit SELL 0.01 @ 4368.75 sl=4442.08 tp=4258.75 rc=10009 [WT|CHOCH|0.65|RL]
+2026.03.24 14:40:00;RISK;sizing: vol_ratio=0.72 scalar=1.00 gap_buf=11.78786 eff_stop=85.12179
+2026.03.24 14:40:40;ORDER;entry fill deal #46 SELL 0.01 @ 4368.75000
+2026.03.24 19:06:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.03.24 22:23:00;VETO;M1 break rejected: regime: chop ADX 13.0 < 22.0
+2026.03.24 22:24:40;RISK;deal closed pnl=-73.33 streak=1 lock=0
+2026.03.24 22:30:00;VETO;outlier bar masked, z=6.5
+2026.03.25 01:17:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4485.76|RelVol=1.01|VPnear|VWAPside]
+2026.03.25 07:18:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.03.25 10:16:00;DECISION;M1 setup LONG score=0.65 entry=4566.84 inv=4533.26 AWAIT-RETEST [CHoCH long lvl=4563.29|RelVol=1.08|Retest@4566.84|VPnode d=6.86|VWAPside]
+2026.03.25 10:30:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.03.25 10:45:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.03.25 11:00:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.03.25 11:15:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.03.25 13:07:00;VETO;M1 break rejected: regime: chop ADX 17.3 < 22.0
+2026.03.25 16:51:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.03.25 17:18:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.03.25 20:51:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.03.25 21:15:00;VETO;outlier bar masked, z=5.5
+2026.03.26 01:38:00;VETO;M1 break rejected: regime: chop ADX 16.4 < 22.0
+2026.03.26 02:50:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.03.26 07:27:00;VETO;M1 break rejected: regime: chop ADX 21.9 < 22.0
+2026.03.26 08:00:00;VETO;outlier bar masked, z=4.5
+2026.03.26 10:44:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS short lvl=4415.89|RelVol=1.31|VWAPside]
+2026.03.26 15:46:00;VETO;M1 break rejected: regime: chop ADX 20.5 < 22.0
+2026.03.26 18:21:00;VETO;M1 break rejected: volume: relVol 0.66 < 1.00
+2026.03.26 18:30:00;VETO;outlier bar masked, z=6.1
+2026.03.26 21:55:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.03.26 22:14:00;DECISION;M1 setup LONG score=0.55 entry=4403.58 inv=4367.79 AWAIT-RETEST [CHoCH long lvl=4399.41|RelVol=1.10|Retest@4403.58|VPnode d=8.82]
+2026.03.26 22:15:00;VETO;outlier bar masked, z=6.5
+2026.03.26 22:30:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.03.26 22:45:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.03.27 00:00:00;VETO;authorization denied: outside session window (server hour 00, window 12-20)
+2026.03.27 00:15:00;VETO;authorization denied: outside session window (server hour 00, window 12-20)
+2026.03.27 02:23:00;VETO;M1 break rejected: volume: relVol 0.50 < 1.00
+2026.03.27 03:32:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.03.27 06:56:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.03.27 12:42:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.03.27 16:04:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.03.27 17:00:00;VETO;outlier bar masked, z=4.5
+2026.03.27 22:49:00;VETO;M1 break rejected: regime: chop ADX 21.1 < 22.0
+2026.03.30 01:15:00;VETO;outlier bar masked, z=4.7
+2026.03.30 02:32:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.03.30 03:30:00;VETO;outlier bar masked, z=4.5
+2026.03.30 05:42:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.03.30 05:45:00;VETO;outlier bar masked, z=3.5
+2026.03.30 08:50:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.03.30 14:19:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.03.30 16:59:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.03.30 20:58:00;VETO;M1 break rejected: volume: relVol 0.98 < 1.00
+2026.03.30 21:55:00;VETO;M1 break rejected: volume: relVol 0.68 < 1.00
+2026.03.31 03:03:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.03.31 03:21:00;VETO;M1 break rejected: regime: chop ADX 21.3 < 22.0
+2026.03.31 03:30:00;VETO;outlier bar masked, z=4.9
+2026.03.31 03:45:00;VETO;outlier bar masked, z=3.6
+2026.03.31 04:30:00;VETO;outlier bar masked, z=6.0
+2026.03.31 04:45:00;VETO;outlier bar masked, z=5.8
+2026.03.31 10:20:00;VETO;M1 break rejected: regime: chop ADX 18.3 < 22.0
+2026.03.31 13:37:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.03.31 13:45:00;VETO;outlier bar masked, z=4.1
+2026.03.31 14:23:00;DECISION;M1 setup LONG score=0.65 entry=4577.75 inv=4550.19 AWAIT-RETEST [CHoCH long lvl=4575.21|RelVol=1.05|Retest@4577.75|VPnode d=2.05|VWAPside]
+2026.03.31 14:23:00;DECISION;TP capped 55.11679 -> 41.33759 (3.0xATR)
+2026.03.31 14:23:00;ERROR;limit BUY 0.03 @ 4577.75 sl=4550.19 tp=4619.09 rc=10015 [WT|CHOCH|0.65|RL]
+2026.03.31 14:30:00;VETO;outlier bar masked, z=4.3
+2026.03.31 14:45:00;DECISION;TP capped 83.62000 -> 62.71500 (3.0xATR)
+2026.03.31 14:45:00;ORDER;filled BUY 0.02 lots sl=4550.19 tp=4654.72 [WT|CHOCH|0.65]
+2026.03.31 14:45:00;RISK;sizing: vol_ratio=0.95 scalar=1.00 gap_buf=7.17071 eff_stop=48.98071
+2026.03.31 14:45:00;ORDER;entry fill deal #48 BUY 0.02 @ 4592.00000
+2026.03.31 16:53:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.03.31 19:40:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.03.31 19:40:40;MANAGE;#48 SL 4550.19 -> 4592.04 breakeven
+2026.03.31 19:40:40;MANAGE;#48 partial close 0.01 of 0.02 lots
+2026.03.31 19:40:40;RISK;deal closed pnl=49.44 streak=0 lock=0
+2026.03.31 19:40:59;MANAGE;#48 SL 4592.04 -> 4603.93 trail
+2026.03.31 19:41:40;MANAGE;#48 SL 4603.93 -> 4612.43 trail
+2026.03.31 19:42:20;MANAGE;#48 SL 4612.43 -> 4613.93 trail
+2026.03.31 19:43:20;MANAGE;#48 SL 4613.93 -> 4615.73 trail
+2026.03.31 19:45:00;VETO;outlier bar masked, z=3.9
+2026.03.31 20:04:20;RISK;deal closed pnl=62.72 streak=0 lock=0
+2026.04.01 02:56:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.04.01 05:37:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.04.01 07:03:00;DECISION;M1 setup SHORT score=0.65 entry=4678.18 inv=4724.23 [BOS short lvl=4678.28|RelVol=1.02|VPnode d=0.22|VWAPside]
+2026.04.01 07:03:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.04.01 07:15:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.04.01 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.04.01 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.04.01 08:36:00;VETO;M1 break rejected: volume: relVol 0.63 < 1.00
+2026.04.01 14:18:00;VETO;M1 break rejected: volume: relVol 0.67 < 1.00
+2026.04.01 17:43:00;VETO;M1 break rejected: regime: chop ADX 18.6 < 22.0
+2026.04.01 20:03:00;VETO;M1 break rejected: volume: relVol 0.58 < 1.00
+2026.04.02 01:36:00;VETO;M1 break rejected: regime: chop ADX 19.5 < 22.0
+2026.04.02 04:01:00;VETO;M1 break rejected: volume: relVol 0.73 < 1.00
+2026.04.02 04:15:00;VETO;outlier bar masked, z=8.7
+2026.04.02 04:30:00;VETO;outlier bar masked, z=9.3
+2026.04.02 04:45:00;VETO;outlier bar masked, z=8.0
+2026.04.02 08:34:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.04.02 08:45:00;VETO;outlier bar masked, z=7.2
+2026.04.02 09:00:00;VETO;outlier bar masked, z=6.3
+2026.04.02 09:15:00;VETO;outlier bar masked, z=4.6
+2026.04.02 13:21:00;VETO;M1 break rejected: regime: chop ADX 18.2 < 22.0
+2026.04.02 14:42:00;VETO;M1 break rejected: regime: chop ADX 12.7 < 22.0
+2026.04.02 16:01:00;VETO;M1 break rejected: regime: chop ADX 17.9 < 22.0
+2026.04.02 16:50:00;VETO;M1 break rejected: volume: relVol 1.00 < 1.00
+2026.04.02 17:00:00;VETO;outlier bar masked, z=4.8
+2026.04.02 21:59:00;VETO;M1 break rejected: regime: chop ADX 20.7 < 22.0
+2026.04.06 01:01:00;VETO;M1 break rejected: score 0.30 < 0.55 [CHoCH short lvl=4645.77|RelVol=1.30|Retest@4642.74]
+2026.04.06 01:15:00;VETO;outlier bar masked, z=7.2
+2026.04.06 02:00:00;VETO;outlier bar masked, z=5.4
+2026.04.06 05:17:00;VETO;M1 break rejected: regime: chop ADX 21.4 < 22.0
+2026.04.06 08:11:00;VETO;M1 break rejected: volume: relVol 0.56 < 1.00
+2026.04.06 10:50:00;VETO;M1 break rejected: regime: chop ADX 19.1 < 22.0
+2026.04.06 14:46:00;VETO;M1 break rejected: volume: relVol 0.46 < 1.00
+2026.04.06 18:16:00;VETO;M1 break rejected: regime: chop ADX 19.7 < 22.0
+2026.04.06 20:13:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.04.07 01:06:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.04.07 04:01:00;VETO;M1 break rejected: regime: chop ADX 21.1 < 22.0
+2026.04.07 04:15:00;VETO;outlier bar masked, z=4.0
+2026.04.07 04:45:00;VETO;outlier bar masked, z=3.6
+2026.04.07 07:32:00;VETO;M1 break rejected: volume: relVol 0.66 < 1.00
+2026.04.07 11:13:00;VETO;M1 break rejected: regime: chop ADX 16.6 < 22.0
+2026.04.07 11:30:00;VETO;outlier bar masked, z=4.3
+2026.04.07 14:15:00;VETO;signal rejected: volume: relVol 0.95 < 1.00
+2026.04.07 17:04:00;VETO;M1 break rejected: volume: relVol 0.93 < 1.00
+2026.04.07 17:15:00;VETO;outlier bar masked, z=3.9
+2026.04.07 17:30:00;VETO;outlier bar masked, z=4.0
+2026.04.07 19:03:00;VETO;M1 break rejected: regime: chop ADX 20.7 < 22.0
+2026.04.07 20:07:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.04.07 22:20:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4686.61|RelVol=2.11|VWAPside|ADX=37]
+2026.04.07 22:30:00;VETO;outlier bar masked, z=3.5
+2026.04.08 01:15:00;VETO;outlier bar masked, z=5.7
+2026.04.08 01:45:00;VETO;outlier bar masked, z=7.9
+2026.04.08 02:00:00;VETO;outlier bar masked, z=6.6
+2026.04.08 08:47:00;VETO;M1 break rejected: regime: chop ADX 21.1 < 22.0
+2026.04.08 12:44:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.04.08 15:25:00;VETO;M1 break rejected: regime: chop ADX 18.9 < 22.0
+2026.04.08 15:30:00;VETO;outlier bar masked, z=4.0
+2026.04.08 17:26:00;VETO;M1 break rejected: regime: chop ADX 15.1 < 22.0
+2026.04.08 19:52:00;VETO;M1 break rejected: regime: chop ADX 19.5 < 22.0
+2026.04.08 20:35:00;VETO;M1 break rejected: regime: chop ADX 16.1 < 22.0
+2026.04.09 03:06:00;VETO;M1 break rejected: volume: relVol 0.65 < 1.00
+2026.04.09 04:15:00;VETO;signal rejected: regime: chop ADX 21.4 < 22.0
+2026.04.09 09:54:00;VETO;M1 break rejected: regime: chop ADX 18.5 < 22.0
+2026.04.09 10:11:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.04.09 11:47:00;VETO;M1 break rejected: regime: chop ADX 17.4 < 22.0
+2026.04.09 13:25:00;VETO;M1 break rejected: regime: chop ADX 16.5 < 22.0
+2026.04.09 16:36:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.04.09 18:18:00;VETO;M1 break rejected: volume: relVol 0.86 < 1.00
+2026.04.09 21:09:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.04.09 22:56:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.04.10 05:14:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.04.10 09:15:00;VETO;signal rejected: regime: chop ADX 19.3 < 22.0
+2026.04.10 11:48:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.04.10 12:20:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.04.10 14:25:00;VETO;M1 break rejected: regime: chop ADX 16.7 < 22.0
+2026.04.10 17:16:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.04.10 21:21:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.04.13 01:01:00;VETO;M1 break rejected: regime: chop ADX 15.9 < 22.0
+2026.04.13 01:15:00;VETO;outlier bar masked, z=44.0
+2026.04.13 01:30:00;VETO;outlier bar masked, z=7.9
+2026.04.13 04:15:00;VETO;outlier bar masked, z=4.1
+2026.04.13 07:22:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.04.13 08:03:00;VETO;M1 break rejected: volume: relVol 0.66 < 1.00
+2026.04.13 12:10:00;VETO;M1 break rejected: volume: relVol 0.86 < 1.00
+2026.04.13 14:44:00;VETO;M1 break rejected: volume: relVol 0.64 < 1.00
+2026.04.13 16:08:00;VETO;M1 break rejected: regime: chop ADX 18.4 < 22.0
+2026.04.13 18:06:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.04.13 20:22:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.04.14 01:01:00;VETO;M1 break rejected: score 0.30 < 0.55 [BOS long lvl=4750.12|RelVol=1.12]
+2026.04.14 03:31:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.04.14 08:12:00;VETO;M1 break rejected: regime: chop ADX 18.2 < 22.0
+2026.04.14 09:53:00;VETO;M1 break rejected: regime: chop ADX 17.9 < 22.0
+2026.04.14 10:30:00;VETO;outlier bar masked, z=3.9
+2026.04.14 13:39:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.04.14 13:45:00;VETO;outlier bar masked, z=6.4
+2026.04.14 16:21:00;VETO;M1 break rejected: regime: chop ADX 16.8 < 22.0
+2026.04.14 16:45:00;VETO;outlier bar masked, z=4.0
+2026.04.14 19:28:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.04.14 20:15:00;VETO;outlier bar masked, z=4.2
+2026.04.14 22:57:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4843.38|RelVol=1.12|VWAPside|ADX=44]
+2026.04.15 03:13:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.04.15 04:12:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.04.15 04:15:00;VETO;outlier bar masked, z=4.5
+2026.04.15 04:30:00;VETO;outlier bar masked, z=5.9
+2026.04.15 05:36:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.04.15 08:20:00;VETO;M1 break rejected: volume: relVol 0.94 < 1.00
+2026.04.15 08:37:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.04.15 09:56:00;DECISION;M1 setup SHORT score=0.65 entry=4811.54 inv=4830.39 [BOS short lvl=4812.63|RelVol=1.14|VPnode d=2.06|VWAPside]
+2026.04.15 09:56:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.04.15 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.04.15 10:15:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.04.15 10:30:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.04.15 12:11:00;DECISION;M1 setup SHORT score=0.75 entry=4804.54 inv=4830.39 [BOS short lvl=4804.61|RelVol=1.03|VPnode d=2.26|VWAPside|ADX=30]
+2026.04.15 12:11:00;DECISION;TP capped 51.70000 -> 38.77500 (3.0xATR)
+2026.04.15 12:11:00;ORDER;filled SELL 0.03 lots sl=4830.39 tp=4765.76 [WT|BOS|0.75]
+2026.04.15 12:11:00;RISK;sizing: vol_ratio=0.94 scalar=1.00 gap_buf=4.62000 eff_stop=30.47000
+2026.04.15 12:11:00;ORDER;entry fill deal #51 SELL 0.03 @ 4804.54000
+2026.04.15 12:15:00;VETO;outlier bar masked, z=5.4
+2026.04.15 16:30:00;VETO;signal rejected: volume: relVol 0.82 < 1.00
+2026.04.15 17:17:20;RISK;deal closed pnl=-77.55 streak=1 lock=0
+2026.04.16 01:47:00;VETO;M1 break rejected: regime: chop ADX 16.7 < 22.0
+2026.04.16 04:36:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.04.16 07:16:00;VETO;M1 break rejected: regime: chop ADX 16.9 < 22.0
+2026.04.16 11:05:00;VETO;M1 break rejected: regime: chop ADX 16.3 < 22.0
+2026.04.16 13:31:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.04.16 14:04:00;VETO;M1 break rejected: volume: relVol 0.86 < 1.00
+2026.04.16 16:51:00;VETO;M1 break rejected: regime: chop ADX 17.7 < 22.0
+2026.04.16 17:00:00;VETO;outlier bar masked, z=10.4
+2026.04.16 17:15:00;VETO;outlier bar masked, z=4.7
+2026.04.16 17:45:00;VETO;outlier bar masked, z=6.8
+2026.04.16 18:15:00;VETO;outlier bar masked, z=5.5
+2026.04.16 22:03:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.04.17 03:05:00;VETO;M1 break rejected: regime: chop ADX 13.8 < 22.0
+2026.04.17 03:44:00;VETO;M1 break rejected: regime: chop ADX 18.3 < 22.0
+2026.04.17 04:10:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.04.17 04:15:00;VETO;outlier bar masked, z=7.3
+2026.04.17 04:30:00;VETO;outlier bar masked, z=3.9
+2026.04.17 07:36:00;VETO;M1 break rejected: volume: relVol 0.48 < 1.00
+2026.04.17 09:30:00;VETO;signal rejected: volume: relVol 0.80 < 1.00
+2026.04.17 11:44:00;VETO;M1 break rejected: regime: chop ADX 21.7 < 22.0
+2026.04.17 14:46:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.04.17 15:30:00;VETO;outlier bar masked, z=3.6
+2026.04.17 16:00:00;VETO;outlier bar masked, z=6.9
+2026.04.17 16:15:00;VETO;outlier bar masked, z=16.6
+2026.04.17 16:30:00;VETO;outlier bar masked, z=9.1
+2026.04.17 16:45:00;VETO;outlier bar masked, z=5.8
+2026.04.17 17:00:00;VETO;outlier bar masked, z=7.5
+2026.04.17 17:15:00;VETO;outlier bar masked, z=5.7
+2026.04.17 20:25:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.04.20 01:01:00;VETO;M1 break rejected: score 0.30 < 0.55 [BOS short lvl=4853.68|RelVol=1.03|Retest@4851.88]
+2026.04.20 01:15:00;VETO;outlier bar masked, z=29.0
+2026.04.20 02:44:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4757.97|RelVol=1.05|Retest@4756.07|VWAPside|ADX=46]
+2026.04.20 02:45:00;VETO;outlier bar masked, z=6.2
+2026.04.20 04:15:00;VETO;outlier bar masked, z=4.1
+2026.04.20 07:37:00;VETO;M1 break rejected: volume: relVol 0.54 < 1.00
+2026.04.20 10:01:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.04.20 12:33:00;VETO;M1 break rejected: volume: relVol 0.60 < 1.00
+2026.04.20 13:11:00;VETO;M1 break rejected: regime: chop ADX 20.8 < 22.0
+2026.04.20 14:50:00;VETO;M1 break rejected: regime: chop ADX 17.6 < 22.0
+2026.04.20 16:30:00;VETO;signal rejected: volume: relVol 0.88 < 1.00
+2026.04.21 01:01:00;VETO;M1 break rejected: volume: relVol 0.51 < 1.00
+2026.04.21 04:48:00;VETO;M1 break rejected: volume: relVol 0.67 < 1.00
+2026.04.21 13:55:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.04.21 14:10:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.04.21 15:45:00;VETO;outlier bar masked, z=4.7
+2026.04.21 16:07:00;VETO;M1 break rejected: regime: chop ADX 19.2 < 22.0
+2026.04.21 16:45:00;VETO;outlier bar masked, z=4.2
+2026.04.21 17:41:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.04.21 17:45:00;VETO;outlier bar masked, z=6.3
+2026.04.21 18:00:00;VETO;outlier bar masked, z=3.7
+2026.04.21 18:15:00;VETO;outlier bar masked, z=4.0
+2026.04.21 19:30:00;VETO;signal rejected: score 0.50 < 0.55 [BOS short lvl=4723.72|RelVol=1.32|VWAPside|ADX=35]
+2026.04.21 20:45:00;VETO;outlier bar masked, z=4.4
+2026.04.21 22:42:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4692.36|RelVol=1.21|VWAPside|ADX=40]
+2026.04.21 22:45:00;VETO;outlier bar masked, z=9.3
+2026.04.22 01:15:00;VETO;outlier bar masked, z=9.1
+2026.04.22 02:14:00;VETO;M1 break rejected: volume: relVol 0.57 < 1.00
+2026.04.22 04:24:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.04.22 08:19:00;VETO;M1 break rejected: volume: relVol 0.60 < 1.00
+2026.04.22 13:03:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.04.22 15:49:00;VETO;M1 break rejected: regime: chop ADX 14.7 < 22.0
+2026.04.22 17:35:00;VETO;M1 break rejected: regime: chop ADX 17.4 < 22.0
+2026.04.22 18:36:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.04.22 21:46:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.04.23 01:45:00;VETO;signal rejected: regime: chop ADX 17.9 < 22.0
+2026.04.23 03:02:00;VETO;M1 break rejected: volume: relVol 0.67 < 1.00
+2026.04.23 03:15:00;VETO;outlier bar masked, z=8.9
+2026.04.23 03:30:00;VETO;outlier bar masked, z=16.2
+2026.04.23 03:46:00;DECISION;M1 setup LONG score=0.85 entry=4747.35 inv=4723.41 AWAIT-RETEST [CHoCH long lvl=4745.71|RelVol=1.49|Retest@4747.35|VPnode d=2.75|VWAPside|CycleTurn w=-0.85<--0.99]
+2026.04.23 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.04.23 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.04.23 04:30:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.04.23 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.04.23 05:15:00;VETO;outlier bar masked, z=4.0
+2026.04.23 08:31:00;VETO;M1 break rejected: volume: relVol 0.93 < 1.00
+2026.04.23 11:01:00;VETO;M1 break rejected: regime: chop ADX 18.1 < 22.0
+2026.04.23 11:46:00;VETO;M1 break rejected: regime: chop ADX 18.5 < 22.0
+2026.04.23 15:01:00;DECISION;M1 setup LONG score=0.85 entry=4727.08 inv=4684.31 AWAIT-RETEST [CHoCH long lvl=4724.78|RelVol=1.09|Retest@4727.08|VPnode d=3.28|VWAPside|CycleTurn w=0.69<--0.22]
+2026.04.23 15:01:00;DECISION;TP capped 85.54393 -> 64.15795 (3.0xATR)
+2026.04.23 15:01:00;ERROR;limit BUY 0.02 @ 4727.08 sl=4684.31 tp=4791.24 rc=10015 [WT|CHOCH|0.85|RL]
+2026.04.23 15:15:00;VETO;outlier bar masked, z=3.6
+2026.04.23 15:30:00;DECISION;TP capped 98.20000 -> 73.65000 (3.0xATR)
+2026.04.23 15:30:00;ORDER;filled BUY 0.01 lots sl=4684.31 tp=4807.06 [WT|CHOCH|0.85]
+2026.04.23 15:30:00;RISK;sizing: vol_ratio=1.08 scalar=0.94 gap_buf=4.94250 eff_stop=54.04250
+2026.04.23 15:30:00;ORDER;entry fill deal #53 BUY 0.01 @ 4733.41000
+2026.04.23 17:01:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.04.23 20:10:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.04.23 20:15:00;VETO;outlier bar masked, z=6.1
+2026.04.23 20:42:40;RISK;deal closed pnl=-49.10 streak=1 lock=0
+2026.04.23 20:45:00;VETO;outlier bar masked, z=9.0
+2026.04.23 21:00:00;VETO;outlier bar masked, z=10.6
+2026.04.24 02:18:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.04.24 05:25:00;VETO;M1 break rejected: regime: chop ADX 17.7 < 22.0
+2026.04.24 07:21:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4668.67|RelVol=1.25|VWAPside|ADX=47]
+2026.04.24 10:46:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.04.24 13:32:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.04.24 14:08:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.04.24 14:15:00;VETO;outlier bar masked, z=4.9
+2026.04.24 14:30:00;VETO;outlier bar masked, z=4.6
+2026.04.24 17:06:00;VETO;M1 break rejected: regime: chop ADX 16.5 < 22.0
+2026.04.24 17:15:00;VETO;outlier bar masked, z=6.3
+2026.04.24 22:39:00;VETO;M1 break rejected: regime: chop ADX 13.9 < 22.0
+2026.04.27 01:15:00;VETO;outlier bar masked, z=7.8
+2026.04.27 02:29:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.04.27 05:39:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.04.27 11:31:00;VETO;M1 break rejected: volume: relVol 0.86 < 1.00
+2026.04.27 15:21:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.04.27 15:41:00;VETO;M1 break rejected: volume: relVol 0.93 < 1.00
+2026.04.28 01:08:00;VETO;M1 break rejected: regime: chop ADX 20.5 < 22.0
+2026.04.28 02:31:00;VETO;M1 break rejected: regime: chop ADX 18.3 < 22.0
+2026.04.28 04:58:00;VETO;M1 break rejected: volume: relVol 0.69 < 1.00
+2026.04.28 05:00:00;VETO;outlier bar masked, z=4.5
+2026.04.28 08:01:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.04.28 08:15:00;VETO;outlier bar masked, z=5.1
+2026.04.28 08:45:00;VETO;outlier bar masked, z=10.9
+2026.04.28 09:15:00;VETO;outlier bar masked, z=4.4
+2026.04.28 09:30:00;VETO;outlier bar masked, z=4.5
+2026.04.28 10:56:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4623.23|RelVol=1.12|VWAPside|ADX=37]
+2026.04.28 11:15:00;VETO;outlier bar masked, z=4.2
+2026.04.28 12:26:00;DECISION;M1 setup SHORT score=0.65 entry=4614.28 inv=4675.81 [BOS short lvl=4614.73|RelVol=1.07|VPnode d=1.52|VWAPside]
+2026.04.28 12:26:00;DECISION;TP capped 123.06000 -> 92.29500 (3.0xATR)
+2026.04.28 12:26:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.04.28 14:45:00;VETO;outlier bar masked, z=6.6
+2026.04.28 15:15:00;VETO;outlier bar masked, z=5.0
+2026.04.28 15:30:00;VETO;outlier bar masked, z=4.2
+2026.04.28 20:42:00;VETO;M1 break rejected: regime: chop ADX 21.7 < 22.0
+2026.04.29 03:01:00;VETO;M1 break rejected: volume: relVol 0.70 < 1.00
+2026.04.29 04:04:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.04.29 07:37:00;VETO;M1 break rejected: regime: chop ADX 15.7 < 22.0
+2026.04.29 08:59:00;VETO;M1 break rejected: regime: chop ADX 20.9 < 22.0
+2026.04.29 12:51:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4557.19|RelVol=1.16|VWAPside|ADX=41]
+2026.04.29 15:52:00;VETO;M1 break rejected: regime: chop ADX 19.3 < 22.0
+2026.04.29 16:45:00;VETO;outlier bar masked, z=4.4
+2026.04.29 21:15:00;VETO;outlier bar masked, z=5.5
+2026.04.29 22:00:00;VETO;outlier bar masked, z=4.1
+2026.04.30 01:32:00;VETO;M1 break rejected: regime: chop ADX 20.0 < 22.0
+2026.04.30 09:55:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS long lvl=4582.57|RelVol=1.23|VWAPside]
+2026.04.30 11:15:00;VETO;outlier bar masked, z=7.1
+2026.04.30 13:17:00;DECISION;M1 setup LONG score=0.75 entry=4631.64 inv=4540.93 [BOS long lvl=4629.56|RelVol=1.43|VPnode d=0.36|VWAPside|ADX=68]
+2026.04.30 13:17:00;DECISION;TP capped 181.50000 -> 136.12500 (3.0xATR)
+2026.04.30 13:17:00;VETO;risk veto: size 0.00 < broker min 0.01 (risk too small for stop)
+2026.04.30 15:45:00;DECISION;setup SHORT score=0.55 entry=4624.21 inv=4646.89 tgt=0.00 AWAIT-RETEST [CHoCH short lvl=4626.82|RelVol=1.42|Retest@4624.21|VPnode d=6.09]
+2026.04.30 15:45:00;DECISION;TP capped 45.36071 -> 34.02054 (3.0xATR)
+2026.04.30 15:45:00;ERROR;limit SELL 0.03 @ 4624.21 sl=4646.89 tp=4590.19 rc=10015 [WT|CHOCH|0.55|RL]
+2026.04.30 16:00:00;ORDER;filled SELL 0.07 lots sl=4646.89 tp=4625.05 [WT|CHOCH|0.55]
+2026.04.30 16:00:00;RISK;sizing: vol_ratio=1.04 scalar=0.97 gap_buf=5.36893 eff_stop=12.64893
+2026.04.30 16:00:00;ORDER;entry fill deal #55 SELL 0.07 @ 4639.61000
+2026.04.30 16:30:40;MANAGE;#55 SL 4646.89 -> 4639.57 breakeven
+2026.04.30 16:30:40;MANAGE;#55 partial close 0.03 of 0.07 lots
+2026.04.30 16:30:40;RISK;deal closed pnl=29.01 streak=0 lock=0
+2026.04.30 16:36:20;RISK;deal closed pnl=58.24 streak=0 lock=0
+2026.04.30 19:17:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4609.41|RelVol=1.04|VPnear|ADX=40]
+2026.04.30 22:08:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.05.01 01:02:00;VETO;M1 break rejected: regime: chop ADX 21.2 < 22.0
+2026.05.01 02:35:00;VETO;M1 break rejected: regime: chop ADX 13.8 < 22.0
+2026.05.01 04:20:00;VETO;M1 break rejected: volume: relVol 0.53 < 1.00
+2026.05.01 05:18:00;VETO;M1 break rejected: volume: relVol 0.67 < 1.00
+2026.05.01 07:31:00;VETO;M1 break rejected: regime: chop ADX 18.3 < 22.0
+2026.05.01 13:31:00;VETO;M1 break rejected: volume: relVol 0.62 < 1.00
+2026.05.01 15:30:00;VETO;outlier bar masked, z=6.2
+2026.05.01 16:45:00;VETO;outlier bar masked, z=5.7
+2026.05.01 17:00:00;VETO;outlier bar masked, z=8.6
+2026.05.01 17:15:00;VETO;outlier bar masked, z=10.1
+2026.05.01 18:15:00;VETO;outlier bar masked, z=3.5
+2026.05.01 21:14:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.05.01 22:43:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.05.04 01:15:00;VETO;outlier bar masked, z=4.7
+2026.05.04 03:01:00;VETO;M1 break rejected: regime: chop ADX 19.4 < 22.0
+2026.05.04 04:15:00;VETO;outlier bar masked, z=3.8
+2026.05.04 08:28:00;VETO;M1 break rejected: regime: chop ADX 16.4 < 22.0
+2026.05.04 13:02:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.05.04 13:15:00;VETO;outlier bar masked, z=8.3
+2026.05.04 15:19:00;VETO;M1 break rejected: volume: relVol 0.91 < 1.00
+2026.05.04 17:23:00;VETO;M1 break rejected: regime: chop ADX 16.6 < 22.0
+2026.05.04 18:14:00;VETO;M1 break rejected: regime: chop ADX 14.9 < 22.0
+2026.05.04 18:30:00;VETO;outlier bar masked, z=6.6
+2026.05.05 03:14:00;VETO;M1 break rejected: regime: chop ADX 21.4 < 22.0
+2026.05.05 03:28:00;VETO;M1 break rejected: regime: chop ADX 18.5 < 22.0
+2026.05.05 08:35:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.05.05 10:03:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.05.05 11:59:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.05.05 13:52:00;VETO;M1 break rejected: volume: relVol 1.00 < 1.00
+2026.05.05 14:43:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH long lvl=4560.45|RelVol=1.09|Retest@4562.34|VPnear|VWAPside]
+2026.05.05 17:29:00;VETO;M1 break rejected: regime: chop ADX 17.6 < 22.0
+2026.05.05 19:04:00;VETO;M1 break rejected: regime: chop ADX 20.0 < 22.0
+2026.05.05 22:57:00;VETO;M1 break rejected: volume: relVol 0.49 < 1.00
+2026.05.06 01:56:00;VETO;M1 break rejected: volume: relVol 0.60 < 1.00
+2026.05.06 02:00:00;VETO;outlier bar masked, z=9.0
+2026.05.06 02:15:00;VETO;outlier bar masked, z=5.4
+2026.05.06 12:00:00;VETO;outlier bar masked, z=6.3
+2026.05.06 12:15:00;VETO;outlier bar masked, z=4.0
+2026.05.06 13:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4708.52|RelVol=1.08|VWAPside|ADX=45]
+2026.05.06 15:15:00;VETO;outlier bar masked, z=4.7
+2026.05.06 15:30:00;VETO;outlier bar masked, z=6.6
+2026.05.06 16:15:00;VETO;outlier bar masked, z=5.2
+2026.05.07 03:23:00;VETO;M1 break rejected: regime: chop ADX 16.8 < 22.0
+2026.05.07 04:15:00;VETO;outlier bar masked, z=4.3
+2026.05.07 07:00:00;VETO;signal rejected: regime: chop ADX 17.3 < 22.0
+2026.05.07 09:17:00;VETO;M1 break rejected: volume: relVol 0.86 < 1.00
+2026.05.07 09:45:00;VETO;outlier bar masked, z=8.1
+2026.05.07 13:46:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.05.07 14:56:00;VETO;M1 break rejected: regime: chop ADX 22.0 < 22.0
+2026.05.07 18:53:00;VETO;M1 break rejected: regime: chop ADX 16.6 < 22.0
+2026.05.07 20:27:00;DECISION;M1 setup SHORT score=0.60 entry=4697.06 inv=4764.81 [BOS short lvl=4704.44|RelVol=1.05|VPnear|VWAPside|ADX=36]
+2026.05.07 20:27:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.05.07 20:30:00;VETO;outlier bar masked, z=6.1
+2026.05.07 20:45:00;VETO;authorization denied: outside session window (server hour 20, window 12-20)
+2026.05.07 21:00:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.05.07 21:15:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.05.08 01:01:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS short lvl=4695.52|RelVol=1.08|Retest@4692.80|ADX=32]
+2026.05.08 01:15:00;VETO;outlier bar masked, z=3.9
+2026.05.08 04:02:00;DECISION;M1 setup LONG score=0.65 entry=4711.82 inv=4678.29 AWAIT-RETEST [CHoCH long lvl=4709.61|RelVol=1.06|Retest@4711.82|VPnode d=6.02|VWAPside]
+2026.05.08 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.08 04:30:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.08 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.08 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.08 09:29:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.05.08 10:23:00;VETO;M1 break rejected: regime: chop ADX 18.7 < 22.0
+2026.05.08 13:37:00;VETO;M1 break rejected: regime: chop ADX 16.0 < 22.0
+2026.05.08 15:11:00;VETO;M1 break rejected: regime: chop ADX 17.7 < 22.0
+2026.05.08 15:44:00;VETO;M1 break rejected: regime: chop ADX 21.0 < 22.0
+2026.05.08 15:45:00;VETO;outlier bar masked, z=5.6
+2026.05.08 17:15:00;VETO;outlier bar masked, z=5.9
+2026.05.11 01:01:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.05.11 01:15:00;VETO;outlier bar masked, z=11.2
+2026.05.11 03:20:00;VETO;M1 break rejected: regime: chop ADX 20.9 < 22.0
+2026.05.11 04:00:00;VETO;outlier bar masked, z=4.3
+2026.05.11 04:15:00;VETO;outlier bar masked, z=4.8
+2026.05.11 04:30:00;VETO;signal rejected: regime: chop ADX 21.1 < 22.0
+2026.05.11 07:20:00;DECISION;M1 setup SHORT score=0.70 entry=4672.23 inv=4700.29 AWAIT-RETEST [CHoCH short lvl=4675.09|RelVol=1.30|Retest@4672.23|VPnear|VWAPside|CycleTurn w=0.91<-0.97]
+2026.05.11 07:30:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.05.11 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.05.11 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.11 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.11 08:44:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.05.11 12:23:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.05.11 15:22:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.05.11 15:30:00;VETO;outlier bar masked, z=4.9
+2026.05.11 16:15:00;VETO;outlier bar masked, z=3.7
+2026.05.11 19:43:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.05.11 22:48:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.05.12 04:42:00;DECISION;M1 setup SHORT score=0.60 entry=4719.80 inv=4773.42 AWAIT-RETEST [CHoCH short lvl=4722.45|RelVol=1.23|Retest@4719.80|VWAPside|CycleTurn w=-0.53<-0.51]
+2026.05.12 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.12 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.12 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.12 05:30:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.12 06:46:00;VETO;M1 break rejected: volume: relVol 0.98 < 1.00
+2026.05.12 07:52:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.05.12 09:01:00;DECISION;M1 setup SHORT score=0.75 entry=4708.52 inv=4730.40 [BOS short lvl=4708.63|RelVol=1.14|VPnode d=1.08|VWAPside|ADX=30]
+2026.05.12 09:01:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.05.12 09:15:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.05.12 09:30:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.05.12 09:45:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.05.12 13:08:00;VETO;M1 break rejected: regime: chop ADX 19.9 < 22.0
+2026.05.12 13:40:00;VETO;M1 break rejected: regime: chop ADX 19.2 < 22.0
+2026.05.12 15:44:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.05.12 15:45:00;VETO;outlier bar masked, z=3.5
+2026.05.12 16:15:00;VETO;outlier bar masked, z=4.0
+2026.05.12 16:59:00;VETO;M1 break rejected: regime: chop ADX 17.5 < 22.0
+2026.05.12 17:00:00;VETO;outlier bar masked, z=4.4
+2026.05.12 18:30:00;VETO;outlier bar masked, z=4.6
+2026.05.12 22:54:00;DECISION;M1 setup LONG score=0.65 entry=4713.60 inv=4638.32 AWAIT-RETEST [CHoCH long lvl=4711.85|RelVol=1.12|Retest@4713.60|VPnode d=2.80|VWAPside]
+2026.05.13 01:00:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.05.13 01:15:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.05.13 01:30:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.05.13 01:45:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.05.13 08:05:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS long lvl=4705.87|RelVol=1.08|VPnear]
+2026.05.13 09:05:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4707.34|RelVol=1.08|VPnear|VWAPside]
+2026.05.13 11:27:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.05.13 15:21:00;VETO;M1 break rejected: regime: chop ADX 17.3 < 22.0
+2026.05.13 16:39:00;VETO;M1 break rejected: regime: chop ADX 18.9 < 22.0
+2026.05.13 16:45:00;VETO;outlier bar masked, z=3.7
+2026.05.13 18:35:00;VETO;M1 break rejected: regime: chop ADX 14.1 < 22.0
+2026.05.14 03:18:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.05.14 04:08:00;VETO;M1 break rejected: regime: chop ADX 16.9 < 22.0
+2026.05.14 04:15:00;VETO;outlier bar masked, z=5.4
+2026.05.14 05:49:00;VETO;M1 break rejected: regime: chop ADX 16.9 < 22.0
+2026.05.14 07:27:00;DECISION;M1 setup LONG score=0.65 entry=4702.17 inv=4683.55 AWAIT-RETEST [CHoCH long lvl=4699.65|RelVol=1.50|Retest@4702.17|VPnode d=3.37|VWAPside]
+2026.05.14 07:30:00;VETO;outlier bar masked, z=5.8
+2026.05.14 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.05.14 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.14 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.14 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.14 10:36:00;VETO;M1 break rejected: regime: chop ADX 19.3 < 22.0
+2026.05.14 11:00:00;VETO;outlier bar masked, z=3.5
+2026.05.14 12:31:00;VETO;M1 break rejected: regime: chop ADX 17.4 < 22.0
+2026.05.14 15:21:00;VETO;M1 break rejected: regime: chop ADX 13.6 < 22.0
+2026.05.14 16:30:00;VETO;signal rejected: regime: chop ADX 15.0 < 22.0
+2026.05.14 16:45:00;VETO;outlier bar masked, z=4.4
+2026.05.14 19:08:00;VETO;M1 break rejected: regime: chop ADX 17.3 < 22.0
+2026.05.14 21:05:00;VETO;M1 break rejected: regime: chop ADX 19.9 < 22.0
+2026.05.15 03:02:00;DECISION;M1 setup SHORT score=0.60 entry=4645.61 inv=4682.99 [BOS short lvl=4645.70|RelVol=1.29|VPnear|VWAPside|ADX=46]
+2026.05.15 03:02:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.05.15 03:15:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.05.15 03:30:00;VETO;outlier bar masked, z=5.1
+2026.05.15 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.05.15 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.15 04:15:00;VETO;outlier bar masked, z=3.8
+2026.05.15 07:44:00;DECISION;M1 setup SHORT score=0.75 entry=4605.14 inv=4623.44 [BOS short lvl=4607.10|RelVol=1.34|VPnode d=3.26|VWAPside|ADX=41]
+2026.05.15 07:44:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.05.15 07:45:00;VETO;authorization denied: outside session window (server hour 07, window 12-20)
+2026.05.15 08:00:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.15 08:15:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.05.15 08:45:00;VETO;outlier bar masked, z=4.2
+2026.05.15 11:18:00;DECISION;M1 setup SHORT score=0.60 entry=4556.04 inv=4588.63 [BOS short lvl=4556.34|RelVol=1.40|VPnear|VWAPside|ADX=43]
+2026.05.15 11:18:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.05.15 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.05.15 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.05.15 12:00:00;DECISION;TP capped 68.42000 -> 51.31500 (3.0xATR)
+2026.05.15 12:00:00;ORDER;filled SELL 0.01 lots sl=4588.63 tp=4503.10 [WT|BOS|0.60]
+2026.05.15 12:00:00;RISK;sizing: vol_ratio=1.31 scalar=0.77 gap_buf=6.73893 eff_stop=40.94893
+2026.05.15 12:00:00;ORDER;entry fill deal #58 SELL 0.01 @ 4554.42000
+2026.05.15 16:38:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4531.89|RelVol=1.11|VWAPside|ADX=32]
+2026.05.15 16:44:40;MANAGE;#58 SL 4588.63 -> 4554.38 breakeven
+2026.05.15 16:44:59;MANAGE;#58 SL 4554.38 -> 4544.73 trail
+2026.05.15 16:45:00;VETO;outlier bar masked, z=4.2
+2026.05.15 16:45:40;MANAGE;#58 SL 4544.73 -> 4538.27 trail
+2026.05.15 16:55:40;RISK;deal closed pnl=16.15 streak=0 lock=0
+2026.05.15 17:00:00;VETO;outlier bar masked, z=4.1
+2026.05.15 17:20:00;DECISION;M1 setup LONG score=0.55 entry=4560.80 inv=4531.89 AWAIT-RETEST [CHoCH long lvl=4557.61|RelVol=1.18|Retest@4560.80|VPnode d=8.80]
+2026.05.15 17:20:00;DECISION;TP capped 57.81214 -> 43.35911 (3.0xATR)
+2026.05.15 17:20:00;ERROR;limit BUY 0.02 @ 4560.80 sl=4531.89 tp=4604.16 rc=10015 [WT|CHOCH|0.55|RL]
+2026.05.15 17:30:00;DECISION;TP capped 47.58000 -> 40.48286 (3.0xATR)
+2026.05.15 17:30:00;ORDER;filled BUY 0.02 lots sl=4531.89 tp=4596.16 [WT|CHOCH|0.55]
+2026.05.15 17:30:00;RISK;sizing: vol_ratio=1.36 scalar=0.73 gap_buf=8.03107 eff_stop=31.82107
+2026.05.15 17:30:00;ORDER;entry fill deal #60 BUY 0.02 @ 4555.68000
+2026.05.15 19:06:40;RISK;deal closed pnl=-47.58 streak=1 lock=0
+2026.05.18 01:15:00;VETO;outlier bar masked, z=8.0
+2026.05.18 03:34:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH short lvl=4503.72|RelVol=1.31|Retest@4501.09|VWAPside]
+2026.05.18 03:45:00;VETO;outlier bar masked, z=5.9
+2026.05.18 04:00:00;VETO;outlier bar masked, z=5.1
+2026.05.18 08:31:00;VETO;M1 break rejected: regime: chop ADX 15.8 < 22.0
+2026.05.18 10:31:00;VETO;M1 break rejected: regime: chop ADX 15.6 < 22.0
+2026.05.18 14:42:00;VETO;M1 break rejected: volume: relVol 0.98 < 1.00
+2026.05.18 14:45:00;VETO;outlier bar masked, z=5.7
+2026.05.18 15:44:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS long lvl=4567.20|RelVol=1.01|VWAPside]
+2026.05.18 22:04:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.05.18 22:15:00;VETO;outlier bar masked, z=5.2
+2026.05.19 01:01:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4565.04|RelVol=1.07|CycleTurn w=0.67<--0.28]
+2026.05.19 07:01:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH short lvl=4543.59|RelVol=1.22|Retest@4541.02|VPnear|VWAPside]
+2026.05.19 09:19:00;DECISION;M1 setup LONG score=0.60 entry=4548.67 inv=4530.89 AWAIT-RETEST [CHoCH long lvl=4546.61|RelVol=1.21|Retest@4548.67|VPnear|CycleTurn w=-0.97<--0.99]
+2026.05.19 09:30:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.05.19 09:45:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.05.19 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.05.19 10:15:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.05.19 13:39:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.05.19 16:05:00;VETO;M1 break rejected: regime: chop ADX 12.3 < 22.0
+2026.05.19 16:30:00;VETO;outlier bar masked, z=5.0
+2026.05.19 16:45:00;VETO;outlier bar masked, z=4.1
+2026.05.19 17:00:00;VETO;outlier bar masked, z=5.3
+2026.05.20 04:28:00;DECISION;M1 setup SHORT score=0.65 entry=4478.86 inv=4512.45 [BOS short lvl=4479.62|RelVol=1.03|VPnode d=0.34|VWAPside]
+2026.05.20 04:28:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.20 04:30:00;VETO;outlier bar masked, z=3.7
+2026.05.20 04:45:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.20 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.20 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.20 06:08:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4456.24|RelVol=1.13|VPnear|VWAPside]
+2026.05.20 10:10:00;VETO;M1 break rejected: regime: chop ADX 15.8 < 22.0
+2026.05.20 13:08:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.05.20 16:30:00;VETO;signal rejected: volume: relVol 0.95 < 1.00
+2026.05.20 17:23:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.05.20 17:30:00;VETO;outlier bar masked, z=6.5
+2026.05.20 18:30:00;VETO;outlier bar masked, z=4.3
+2026.05.20 21:35:00;VETO;M1 break rejected: volume: relVol 0.98 < 1.00
+2026.05.21 02:29:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.05.21 03:16:00;DECISION;M1 setup LONG score=0.70 entry=4551.70 inv=4534.58 AWAIT-RETEST [CHoCH long lvl=4550.23|RelVol=1.01|Retest@4551.70|VPnear|VWAPside|CycleTurn w=-0.98<--1.00]
+2026.05.21 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.05.21 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.05.21 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.21 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.05.21 05:34:00;DECISION;M1 setup SHORT score=0.85 entry=4534.83 inv=4570.94 AWAIT-RETEST [CHoCH short lvl=4537.29|RelVol=1.16|Retest@4534.83|VPnode d=0.37|VWAPside|CycleTurn w=0.83<-0.99]
+2026.05.21 05:45:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.05.21 06:00:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.05.21 06:15:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.05.21 06:30:00;VETO;authorization denied: outside session window (server hour 06, window 12-20)
+2026.05.21 06:51:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.05.21 08:19:00;VETO;M1 break rejected: regime: chop ADX 21.0 < 22.0
+2026.05.21 10:25:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.05.21 12:20:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.05.21 13:30:00;VETO;outlier bar masked, z=4.5
+2026.05.21 14:00:00;VETO;signal rejected: regime: chop ADX 19.0 < 22.0
+2026.05.21 15:29:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.05.21 17:00:00;VETO;outlier bar masked, z=4.3
+2026.05.21 19:01:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.05.21 20:11:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.05.22 04:00:00;VETO;signal rejected: volume: relVol 0.82 < 1.00
+2026.05.22 05:34:00;VETO;M1 break rejected: volume: relVol 0.96 < 1.00
+2026.05.22 08:40:00;VETO;M1 break rejected: regime: chop ADX 21.0 < 22.0
+2026.05.22 08:57:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.05.22 09:00:00;VETO;outlier bar masked, z=6.7
+2026.05.22 11:11:00;VETO;M1 break rejected: regime: chop ADX 14.8 < 22.0
+2026.05.22 12:31:00;VETO;M1 break rejected: regime: chop ADX 18.6 < 22.0
+2026.05.22 12:52:00;VETO;M1 break rejected: regime: chop ADX 18.0 < 22.0
+2026.05.22 13:42:00;VETO;M1 break rejected: regime: chop ADX 15.7 < 22.0
+2026.05.22 16:49:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.05.22 22:03:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.05.25 01:01:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.05.25 01:15:00;VETO;outlier bar masked, z=13.3
+2026.05.25 06:45:00;VETO;signal rejected: regime: chop ADX 15.8 < 22.0
+2026.05.25 08:25:00;VETO;M1 break rejected: regime: chop ADX 16.5 < 22.0
+2026.05.25 12:39:00;VETO;M1 break rejected: regime: chop ADX 15.9 < 22.0
+2026.05.25 14:18:00;VETO;M1 break rejected: volume: relVol 0.36 < 1.00
+2026.05.25 15:01:00;VETO;M1 break rejected: volume: relVol 0.56 < 1.00
+2026.05.25 18:12:00;VETO;M1 break rejected: regime: chop ADX 14.3 < 22.0
+2026.05.25 20:03:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.05.25 20:40:00;VETO;M1 break rejected: volume: relVol 0.32 < 1.00
+2026.05.26 02:11:00;VETO;M1 break rejected: regime: chop ADX 18.8 < 22.0
+2026.05.26 02:34:00;VETO;M1 break rejected: regime: chop ADX 19.9 < 22.0
+2026.05.26 04:45:00;VETO;outlier bar masked, z=4.0
+2026.05.26 07:37:00;VETO;M1 break rejected: volume: relVol 0.61 < 1.00
+2026.05.26 10:18:00;VETO;M1 break rejected: regime: chop ADX 17.9 < 22.0
+2026.05.26 10:58:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.05.26 14:36:00;VETO;M1 break rejected: volume: relVol 0.94 < 1.00
+2026.05.26 14:45:00;VETO;outlier bar masked, z=4.8
+2026.05.26 18:18:00;VETO;M1 break rejected: regime: chop ADX 16.6 < 22.0
+2026.05.26 20:31:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.05.27 01:01:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.05.27 01:15:00;VETO;outlier bar masked, z=8.5
+2026.05.27 06:59:00;VETO;M1 break rejected: volume: relVol 0.59 < 1.00
+2026.05.27 07:47:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.05.27 08:36:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.05.27 10:50:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.05.27 13:31:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.05.27 14:00:00;VETO;outlier bar masked, z=5.4
+2026.05.27 15:00:00;VETO;outlier bar masked, z=3.8
+2026.05.27 15:30:00;VETO;outlier bar masked, z=10.1
+2026.05.27 16:07:00;VETO;M1 break rejected: volume: relVol 0.96 < 1.00
+2026.05.27 16:15:00;VETO;outlier bar masked, z=6.2
+2026.05.27 16:30:00;VETO;outlier bar masked, z=3.7
+2026.05.27 16:45:00;VETO;outlier bar masked, z=4.1
+2026.05.27 17:15:00;VETO;outlier bar masked, z=6.2
+2026.05.27 21:21:00;VETO;M1 break rejected: volume: relVol 0.62 < 1.00
+2026.05.28 01:01:00;VETO;M1 break rejected: regime: chop ADX 15.1 < 22.0
+2026.05.28 02:46:00;VETO;M1 break rejected: regime: chop ADX 20.9 < 22.0
+2026.05.28 04:15:00;VETO;outlier bar masked, z=4.0
+2026.05.28 04:30:00;VETO;outlier bar masked, z=4.7
+2026.05.28 12:22:00;VETO;M1 break rejected: volume: relVol 0.82 < 1.00
+2026.05.28 13:48:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.05.28 15:47:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.05.28 16:00:00;VETO;outlier bar masked, z=5.9
+2026.05.28 17:13:00;VETO;M1 break rejected: volume: relVol 0.91 < 1.00
+2026.05.28 17:15:00;VETO;outlier bar masked, z=8.9
+2026.05.28 21:03:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.05.28 22:52:00;VETO;M1 break rejected: volume: relVol 0.68 < 1.00
+2026.05.29 04:15:00;VETO;outlier bar masked, z=3.7
+2026.05.29 09:53:00;VETO;M1 break rejected: volume: relVol 0.96 < 1.00
+2026.05.29 11:51:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.05.29 12:14:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.05.29 17:02:00;VETO;M1 break rejected: regime: chop ADX 17.1 < 22.0
+2026.05.29 18:00:00;VETO;outlier bar masked, z=6.3
+2026.05.29 18:15:00;VETO;outlier bar masked, z=5.4
+2026.05.29 20:44:00;VETO;M1 break rejected: regime: chop ADX 20.5 < 22.0
+2026.05.29 22:44:00;VETO;M1 break rejected: regime: chop ADX 19.7 < 22.0
+2026.05.29 22:48:00;VETO;M1 break rejected: regime: chop ADX 21.7 < 22.0
+2026.06.01 01:15:00;VETO;outlier bar masked, z=8.1
+2026.06.01 09:23:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.06.01 13:42:00;VETO;M1 break rejected: regime: chop ADX 21.0 < 22.0
+2026.06.01 16:12:00;VETO;M1 break rejected: regime: chop ADX 18.7 < 22.0
+2026.06.01 16:15:00;VETO;outlier bar masked, z=7.3
+2026.06.01 16:30:00;VETO;outlier bar masked, z=5.7
+2026.06.01 17:00:00;VETO;outlier bar masked, z=3.7
+2026.06.01 19:56:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.06.02 02:04:00;VETO;M1 break rejected: volume: relVol 0.53 < 1.00
+2026.06.02 03:22:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.06.02 04:48:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.06.02 06:32:00;VETO;M1 break rejected: volume: relVol 0.94 < 1.00
+2026.06.02 11:52:00;VETO;M1 break rejected: volume: relVol 0.78 < 1.00
+2026.06.02 15:48:00;VETO;M1 break rejected: regime: chop ADX 12.8 < 22.0
+2026.06.02 19:31:00;VETO;M1 break rejected: volume: relVol 0.84 < 1.00
+2026.06.02 20:37:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.06.02 21:42:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.06.03 02:11:00;DECISION;M1 setup SHORT score=0.60 entry=4478.42 inv=4493.12 AWAIT-RETEST [BOS short lvl=4480.04|RelVol=1.37|Retest@4478.42|VPnear|VWAPside|ADX=53]
+2026.06.03 02:15:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.03 02:30:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.03 02:45:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.03 03:00:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.06.03 03:41:00;VETO;M1 break rejected: volume: relVol 0.62 < 1.00
+2026.06.03 04:15:00;VETO;outlier bar masked, z=4.2
+2026.06.03 08:31:00;VETO;M1 break rejected: volume: relVol 0.78 < 1.00
+2026.06.03 09:46:00;DECISION;M1 setup SHORT score=0.75 entry=4456.50 inv=4488.19 [BOS short lvl=4456.66|RelVol=1.09|VPnode d=3.70|VWAPside|ADX=42]
+2026.06.03 09:46:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.06.03 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.03 10:15:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.03 10:30:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.03 13:15:00;VETO;outlier bar masked, z=5.1
+2026.06.03 16:43:00;VETO;M1 break rejected: regime: chop ADX 21.3 < 22.0
+2026.06.03 16:45:00;VETO;outlier bar masked, z=4.7
+2026.06.03 17:00:00;VETO;outlier bar masked, z=4.3
+2026.06.03 22:05:00;VETO;M1 break rejected: regime: chop ADX 21.4 < 22.0
+2026.06.04 01:04:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.06.04 02:45:00;VETO;signal rejected: regime: chop ADX 21.1 < 22.0
+2026.06.04 04:13:00;VETO;M1 break rejected: regime: chop ADX 21.1 < 22.0
+2026.06.04 04:15:00;VETO;outlier bar masked, z=4.3
+2026.06.04 05:52:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.06.04 07:32:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.06.04 12:49:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.06.04 14:08:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.06.04 15:00:00;VETO;outlier bar masked, z=5.1
+2026.06.04 15:15:00;VETO;outlier bar masked, z=4.8
+2026.06.04 17:00:00;VETO;outlier bar masked, z=4.0
+2026.06.04 17:54:00;VETO;M1 break rejected: volume: relVol 0.88 < 1.00
+2026.06.04 21:35:00;VETO;M1 break rejected: regime: chop ADX 17.9 < 22.0
+2026.06.05 01:52:00;VETO;M1 break rejected: regime: chop ADX 14.7 < 22.0
+2026.06.05 02:03:00;VETO;M1 break rejected: regime: chop ADX 14.7 < 22.0
+2026.06.05 04:27:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.06.05 09:04:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.06.05 09:30:00;VETO;outlier bar masked, z=3.6
+2026.06.05 09:47:00;VETO;M1 break rejected: volume: relVol 0.98 < 1.00
+2026.06.05 12:14:00;VETO;M1 break rejected: volume: relVol 0.78 < 1.00
+2026.06.05 14:52:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.06.05 15:31:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.06.05 15:45:00;VETO;outlier bar masked, z=6.1
+2026.06.05 16:00:00;VETO;outlier bar masked, z=11.6
+2026.06.05 16:15:00;VETO;outlier bar masked, z=4.1
+2026.06.05 16:45:00;VETO;outlier bar masked, z=4.6
+2026.06.05 17:00:00;VETO;outlier bar masked, z=5.2
+2026.06.05 18:00:00;VETO;outlier bar masked, z=4.0
+2026.06.05 18:38:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4344.56|RelVol=1.33|VWAPside|ADX=47]
+2026.06.05 20:00:00;VETO;outlier bar masked, z=3.5
+2026.06.05 21:15:00;VETO;outlier bar masked, z=3.6
+2026.06.08 01:15:00;VETO;outlier bar masked, z=5.9
+2026.06.08 02:41:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH long lvl=4337.34|RelVol=1.46|Retest@4340.13|VPnear|VWAPside]
+2026.06.08 04:31:00;DECISION;M1 setup SHORT score=0.70 entry=4306.91 inv=4353.38 AWAIT-RETEST [CHoCH short lvl=4309.74|RelVol=1.40|Retest@4306.91|VPnear|VWAPside|CycleTurn w=0.95<-0.99]
+2026.06.08 04:45:00;VETO;outlier bar masked, z=5.3
+2026.06.08 05:00:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.06.08 05:15:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.06.08 05:30:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.06.08 05:45:00;VETO;authorization denied: outside session window (server hour 05, window 12-20)
+2026.06.08 08:31:00;DECISION;M1 setup SHORT score=0.85 entry=4303.37 inv=4321.81 [BOS short lvl=4303.53|RelVol=1.33|VPnode d=2.83|VWAPside|CycleTurn w=0.95<-0.98]
+2026.06.08 08:31:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.06.08 08:45:00;VETO;outlier bar masked, z=9.2
+2026.06.08 09:00:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.06.08 09:15:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.06.08 09:30:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.06.08 14:15:00;DECISION;setup LONG score=0.65 entry=4319.85 inv=4273.03 tgt=0.00 AWAIT-RETEST [CHoCH long lvl=4317.12|RelVol=1.31|Retest@4319.85|VPnode d=0.45|VWAPside]
+2026.06.08 14:15:00;DECISION;TP capped 93.63036 -> 70.22277 (3.0xATR)
+2026.06.08 14:15:00;ERROR;limit BUY 0.01 @ 4319.85 sl=4273.03 tp=4390.07 rc=10015 [WT|CHOCH|0.65|RL]
+2026.06.08 14:30:00;DECISION;TP capped 104.60000 -> 78.45000 (3.0xATR)
+2026.06.08 14:30:00;ORDER;filled BUY 0.01 lots sl=4273.03 tp=4403.78 [WT|CHOCH|0.65]
+2026.06.08 14:30:00;RISK;sizing: vol_ratio=0.95 scalar=1.00 gap_buf=5.81179 eff_stop=58.11179
+2026.06.08 14:30:00;ORDER;entry fill deal #62 BUY 0.01 @ 4325.33000
+2026.06.08 16:37:00;DECISION;M1 setup LONG score=0.75 entry=4340.01 inv=4320.21 [BOS long lvl=4339.46|RelVol=1.04|VPnode d=6.21|VWAPside|ADX=32]
+2026.06.08 16:37:00;DECISION;TP capped 39.68000 -> 37.36929 (3.0xATR)
+2026.06.08 16:37:00;VETO;risk veto: max positions
+2026.06.08 17:11:00;DECISION;M1 setup SHORT score=0.55 entry=4316.91 inv=4339.46 AWAIT-RETEST [CHoCH short lvl=4320.21|RelVol=1.09|Retest@4316.91|VPnode d=8.59]
+2026.06.08 17:11:00;VETO;retest limit risk veto: max positions
+2026.06.08 17:15:00;DECISION;TP capped 39.96000 -> 39.81429 (3.0xATR)
+2026.06.08 17:15:00;VETO;risk veto: max positions
+2026.06.08 22:11:00;VETO;M1 break rejected: regime: chop ADX 21.3 < 22.0
+2026.06.09 02:28:00;VETO;M1 break rejected: volume: relVol 0.62 < 1.00
+2026.06.09 04:28:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.06.09 05:32:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4338.79|RelVol=1.22|VPnear|VWAPside]
+2026.06.09 08:35:00;VETO;M1 break rejected: regime: chop ADX 16.8 < 22.0
+2026.06.09 10:16:00;VETO;M1 break rejected: regime: chop ADX 21.9 < 22.0
+2026.06.09 13:58:00;VETO;M1 break rejected: regime: chop ADX 21.2 < 22.0
+2026.06.09 14:51:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.06.09 17:00:00;VETO;outlier bar masked, z=10.6
+2026.06.09 17:15:00;VETO;signal rejected: regime: chop ADX 21.0 < 22.0
+2026.06.09 17:30:00;VETO;outlier bar masked, z=3.6
+2026.06.09 17:45:00;VETO;outlier bar masked, z=10.1
+2026.06.09 18:00:00;VETO;outlier bar masked, z=5.2
+2026.06.09 18:30:00;VETO;outlier bar masked, z=4.3
+2026.06.09 18:31:40;RISK;deal closed pnl=-52.43 streak=1 lock=0
+2026.06.09 18:45:00;VETO;outlier bar masked, z=4.0
+2026.06.09 19:15:00;VETO;outlier bar masked, z=5.3
+2026.06.09 19:45:00;VETO;outlier bar masked, z=8.3
+2026.06.10 01:52:00;DECISION;M1 setup SHORT score=0.70 entry=4234.18 inv=4274.27 [BOS short lvl=4236.55|RelVol=1.56|VWAPside|CycleTurn w=1.00<-1.00|ADX=42]
+2026.06.10 01:52:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.06.10 02:00:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.10 02:15:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.10 02:30:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.10 03:45:00;VETO;outlier bar masked, z=3.7
+2026.06.10 04:00:00;VETO;outlier bar masked, z=3.6
+2026.06.10 04:15:00;VETO;outlier bar masked, z=6.0
+2026.06.10 08:33:00;VETO;M1 break rejected: score 0.30 < 0.55 [CHoCH long lvl=4187.27|RelVol=1.32|Retest@4189.56]
+2026.06.10 11:04:00;DECISION;M1 setup SHORT score=0.85 entry=4170.01 inv=4221.87 AWAIT-RETEST [CHoCH short lvl=4172.45|RelVol=1.38|Retest@4170.01|VPnode d=3.19|VWAPside|CycleTurn w=0.92<-0.96]
+2026.06.10 11:15:00;VETO;outlier bar masked, z=3.5
+2026.06.10 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.10 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.10 12:00:00;DECISION;TP capped 105.68000 -> 79.26000 (3.0xATR)
+2026.06.10 12:00:00;ORDER;filled SELL 0.01 lots sl=4221.87 tp=4089.77 [WT|CHOCH|0.85]
+2026.06.10 12:00:00;RISK;sizing: vol_ratio=1.05 scalar=0.96 gap_buf=6.20393 eff_stop=59.04393
+2026.06.10 12:00:00;ORDER;entry fill deal #64 SELL 0.01 @ 4169.03000
+2026.06.10 13:08:00;DECISION;M1 setup SHORT score=0.60 entry=4156.18 inv=4221.87 [BOS short lvl=4161.35|RelVol=1.44|VPnear|VWAPside|ADX=38]
+2026.06.10 13:08:00;DECISION;TP capped 131.38000 -> 98.53500 (3.0xATR)
+2026.06.10 13:08:00;VETO;risk veto: max positions
+2026.06.10 14:45:00;DECISION;setup SHORT score=0.65 entry=4154.49 inv=4178.68 tgt=0.00 [BOS short lvl=4155.70|RelVol=1.74|VPnode d=5.31|VWAPside]
+2026.06.10 14:45:00;DECISION;TP capped 48.38000 -> 37.47429 (3.0xATR)
+2026.06.10 14:45:00;VETO;risk veto: max positions
+2026.06.10 15:45:00;VETO;outlier bar masked, z=4.6
+2026.06.10 16:45:00;VETO;outlier bar masked, z=4.4
+2026.06.10 17:57:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH short lvl=4132.91|RelVol=1.35|Retest@4128.99|VPnear|VWAPside]
+2026.06.10 18:00:00;VETO;outlier bar masked, z=4.1
+2026.06.10 18:18:40;MANAGE;#64 SL 4221.87 -> 4168.99 breakeven
+2026.06.10 18:18:59;MANAGE;#64 SL 4168.99 -> 4154.89 trail
+2026.06.10 18:19:20;MANAGE;#64 SL 4154.89 -> 4153.66 trail
+2026.06.10 18:48:40;MANAGE;#64 SL 4153.66 -> 4148.44 trail
+2026.06.10 18:51:40;MANAGE;#64 SL 4148.44 -> 4146.78 trail
+2026.06.10 20:17:40;MANAGE;#64 SL 4146.78 -> 4146.48 trail
+2026.06.10 20:18:40;MANAGE;#64 SL 4146.48 -> 4146.03 trail
+2026.06.10 20:19:40;MANAGE;#64 SL 4146.03 -> 4144.72 trail
+2026.06.10 20:22:40;MANAGE;#64 SL 4144.72 -> 4141.86 trail
+2026.06.10 20:24:40;MANAGE;#64 SL 4141.86 -> 4141.51 trail
+2026.06.10 20:29:40;MANAGE;#64 SL 4141.51 -> 4140.59 trail
+2026.06.10 20:30:40;MANAGE;#64 SL 4140.59 -> 4136.97 trail
+2026.06.10 20:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4106.82|RelVol=1.51|VWAPside|ADX=41]
+2026.06.10 20:38:40;MANAGE;#64 SL 4136.97 -> 4136.61 trail
+2026.06.10 20:39:40;MANAGE;#64 SL 4136.61 -> 4136.17 trail
+2026.06.10 20:40:40;MANAGE;#64 SL 4136.17 -> 4135.51 trail
+2026.06.10 20:43:40;MANAGE;#64 SL 4135.51 -> 4135.40 trail
+2026.06.10 20:44:40;MANAGE;#64 SL 4135.40 -> 4133.16 trail
+2026.06.10 20:45:20;MANAGE;#64 SL 4133.16 -> 4131.96 trail
+2026.06.10 21:42:40;MANAGE;#64 SL 4131.96 -> 4131.05 trail
+2026.06.10 21:45:00;MANAGE;#64 SL 4131.05 -> 4130.03 trail
+2026.06.10 21:45:20;MANAGE;#64 SL 4130.03 -> 4129.56 trail
+2026.06.10 21:47:40;MANAGE;#64 SL 4129.56 -> 4129.20 trail
+2026.06.10 21:50:40;MANAGE;#64 SL 4129.20 -> 4121.96 trail
+2026.06.10 21:51:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4100.82|RelVol=1.86|VWAPside|ADX=39]
+2026.06.10 22:02:40;MANAGE;#64 SL 4121.96 -> 4121.50 trail
+2026.06.10 22:04:40;MANAGE;#64 SL 4121.50 -> 4119.11 trail
+2026.06.10 22:05:20;MANAGE;#64 SL 4119.11 -> 4118.66 trail
+2026.06.10 22:09:40;MANAGE;#64 SL 4118.66 -> 4118.07 trail
+2026.06.10 22:10:40;MANAGE;#64 SL 4118.07 -> 4115.86 trail
+2026.06.10 22:11:40;RISK;deal closed pnl=79.26 streak=0 lock=0
+2026.06.11 01:15:00;VETO;outlier bar masked, z=5.8
+2026.06.11 02:15:00;VETO;outlier bar masked, z=4.1
+2026.06.11 02:30:00;VETO;outlier bar masked, z=6.3
+2026.06.11 10:25:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.06.11 15:11:00;VETO;M1 break rejected: score 0.40 < 0.55 [CHoCH short lvl=4077.37|RelVol=1.09|Retest@4075.27|VWAPside]
+2026.06.11 17:13:00;DECISION;M1 setup SHORT score=0.65 entry=4053.92 inv=4095.99 [BOS short lvl=4057.52|RelVol=1.37|VPnode d=8.48|VWAPside]
+2026.06.11 17:13:00;DECISION;TP capped 84.14000 -> 63.10500 (3.0xATR)
+2026.06.11 17:13:00;ORDER;filled SELL 0.02 lots sl=4095.99 tp=3990.82 [WT|BOS|0.65]
+2026.06.11 17:13:00;RISK;sizing: vol_ratio=0.86 scalar=1.00 gap_buf=6.35286 eff_stop=48.42286
+2026.06.11 17:13:00;ORDER;entry fill deal #66 SELL 0.02 @ 4053.92000
+2026.06.11 18:52:00;VETO;M1 break rejected: regime: chop ADX 20.3 < 22.0
+2026.06.11 19:11:40;RISK;deal closed pnl=-84.14 streak=1 lock=0
+2026.06.11 20:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4107.55|RelVol=1.70|Retest@4111.74|VPnear|VWAPside]
+2026.06.11 20:45:00;VETO;outlier bar masked, z=9.5
+2026.06.11 21:49:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS long lvl=4169.99|RelVol=2.16|VWAPside]
+2026.06.12 01:43:00;DECISION;M1 setup LONG score=0.75 entry=4220.88 inv=4071.98 [BOS long lvl=4219.93|RelVol=1.24|VPnode d=10.48|VWAPside|ADX=47]
+2026.06.12 01:43:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.06.12 01:45:00;VETO;authorization denied: outside session window (server hour 01, window 12-20)
+2026.06.12 02:00:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.12 02:15:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.12 06:19:00;VETO;M1 break rejected: regime: chop ADX 21.4 < 22.0
+2026.06.12 11:17:00;DECISION;M1 setup LONG score=0.85 entry=4206.28 inv=4170.58 [BOS long lvl=4204.95|RelVol=1.32|VPnode d=3.28|VWAPside|CycleTurn w=-0.63<--0.96]
+2026.06.12 11:17:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.12 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.12 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.12 12:00:00;DECISION;TP capped 98.20000 -> 73.65000 (3.0xATR)
+2026.06.12 12:00:00;ORDER;filled BUY 0.01 lots sl=4170.58 tp=4293.33 [WT|BOS|0.85]
+2026.06.12 12:00:00;RISK;sizing: vol_ratio=0.89 scalar=1.00 gap_buf=6.04464 eff_stop=55.14464
+2026.06.12 12:00:00;ORDER;entry fill deal #68 BUY 0.01 @ 4219.68000
+2026.06.12 14:30:00;VETO;signal rejected: score 0.50 < 0.55 [CHoCH short lvl=4202.79|RelVol=1.07|Retest@4200.12|VPnear|VWAPside]
+2026.06.12 15:37:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.06.12 18:00:00;VETO;outlier bar masked, z=3.7
+2026.06.12 18:15:00;DECISION;setup LONG score=0.85 entry=4213.61 inv=4193.21 tgt=0.00 AWAIT-RETEST [CHoCH long lvl=4210.21|RelVol=1.13|Retest@4213.61|StopFloored|VPnode d=2.61|VWAPside|CycleTurn w=-0.89<--0.99]
+2026.06.12 18:15:00;VETO;retest limit risk veto: max positions
+2026.06.12 18:30:00;DECISION;TP capped 65.25643 -> 48.94232 (3.0xATR)
+2026.06.12 18:30:00;VETO;risk veto: max positions
+2026.06.12 21:22:00;DECISION;M1 setup LONG score=0.75 entry=4234.64 inv=4177.16 [BOS long lvl=4232.91|RelVol=1.13|VPnode d=9.04|VWAPside|ADX=33]
+2026.06.12 21:22:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.06.12 21:30:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.06.12 21:45:00;VETO;authorization denied: outside session window (server hour 21, window 12-20)
+2026.06.12 22:00:00;VETO;authorization denied: outside session window (server hour 22, window 12-20)
+2026.06.15 01:00:20;MANAGE;#68 SL 4170.58 -> 4225.70 breakeven
+2026.06.15 01:00:59;MANAGE;#68 SL 4225.70 -> 4243.89 trail
+2026.06.15 01:01:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS long lvl=4235.44|RelVol=1.10|Retest@4237.65|ADX=31]
+2026.06.15 01:01:40;MANAGE;#68 SL 4243.89 -> 4258.96 trail
+2026.06.15 01:02:40;MANAGE;#68 SL 4258.96 -> 4270.00 trail
+2026.06.15 01:03:40;RISK;deal closed pnl=73.52 streak=0 lock=0
+2026.06.15 01:15:00;VETO;outlier bar masked, z=16.9
+2026.06.15 04:33:00;VETO;M1 break rejected: regime: chop ADX 21.7 < 22.0
+2026.06.15 08:38:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.06.15 11:33:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.06.15 14:33:00;DECISION;M1 setup LONG score=0.75 entry=4346.16 inv=4300.80 [BOS long lvl=4345.45|RelVol=1.01|VPnode d=4.36|VWAPside|ADX=47]
+2026.06.15 14:33:00;DECISION;TP capped 91.02000 -> 68.26500 (3.0xATR)
+2026.06.15 14:33:00;ORDER;filled BUY 0.02 lots sl=4300.80 tp=4414.58 [WT|BOS|0.75]
+2026.06.15 14:33:00;RISK;sizing: vol_ratio=0.62 scalar=1.00 gap_buf=3.33321 eff_stop=48.84321
+2026.06.15 14:33:00;ORDER;entry fill deal #70 BUY 0.02 @ 4346.31000
+2026.06.15 15:51:00;VETO;M1 break rejected: volume: relVol 0.77 < 1.00
+2026.06.15 19:18:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.06.15 22:49:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.06.16 03:59:00;VETO;M1 break rejected: volume: relVol 0.92 < 1.00
+2026.06.16 06:36:00;VETO;M1 break rejected: regime: chop ADX 16.0 < 22.0
+2026.06.16 10:52:00;DECISION;M1 setup LONG score=0.70 entry=4331.46 inv=4313.33 [BOS long lvl=4330.89|RelVol=1.06|VPnear|VWAPside|CycleTurn w=0.73<--0.14]
+2026.06.16 10:52:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.16 11:00:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.16 11:15:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.16 11:30:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.16 13:51:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.06.16 14:37:00;VETO;M1 break rejected: volume: relVol 0.79 < 1.00
+2026.06.16 15:45:00;VETO;signal rejected: volume: relVol 0.84 < 1.00
+2026.06.16 16:23:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.06.16 17:30:00;VETO;outlier bar masked, z=4.3
+2026.06.16 19:00:00;VETO;outlier bar masked, z=5.7
+2026.06.16 22:53:00;VETO;M1 break rejected: regime: chop ADX 12.9 < 22.0
+2026.06.17 03:11:00;VETO;M1 break rejected: regime: chop ADX 20.6 < 22.0
+2026.06.17 04:15:00;VETO;outlier bar masked, z=3.9
+2026.06.17 07:24:00;VETO;M1 break rejected: volume: relVol 0.80 < 1.00
+2026.06.17 11:32:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.06.17 16:23:00;VETO;M1 break rejected: regime: chop ADX 16.2 < 22.0
+2026.06.17 17:30:00;VETO;outlier bar masked, z=6.5
+2026.06.17 17:45:00;VETO;outlier bar masked, z=4.6
+2026.06.17 18:00:00;VETO;outlier bar masked, z=7.8
+2026.06.17 19:01:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.06.17 20:34:00;VETO;M1 break rejected: volume: relVol 1.00 < 1.00
+2026.06.17 20:45:00;VETO;outlier bar masked, z=7.2
+2026.06.17 21:01:00;DECISION;M1 setup SHORT score=0.60 entry=4353.31 inv=4366.49 AWAIT-RETEST [CHoCH short lvl=4355.12|RelVol=1.10|Retest@4353.31|VPnear|CycleTurn w=0.82<-0.91]
+2026.06.17 21:08:40;RISK;deal closed pnl=-91.52 streak=1 lock=0
+2026.06.17 21:15:00;VETO;outlier bar masked, z=42.7
+2026.06.17 21:30:00;VETO;outlier bar masked, z=8.2
+2026.06.17 21:45:00;VETO;outlier bar masked, z=21.6
+2026.06.17 22:00:00;VETO;outlier bar masked, z=19.4
+2026.06.17 22:15:00;VETO;outlier bar masked, z=11.8
+2026.06.17 22:30:00;VETO;outlier bar masked, z=13.5
+2026.06.17 22:45:00;VETO;outlier bar masked, z=4.3
+2026.06.18 01:00:00;VETO;outlier bar masked, z=4.3
+2026.06.18 01:15:00;VETO;outlier bar masked, z=9.8
+2026.06.18 02:15:00;VETO;outlier bar masked, z=4.4
+2026.06.18 03:15:00;VETO;outlier bar masked, z=5.6
+2026.06.18 04:15:00;VETO;outlier bar masked, z=5.0
+2026.06.18 05:14:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.06.18 08:47:00;VETO;M1 break rejected: regime: chop ADX 19.3 < 22.0
+2026.06.18 10:36:00;VETO;M1 break rejected: regime: chop ADX 16.1 < 22.0
+2026.06.18 13:53:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4259.56|RelVol=1.08|VWAPside|ADX=38]
+2026.06.18 16:32:00;DECISION;M1 setup LONG score=0.55 entry=4271.93 inv=4239.95 AWAIT-RETEST [CHoCH long lvl=4269.18|RelVol=1.04|Retest@4271.93|VPnode d=5.83]
+2026.06.18 16:32:00;DECISION;TP capped 63.96214 -> 47.97161 (3.0xATR)
+2026.06.18 16:32:00;ORDER;limit BUY 0.02 @ 4271.93 sl=4239.95 tp=4319.90 rc=10009 [WT|CHOCH|0.55|RL]
+2026.06.18 16:32:00;RISK;sizing: vol_ratio=0.89 scalar=1.00 gap_buf=5.50214 eff_stop=37.48321
+2026.06.18 16:33:40;ORDER;entry fill deal #72 BUY 0.02 @ 4271.93000
+2026.06.18 17:04:20;RISK;deal closed pnl=-63.96 streak=1 lock=0
+2026.06.18 17:16:00;DECISION;M1 setup SHORT score=0.65 entry=4236.78 inv=4269.18 AWAIT-RETEST [CHoCH short lvl=4239.95|RelVol=1.20|Retest@4236.78|VPnode d=3.42|VWAPside]
+2026.06.18 17:16:00;DECISION;TP capped 64.79036 -> 48.59277 (3.0xATR)
+2026.06.18 17:16:00;ERROR;limit SELL 0.02 @ 4236.78 sl=4269.18 tp=4188.19 rc=10015 [WT|CHOCH|0.65|RL]
+2026.06.18 17:30:00;DECISION;TP capped 49.88000 -> 39.48214 (3.0xATR)
+2026.06.18 17:30:00;ORDER;filled SELL 0.03 lots sl=4269.18 tp=4204.76 [WT|CHOCH|0.65]
+2026.06.18 17:30:00;RISK;sizing: vol_ratio=1.03 scalar=0.98 gap_buf=6.58036 eff_stop=31.52036
+2026.06.18 17:30:00;ORDER;entry fill deal #74 SELL 0.03 @ 4244.24000
+2026.06.18 18:30:00;VETO;signal rejected: regime: chop ADX 17.0 < 22.0
+2026.06.18 19:36:40;MANAGE;#74 SL 4269.18 -> 4244.19 breakeven
+2026.06.18 19:36:40;MANAGE;#74 partial close 0.01 of 0.03 lots
+2026.06.18 19:36:40;RISK;deal closed pnl=29.05 streak=0 lock=0
+2026.06.18 19:36:59;MANAGE;#74 SL 4244.19 -> 4242.48 trail
+2026.06.18 19:37:20;MANAGE;#74 SL 4242.48 -> 4241.93 trail
+2026.06.18 19:38:40;MANAGE;#74 SL 4241.93 -> 4240.79 trail
+2026.06.18 19:51:40;MANAGE;#74 SL 4240.79 -> 4240.62 trail
+2026.06.18 19:52:20;MANAGE;#74 SL 4240.62 -> 4239.64 trail
+2026.06.18 19:55:40;MANAGE;#74 SL 4239.64 -> 4239.47 trail
+2026.06.18 19:57:40;MANAGE;#74 SL 4239.47 -> 4239.18 trail
+2026.06.18 21:36:40;MANAGE;#74 SL 4239.18 -> 4237.92 trail
+2026.06.18 21:49:20;MANAGE;#74 SL 4237.92 -> 4237.63 trail
+2026.06.18 21:50:40;MANAGE;#74 SL 4237.63 -> 4236.73 trail
+2026.06.18 21:51:40;MANAGE;#74 SL 4236.73 -> 4235.75 trail
+2026.06.18 21:59:40;MANAGE;#74 SL 4235.75 -> 4235.22 trail
+2026.06.18 22:00:00;MANAGE;#74 SL 4235.22 -> 4234.40 trail
+2026.06.18 22:00:40;MANAGE;#74 SL 4234.40 -> 4233.39 trail
+2026.06.18 22:01:40;MANAGE;#74 SL 4233.39 -> 4230.80 trail
+2026.06.18 22:02:40;MANAGE;#74 SL 4230.80 -> 4227.69 trail
+2026.06.18 22:03:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.06.18 22:05:40;MANAGE;#74 SL 4227.69 -> 4226.96 trail
+2026.06.18 22:06:40;MANAGE;#74 SL 4226.96 -> 4224.18 trail
+2026.06.18 22:08:20;MANAGE;#74 SL 4224.18 -> 4223.42 trail
+2026.06.18 22:10:40;MANAGE;#74 SL 4223.42 -> 4222.87 trail
+2026.06.18 22:11:40;MANAGE;#74 SL 4222.87 -> 4221.38 trail
+2026.06.18 22:12:40;RISK;deal closed pnl=78.96 streak=0 lock=0
+2026.06.19 02:03:00;VETO;M1 break rejected: volume: relVol 0.78 < 1.00
+2026.06.19 05:09:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.06.19 16:00:00;VETO;outlier bar masked, z=6.8
+2026.06.19 17:17:00;VETO;M1 break rejected: volume: relVol 0.59 < 1.00
+2026.06.19 19:48:00;VETO;M1 break rejected: volume: relVol 0.41 < 1.00
+2026.06.22 01:15:00;VETO;outlier bar masked, z=5.5
+2026.06.22 02:06:00;VETO;M1 break rejected: regime: chop ADX 18.3 < 22.0
+2026.06.22 03:15:00;VETO;outlier bar masked, z=4.8
+2026.06.22 03:30:00;VETO;signal rejected: regime: chop ADX 17.9 < 22.0
+2026.06.22 04:00:00;VETO;outlier bar masked, z=5.3
+2026.06.22 04:15:00;VETO;outlier bar masked, z=3.7
+2026.06.22 12:07:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.06.22 14:07:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.06.22 16:28:00;DECISION;M1 setup SHORT score=0.65 entry=4186.92 inv=4211.76 AWAIT-RETEST [CHoCH short lvl=4188.65|RelVol=1.21|Retest@4186.92|VPnode d=0.52|VWAPside]
+2026.06.22 16:28:00;DECISION;TP capped 49.68214 -> 37.26161 (3.0xATR)
+2026.06.22 16:28:00;ERROR;limit SELL 0.03 @ 4186.92 sl=4211.76 tp=4149.66 rc=10015 [WT|CHOCH|0.65|RL]
+2026.06.22 16:30:00;DECISION;TP capped 49.48000 -> 37.11000 (3.0xATR)
+2026.06.22 16:30:00;ORDER;filled SELL 0.03 lots sl=4211.76 tp=4149.91 [WT|CHOCH|0.65]
+2026.06.22 16:30:00;RISK;sizing: vol_ratio=0.86 scalar=1.00 gap_buf=3.67536 eff_stop=28.41536
+2026.06.22 16:30:00;ORDER;entry fill deal #77 SELL 0.03 @ 4187.02000
+2026.06.22 17:00:00;VETO;outlier bar masked, z=4.5
+2026.06.22 17:15:00;VETO;outlier bar masked, z=3.9
+2026.06.22 18:36:00;VETO;M1 break rejected: regime: chop ADX 19.1 < 22.0
+2026.06.23 01:03:00;VETO;M1 break rejected: regime: chop ADX 18.6 < 22.0
+2026.06.23 02:38:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.06.23 03:11:00;VETO;M1 break rejected: regime: chop ADX 15.5 < 22.0
+2026.06.23 04:03:00;VETO;M1 break rejected: regime: chop ADX 15.0 < 22.0
+2026.06.23 04:18:00;VETO;M1 break rejected: regime: chop ADX 13.7 < 22.0
+2026.06.23 04:37:40;MANAGE;#77 SL 4211.76 -> 4187.00 breakeven
+2026.06.23 04:37:40;MANAGE;#77 partial close 0.01 of 0.03 lots
+2026.06.23 04:37:40;RISK;deal closed pnl=26.13 streak=0 lock=0
+2026.06.23 04:37:59;MANAGE;#77 SL 4187.00 -> 4176.38 trail
+2026.06.23 04:38:20;MANAGE;#77 SL 4176.38 -> 4175.87 trail
+2026.06.23 04:40:20;MANAGE;#77 SL 4175.87 -> 4175.55 trail
+2026.06.23 04:42:40;MANAGE;#77 SL 4175.55 -> 4170.61 trail
+2026.06.23 04:43:20;MANAGE;#77 SL 4170.61 -> 4170.12 trail
+2026.06.23 04:44:40;MANAGE;#77 SL 4170.12 -> 4168.05 trail
+2026.06.23 04:45:00;VETO;outlier bar masked, z=5.0
+2026.06.23 04:46:20;MANAGE;#77 SL 4168.05 -> 4167.70 trail
+2026.06.23 04:49:40;MANAGE;#77 SL 4167.70 -> 4167.12 trail
+2026.06.23 05:10:40;RISK;deal closed pnl=74.13 streak=0 lock=0
+2026.06.23 07:57:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4130.76|RelVol=1.15|VWAPside|ADX=44]
+2026.06.23 08:00:00;VETO;outlier bar masked, z=5.2
+2026.06.23 08:15:00;VETO;outlier bar masked, z=4.2
+2026.06.23 09:10:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4114.75|RelVol=1.22|VWAPside|ADX=55]
+2026.06.23 15:12:00;DECISION;M1 setup SHORT score=0.85 entry=4116.66 inv=4133.31 [BOS short lvl=4117.34|RelVol=1.08|VPnode d=0.64|VWAPside|CycleTurn w=0.99<-0.99]
+2026.06.23 15:12:00;DECISION;TP capped 33.30000 -> 26.75357 (3.0xATR)
+2026.06.23 15:12:00;ORDER;filled SELL 0.04 lots sl=4133.31 tp=4089.91 [WT|BOS|0.85]
+2026.06.23 15:12:00;RISK;sizing: vol_ratio=0.96 scalar=1.00 gap_buf=4.45893 eff_stop=21.10893
+2026.06.23 15:12:00;ORDER;entry fill deal #80 SELL 0.04 @ 4116.66000
+2026.06.23 16:48:40;RISK;deal closed pnl=-66.60 streak=1 lock=0
+2026.06.23 16:49:00;VETO;M1 break rejected: regime: chop ADX 20.4 < 22.0
+2026.06.23 19:37:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.06.23 21:26:00;VETO;M1 break rejected: regime: chop ADX 20.0 < 22.0
+2026.06.24 01:00:00;VETO;signal rejected: score 0.30 < 0.55 [BOS short lvl=4112.84|RelVol=1.20]
+2026.06.24 04:04:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4080.79|RelVol=1.46|Retest@4078.27|VWAPside|ADX=40]
+2026.06.24 04:15:00;VETO;outlier bar masked, z=4.8
+2026.06.24 05:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4068.47|RelVol=1.27|VWAPside|ADX=45]
+2026.06.24 05:45:00;VETO;outlier bar masked, z=3.6
+2026.06.24 08:22:00;DECISION;M1 setup LONG score=0.55 entry=4073.25 inv=4055.05 AWAIT-RETEST [CHoCH long lvl=4070.67|RelVol=1.24|Retest@4073.25|VPnode d=7.45]
+2026.06.24 08:30:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.06.24 08:45:00;VETO;authorization denied: outside session window (server hour 08, window 12-20)
+2026.06.24 09:00:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.06.24 09:15:00;VETO;authorization denied: outside session window (server hour 09, window 12-20)
+2026.06.24 12:08:00;DECISION;M1 setup SHORT score=0.65 entry=4070.58 inv=4097.57 AWAIT-RETEST [CHoCH short lvl=4073.06|RelVol=1.10|Retest@4070.58|VPnode d=1.62|VWAPside]
+2026.06.24 12:08:00;DECISION;TP capped 53.98679 -> 40.49009 (3.0xATR)
+2026.06.24 12:08:00;ERROR;limit SELL 0.03 @ 4070.58 sl=4097.57 tp=4030.09 rc=10015 [WT|CHOCH|0.65|RL]
+2026.06.24 12:15:00;DECISION;TP capped 42.54000 -> 31.90500 (3.0xATR)
+2026.06.24 12:15:00;ORDER;filled SELL 0.03 lots sl=4097.57 tp=4044.40 [WT|CHOCH|0.65]
+2026.06.24 12:15:00;RISK;sizing: vol_ratio=0.93 scalar=1.00 gap_buf=4.76929 eff_stop=26.03929
+2026.06.24 12:15:00;ORDER;entry fill deal #82 SELL 0.03 @ 4076.30000
+2026.06.24 13:59:20;MANAGE;#82 SL 4097.57 -> 4076.27 breakeven
+2026.06.24 13:59:20;MANAGE;#82 partial close 0.01 of 0.03 lots
+2026.06.24 13:59:20;RISK;deal closed pnl=21.54 streak=0 lock=0
+2026.06.24 13:59:40;MANAGE;#82 SL 4076.27 -> 4072.35 trail
+2026.06.24 13:59:59;MANAGE;#82 SL 4072.35 -> 4071.72 trail
+2026.06.24 14:03:40;MANAGE;#82 SL 4071.72 -> 4071.57 trail
+2026.06.24 14:04:40;MANAGE;#82 SL 4071.57 -> 4067.87 trail
+2026.06.24 14:06:40;MANAGE;#82 SL 4067.87 -> 4065.21 trail
+2026.06.24 14:13:40;MANAGE;#82 SL 4065.21 -> 4064.69 trail
+2026.06.24 14:14:40;MANAGE;#82 SL 4064.69 -> 4061.72 trail
+2026.06.24 14:15:40;RISK;deal closed pnl=63.80 streak=0 lock=0
+2026.06.24 15:30:00;VETO;outlier bar masked, z=7.1
+2026.06.24 16:00:00;VETO;outlier bar masked, z=5.2
+2026.06.24 16:15:00;VETO;outlier bar masked, z=4.7
+2026.06.24 16:45:00;VETO;outlier bar masked, z=8.2
+2026.06.24 17:00:00;VETO;outlier bar masked, z=5.4
+2026.06.24 20:23:00;VETO;M1 break rejected: regime: chop ADX 17.9 < 22.0
+2026.06.24 21:15:00;VETO;outlier bar masked, z=4.3
+2026.06.25 01:01:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH long lvl=3994.24|RelVol=1.25|Retest@3997.00|CycleTurn w=0.69<--0.04]
+2026.06.25 02:35:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.06.25 03:33:00;VETO;M1 break rejected: regime: chop ADX 21.6 < 22.0
+2026.06.25 11:35:00;DECISION;M1 setup LONG score=0.85 entry=4003.10 inv=3966.31 AWAIT-RETEST [CHoCH long lvl=4000.09|RelVol=1.18|Retest@4003.10|VPnode d=5.90|VWAPside|CycleTurn w=0.41<--0.62]
+2026.06.25 11:45:00;VETO;authorization denied: outside session window (server hour 11, window 12-20)
+2026.06.25 12:00:00;DECISION;TP capped 45.74000 -> 36.56357 (3.0xATR)
+2026.06.25 12:00:00;ORDER;filled BUY 0.03 lots sl=3966.31 tp=4025.74 [WT|CHOCH|0.85]
+2026.06.25 12:00:00;RISK;sizing: vol_ratio=0.90 scalar=1.00 gap_buf=6.09393 eff_stop=28.96393
+2026.06.25 12:00:00;ORDER;entry fill deal #85 BUY 0.03 @ 3989.18000
+2026.06.25 15:31:00;VETO;M1 break rejected: volume: relVol 0.99 < 1.00
+2026.06.25 15:47:40;MANAGE;#85 SL 3966.31 -> 3989.20 breakeven
+2026.06.25 15:47:40;MANAGE;#85 partial close 0.01 of 0.03 lots
+2026.06.25 15:47:40;RISK;deal closed pnl=25.36 streak=0 lock=0
+2026.06.25 15:47:59;MANAGE;#85 SL 3989.20 -> 3997.03 trail
+2026.06.25 15:48:40;MANAGE;#85 SL 3997.03 -> 4001.48 trail
+2026.06.25 15:53:40;MANAGE;#85 SL 4001.48 -> 4002.56 trail
+2026.06.25 16:00:40;MANAGE;#85 SL 4002.56 -> 4006.89 trail
+2026.06.25 16:01:40;RISK;deal closed pnl=73.12 streak=0 lock=0
+2026.06.25 18:25:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS long lvl=4034.11|RelVol=1.13|VWAPside]
+2026.06.25 21:30:00;VETO;signal rejected: regime: chop ADX 15.4 < 22.0
+2026.06.25 22:51:00;VETO;M1 break rejected: regime: chop ADX 13.5 < 22.0
+2026.06.26 01:15:00;VETO;outlier bar masked, z=6.0
+2026.06.26 05:20:00;VETO;M1 break rejected: regime: chop ADX 13.1 < 22.0
+2026.06.26 09:58:00;DECISION;M1 setup LONG score=0.65 entry=4031.70 inv=4005.72 AWAIT-RETEST [CHoCH long lvl=4029.54|RelVol=1.28|Retest@4031.70|VPnode d=5.30|VWAPside]
+2026.06.26 10:00:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.26 10:15:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.26 10:30:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.26 10:45:00;VETO;authorization denied: outside session window (server hour 10, window 12-20)
+2026.06.26 12:11:00;VETO;M1 break rejected: volume: relVol 0.91 < 1.00
+2026.06.26 14:00:00;VETO;signal rejected: score 0.50 < 0.55 [BOS long lvl=4054.14|RelVol=1.02|VWAPside|ADX=33]
+2026.06.26 15:42:00;VETO;M1 break rejected: regime: chop ADX 21.8 < 22.0
+2026.06.26 15:59:00;VETO;M1 break rejected: regime: chop ADX 21.9 < 22.0
+2026.06.26 16:00:00;VETO;outlier bar masked, z=4.2
+2026.06.26 16:15:00;VETO;outlier bar masked, z=4.3
+2026.06.26 18:42:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.06.26 20:37:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.06.29 01:15:00;VETO;outlier bar masked, z=5.2
+2026.06.29 02:32:00;DECISION;M1 setup SHORT score=0.65 entry=4052.91 inv=4085.55 [BOS short lvl=4053.29|RelVol=1.77|VPnode d=4.69|VWAPside]
+2026.06.29 02:32:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.29 02:45:00;VETO;authorization denied: outside session window (server hour 02, window 12-20)
+2026.06.29 03:00:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.06.29 03:15:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.06.29 03:45:00;VETO;outlier bar masked, z=3.8
+2026.06.29 08:31:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS short lvl=4048.23|RelVol=1.45|VWAPside|ADX=33]
+2026.06.29 12:49:00;VETO;M1 break rejected: score 0.40 < 0.55 [BOS short lvl=4039.36|RelVol=1.26|VWAPside]
+2026.06.29 17:04:00;VETO;M1 break rejected: volume: relVol 0.90 < 1.00
+2026.06.29 17:15:00;VETO;outlier bar masked, z=4.3
+2026.06.29 17:30:00;VETO;outlier bar masked, z=4.6
+2026.06.29 20:09:00;VETO;M1 break rejected: volume: relVol 0.73 < 1.00
+2026.06.29 21:47:00;VETO;M1 break rejected: regime: chop ADX 19.0 < 22.0
+2026.06.30 03:03:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.06.30 04:15:00;VETO;outlier bar masked, z=9.2
+2026.06.30 04:30:00;VETO;outlier bar masked, z=5.6
+2026.06.30 09:25:00;VETO;M1 break rejected: score 0.50 < 0.55 [CHoCH long lvl=3998.00|RelVol=1.06|Retest@4000.23|VPnear|VWAPside]
+2026.06.30 09:30:00;VETO;outlier bar masked, z=6.0
+2026.06.30 09:45:00;VETO;outlier bar masked, z=4.1
+2026.06.30 15:57:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.06.30 17:10:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.06.30 17:15:00;VETO;outlier bar masked, z=3.9
+2026.06.30 20:09:00;VETO;M1 break rejected: regime: chop ADX 15.3 < 22.0
+2026.06.30 22:50:00;VETO;M1 break rejected: regime: chop ADX 20.0 < 22.0
+2026.07.01 03:42:00;VETO;M1 break rejected: volume: relVol 0.89 < 1.00
+2026.07.01 04:15:00;VETO;outlier bar masked, z=3.7
+2026.07.01 09:08:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.07.01 11:21:00;VETO;M1 break rejected: volume: relVol 0.75 < 1.00
+2026.07.01 12:50:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.07.01 14:15:00;VETO;outlier bar masked, z=4.7
+2026.07.01 16:23:00;VETO;M1 break rejected: score 0.50 < 0.55 [BOS long lvl=4035.53|RelVol=1.40|VWAPside|ADX=53]
+2026.07.01 16:30:00;VETO;outlier bar masked, z=5.3
+2026.07.01 16:45:00;VETO;outlier bar masked, z=14.3
+2026.07.01 17:00:00;VETO;outlier bar masked, z=4.4
+2026.07.01 17:45:00;VETO;outlier bar masked, z=4.3
+2026.07.01 19:35:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.07.02 01:00:00;VETO;outlier bar masked, z=3.7
+2026.07.02 01:15:00;VETO;outlier bar masked, z=10.2
+2026.07.02 03:25:00;DECISION;M1 setup LONG score=0.70 entry=4046.89 inv=3998.58 AWAIT-RETEST [CHoCH long lvl=4045.23|RelVol=1.12|Retest@4046.89|VPnear|VWAPside|CycleTurn w=-0.99<--0.99]
+2026.07.02 03:30:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.07.02 03:45:00;VETO;authorization denied: outside session window (server hour 03, window 12-20)
+2026.07.02 04:00:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.07.02 04:15:00;VETO;authorization denied: outside session window (server hour 04, window 12-20)
+2026.07.02 06:50:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.07.02 09:03:00;VETO;M1 break rejected: volume: relVol 0.95 < 1.00
+2026.07.02 14:05:00;VETO;M1 break rejected: volume: relVol 0.97 < 1.00
+2026.07.02 15:31:00;VETO;M1 break rejected: regime: chop ADX 20.7 < 22.0
+2026.07.02 15:45:00;VETO;outlier bar masked, z=20.3
+2026.07.02 16:00:00;VETO;outlier bar masked, z=4.0
+2026.07.02 16:45:00;VETO;outlier bar masked, z=5.2
+2026.07.03 01:10:00;VETO;M1 break rejected: volume: relVol 0.87 < 1.00
+2026.07.03 01:15:00;VETO;outlier bar masked, z=7.5
+2026.07.03 02:26:00;VETO;M1 break rejected: regime: chop ADX 16.7 < 22.0
+2026.07.03 04:15:00;VETO;outlier bar masked, z=6.2
+2026.07.03 08:48:00;VETO;M1 break rejected: regime: chop ADX 20.8 < 22.0
+2026.07.03 11:03:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.07.03 16:10:00;VETO;M1 break rejected: regime: chop ADX 19.4 < 22.0
+2026.07.03 19:54:00;VETO;M1 break rejected: volume: relVol 0.36 < 1.00
+2026.07.06 01:15:00;VETO;outlier bar masked, z=3.7
+2026.07.06 03:00:00;VETO;outlier bar masked, z=4.4
+2026.07.06 04:15:00;VETO;outlier bar masked, z=4.2
+2026.07.06 06:03:00;VETO;M1 break rejected: volume: relVol 0.85 < 1.00
+2026.07.06 10:41:00;VETO;M1 break rejected: volume: relVol 0.83 < 1.00
+2026.07.06 12:25:00;VETO;M1 break rejected: volume: relVol 0.65 < 1.00
+2026.07.06 15:42:00;VETO;M1 break rejected: regime: chop ADX 20.1 < 22.0
+2026.07.06 17:45:00;VETO;signal rejected: regime: chop ADX 19.0 < 22.0
+2026.07.06 18:30:00;VETO;signal rejected: regime: chop ADX 20.2 < 22.0
+2026.07.06 19:51:00;VETO;M1 break rejected: regime: chop ADX 17.8 < 22.0
+2026.07.07 01:33:00;VETO;M1 break rejected: volume: relVol 0.37 < 1.00
+2026.07.07 02:58:00;VETO;M1 break rejected: volume: relVol 0.42 < 1.00
+2026.07.07 06:49:00;VETO;M1 break rejected: volume: relVol 0.81 < 1.00
+2026.07.07 08:02:00;VETO;M1 break rejected: volume: relVol 0.72 < 1.00
+2026.07.07 10:47:00;VETO;M1 break rejected: volume: relVol 0.71 < 1.00
+2026.07.07 14:19:00;VETO;M1 break rejected: volume: relVol 0.76 < 1.00
+2026.07.07 15:15:00;VETO;outlier bar masked, z=3.9
+2026.07.07 17:00:00;VETO;outlier bar masked, z=4.8
+2026.07.07 21:31:00;VETO;M1 break rejected: volume: relVol 0.74 < 1.00
+2026.07.07 22:15:00;VETO;outlier bar masked, z=5.3
