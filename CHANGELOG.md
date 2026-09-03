@@ -2,6 +2,33 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## WiseTrader EA v2.52 — 2026-08-07
+
+### Fixed — F57 MtfBias() 4805 (ERR_INDICATOR_CANNOT_CREATE): prime H1 history before iMA()
+- ROOT CAUSE (finally confirmed, not guessed): in a single-symbol M15
+  headless backtest the tester does NOT build the secondary H1 timeframe
+  until the EA actually ACCESSES it. Creating the `iMA()` handle alone did
+  not count as an access on build 6093, so `iMA()` returned 4805 and
+  `m_mtf_ma_handle` stayed INVALID for the ENTIRE run. The v2.51 `MTFdbg`
+  instrumentation proved it directly: the 2026-08-06 `Y1_mtf_h1_on` tester
+  log carries `cannot load indicator 'Moving Average' (XAUUSD) [4805]` and
+  every evaluated setup shows `|MTFdbg:handle_invalid err=4805`. That run
+  still "passed" at net +$893.38 - IDENTICAL to `A2_tuned` - precisely
+  because the MTF bonus never once fired. So the two prior "fixes" (v2.50
+  lazy-retry, v2.51 instrumentation) were measuring a feature that had
+  never activated, not a feature that didn't help.
+- FIX: new `PrimeMtfHistory()` does an explicit `CopyRates(mtf_tf,...)` to
+  force the tester to synchronize the H1 series (per MT5 tester docs: the
+  run pauses to download missing symbol/TF data on first access), THEN
+  creates the handle. Applied in both `Init()` and the lazy-retry path in
+  `MtfBias()`, so it self-heals if H1 isn't ready on the very first bar.
+  `MtfBias()` now reports `htf_history_not_ready` distinctly from
+  `handle_invalid` so a future failure is unambiguous.
+- `InpUseMtf=false` (default) is unchanged: no H1 access at all when the
+  feature is off, preserving the earlier "no history-cache build error on
+  the default path" property. `Y1_mtf_h1_on` must be rerun against v2.52 to
+  get F57's FIRST real verdict - all prior runs measured "never activated."
+
 ## Tooling — Console/wfe_score.py added — 2026-08-06
 
 ### Added — F51 Walk-Forward Efficiency scoring (Python, no EA change)

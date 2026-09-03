@@ -155,10 +155,30 @@ private:
    // prior fixes (retry-on-invalid-handle, then asking to reload H1
    // history) both still produced zero MTF tags across every evaluated
    // setup, so guessing further isn't productive; log the real cause.
+   // Prime the higher-TF series so the tester synchronizes it. In a
+   // single-symbol M15 backtest the tester only builds H1 history once the
+   // EA actually ACCESSES that timeframe (per MT5 tester docs: the run
+   // pauses to download missing symbol/TF data on first access). Creating
+   // the iMA handle alone did NOT trigger this on build 6093 - iMA returned
+   // 4805 (ERR_INDICATOR_CANNOT_CREATE) for the whole run. An explicit
+   // history touch (CopyRates) forces the sync; the handle then succeeds.
+   // Returns true once at least one HTF bar is available.
+   bool              PrimeMtfHistory(void)
+     {
+      MqlRates r[];
+      return CopyRates(m_cfg.symbol, m_cfg.mtf_tf, 1, 1, r) == 1;
+     }
+
    ENUM_WT_DIR       MtfBias(string &dbg)
      {
       if(m_mtf_ma_handle == INVALID_HANDLE)
         {
+         //--- touch H1 history first so the tester builds it, THEN create
+         //--- the handle. Lazy-retry every call while the handle is invalid
+         //--- (self-healing) - the tester may not have the H1 data ready on
+         //--- the very first evaluated bar.
+         if(!PrimeMtfHistory())
+           { dbg = StringFormat("htf_history_not_ready err=%d", GetLastError()); return WT_DIR_NONE; }
          m_mtf_ma_handle = iMA(m_cfg.symbol, m_cfg.mtf_tf, m_cfg.mtf_ma_period, 0, MODE_EMA, PRICE_CLOSE);
          if(m_mtf_ma_handle == INVALID_HANDLE)
            { dbg = StringFormat("handle_invalid err=%d", GetLastError()); return WT_DIR_NONE; }
@@ -337,9 +357,14 @@ public:
       //--- only pull higher-TF history when the feature is actually on -
       //--- avoids the "history cache build error" the H1-InpTF ablation
       //--- configs hit, for every run where this feature is off (default).
-      m_mtf_ma_handle = m_cfg.use_mtf
-                       ? iMA(m_cfg.symbol, m_cfg.mtf_tf, m_cfg.mtf_ma_period, 0, MODE_EMA, PRICE_CLOSE)
-                       : INVALID_HANDLE;
+      //--- v2.52: touch H1 history BEFORE creating the handle so the tester
+      //--- synchronizes the secondary TF (single-symbol M15 backtests only
+      //--- build H1 on first access - without this iMA() returned 4805 for
+      //--- the entire run). If it's still not ready at init, MtfBias()
+      //--- lazy-retries (both prime + handle) on every call.
+      m_mtf_ma_handle = INVALID_HANDLE;
+      if(m_cfg.use_mtf && PrimeMtfHistory())
+         m_mtf_ma_handle = iMA(m_cfg.symbol, m_cfg.mtf_tf, m_cfg.mtf_ma_period, 0, MODE_EMA, PRICE_CLOSE);
      }
 
    // Evaluate one structure break event into a scored setup, using

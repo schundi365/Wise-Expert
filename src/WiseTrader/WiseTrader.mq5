@@ -15,13 +15,13 @@
 //|    stops, so recovery is automatic.                              |
 //+------------------------------------------------------------------+
 #property copyright "Wise Trader project"
-#property version   "2.51"
+#property version   "2.52"
 #property description "Rule-based autonomous bot: market structure + Quasimodo signals, VWAP/volume-profile/cycle confluence, disciplined authorization, hard risk limits."
 
 // Single source of truth for the version string used in logs/journals.
 // Keep this equal to #property version above - #property values are not
 // readable at runtime, so this is duplicated by necessity, not choice.
-#define WT_VERSION "2.51"
+#define WT_VERSION "2.52"
 
 #include "src/Config.mqh"
 #include "src/Journal.mqh"
