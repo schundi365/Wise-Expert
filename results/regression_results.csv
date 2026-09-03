@@ -1,2 +1,2 @@
 config,model,trades,net_profit,profit_factor,expectancy,win_rate,avg_win,avg_loss,max_dd,equity_dd,recovery,sharpe,deals,runtime_s,error
-E9_eur_tuned,4,70,-335.25,0.81,-4.79,44 (62.86%),33.42,-69.46,582.25 (5.73%),653.54 (6.43%),-0.51,-3.17,118,10646,
+Y1_mtf_h1_on,1,,,,,,,,,,,,,96,no report - see terminal log tail above

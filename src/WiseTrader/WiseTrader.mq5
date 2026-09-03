@@ -15,13 +15,13 @@
 //|    stops, so recovery is automatic.                              |
 //+------------------------------------------------------------------+
 #property copyright "Wise Trader project"
-#property version   "2.43"
+#property version   "2.51"
 #property description "Rule-based autonomous bot: market structure + Quasimodo signals, VWAP/volume-profile/cycle confluence, disciplined authorization, hard risk limits."
 
 // Single source of truth for the version string used in logs/journals.
 // Keep this equal to #property version above - #property values are not
 // readable at runtime, so this is duplicated by necessity, not choice.
-#define WT_VERSION "2.43"
+#define WT_VERSION "2.51"
 
 #include "src/Config.mqh"
 #include "src/Journal.mqh"
@@ -101,6 +101,40 @@ input group "Volume & outliers (v2.0)"
 input double   InpMinRelVol        = 1.0;        // Min relative volume for BOS/CHoCH (0 = off)
 input int      InpRelVolDays       = 20;         // Sessions for time-of-day volume baseline
 input double   InpOutlierZ         = 3.5;        // Outlier bar threshold, modified Z (0 = off)
+
+input group "Momentum confluence (v2.44, F52)"
+input bool     InpUseMomentum      = false;      // Score bonus for RSI agreeing with trade direction (OFF by default - REJECTED 2026-07-28 M15 campaign, PF 1.44->1.19; kept as toggle for reference)
+input int      InpMomentumPeriod   = 14;         // RSI period - sustained pressure over 14+ bars, not last 3-4
+input double   InpMomentumWeight   = 0.15;       // Score add-on when RSI agrees with trade direction
+input double   InpMomentumLongTh   = 55.0;       // RSI must be above this for long alignment
+input double   InpMomentumShortTh  = 45.0;       // RSI must be below this for short alignment
+
+input group "Trend-slope confluence (v2.45, F53)"
+input bool     InpUseRegression    = false;      // Score bonus for OLS slope agreeing with trade direction (OFF by default - REJECTED 2026-07-28, marginal net gain offset by worse Sharpe; kept as toggle for reference)
+input int      InpRegressionLookback = 30;       // Bars in the linear-regression window (catches grinding trends structure misses)
+input double   InpRegressionWeight = 0.15;       // Score add-on when slope agrees and fit is strong
+input double   InpRegressionMinR2  = 0.30;       // Min R^2 for the slope to count as a real trend, not noise
+
+input group "Ehlers cycle weight (v2.46, F54)"
+input double   InpCycleTurnWeight  = 0.20;       // Score add-on when Ehlers cycle turns WITH the trade (was hardcoded 0.20; REJECTED 2026-07-28, zero effect at 0.30/0.40 - kept for reference)
+
+input group "Volatility-regime confluence (v2.47, F55)"
+input bool     InpUseVolRegime     = false;      // Score bonus for ATR14/ATR100 expansion (directionless; OFF by default - candidate, promising in-sample (net +15%, PF 1.44->1.52), pending model 4 + OOS)
+input double   InpVolRegimeMinRatio = 1.3;       // ATR14/ATR100 must exceed this to count as expansion (vs squeeze/normal)
+input double   InpVolRegimeWeight  = 0.15;       // Score add-on when expanding
+
+input group "Persistence confluence (v2.48, F56)"
+input bool     InpUsePersistence   = false;      // Score bonus for variance-ratio persistence (directionless; OFF by default - candidate, not yet validated)
+input int      InpPersistenceLookback = 60;      // Bars in the 1-period return series
+input int      InpPersistenceQ     = 5;          // Block size for the q-period variance (Lo-MacKinlay style)
+input double   InpPersistenceMinVr = 1.15;       // Min variance ratio to count as a persistent (trending) regime
+input double   InpPersistenceWeight = 0.15;      // Score add-on when persistent
+
+input group "Multi-timeframe agreement (v2.49, F57)"
+input bool     InpUseMtf           = false;      // Score bonus when a higher TF agrees with trade direction (OFF by default - candidate, not yet validated; handle only created when true, avoids pulling HTF history otherwise)
+input ENUM_TIMEFRAMES InpMtfTf     = PERIOD_H1;  // Higher timeframe to check agreement against
+input int      InpMtfMaPeriod      = 50;         // EMA period on that timeframe (close vs EMA = HTF bias)
+input double   InpMtfWeight        = 0.15;       // Score add-on when HTF agrees
 
 input group "Protective flatten (v2.4)"
 input int      InpNewsFlattenMin   = 0;          // Close positions N min before high-impact news (0 = off; live only)
@@ -187,6 +221,28 @@ int OnInit(void)
    g_cfg.entry_mode          = InpBreakEntryMode;
    g_cfg.retest_limit        = InpRetestLimit;
    g_cfg.stop_buffer_atr     = InpStopBufferAtr;
+   g_cfg.use_momentum        = InpUseMomentum;
+   g_cfg.momentum_period     = InpMomentumPeriod;
+   g_cfg.momentum_weight     = InpMomentumWeight;
+   g_cfg.momentum_long_th    = InpMomentumLongTh;
+   g_cfg.momentum_short_th   = InpMomentumShortTh;
+   g_cfg.use_regression      = InpUseRegression;
+   g_cfg.regression_lookback = InpRegressionLookback;
+   g_cfg.regression_weight   = InpRegressionWeight;
+   g_cfg.regression_min_r2   = InpRegressionMinR2;
+   g_cfg.cycle_turn_weight   = InpCycleTurnWeight;
+   g_cfg.use_vol_regime      = InpUseVolRegime;
+   g_cfg.vol_regime_min_ratio= InpVolRegimeMinRatio;
+   g_cfg.vol_regime_weight   = InpVolRegimeWeight;
+   g_cfg.use_persistence       = InpUsePersistence;
+   g_cfg.persistence_lookback  = InpPersistenceLookback;
+   g_cfg.persistence_q         = InpPersistenceQ;
+   g_cfg.persistence_min_vr    = InpPersistenceMinVr;
+   g_cfg.persistence_weight    = InpPersistenceWeight;
+   g_cfg.use_mtf             = InpUseMtf;
+   g_cfg.mtf_tf              = InpMtfTf;
+   g_cfg.mtf_ma_period       = InpMtfMaPeriod;
+   g_cfg.mtf_weight          = InpMtfWeight;
    g_cfg.be_atr_trigger      = InpBeAtrTrigger;
    g_cfg.lock_start_pct      = InpLockStartPct;
    g_cfg.lock_pct            = InpLockPct;

@@ -341,15 +341,21 @@ def main():
     ap.add_argument("--to", dest="to_date", metavar="YYYY.MM.DD",
                     help="test window end (overrides WT_TO)")
     ap.add_argument("--symbol", help="tester symbol (overrides WT_SYMBOL)")
+    ap.add_argument("--period", help="tester CHART period (M1/M5/M15/M30/H1/H4/D1/...). "
+                    "Should match the InpTF being tested in the .set - a mismatch (e.g. "
+                    "chart on M15 while InpTF=H1) can make the tester fail to build the "
+                    "H1 history cache headlessly (default: M15)")
     args = ap.parse_args()
 
-    global FROMDATE, TODATE, SYMBOL
+    global FROMDATE, TODATE, SYMBOL, PERIOD
     if args.from_date:
         FROMDATE = args.from_date
     if args.to_date:
         TODATE = args.to_date
     if args.symbol:
         SYMBOL = args.symbol
+    if args.period:
+        PERIOD = args.period
 
     #--- refuse to start while any terminal64.exe is running: a second
     #--- instance ignores /config and exits silently ("no report", 1s runs)

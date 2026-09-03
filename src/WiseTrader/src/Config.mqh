@@ -118,6 +118,48 @@ struct SSettings
    ENUM_WT_ENTRY_MODE entry_mode;          // how breaks become entries
    bool              retest_limit;         // resting limit order at the retest price
    double            stop_buffer_atr;      // stop-order offset beyond the level, ATR mult
+   //--- momentum confluence (v2.44, F52)
+   bool              use_momentum;         // score bonus for RSI agreeing with trade direction
+   int               momentum_period;      // RSI period (sustained-pressure window, not last 3-4 bars)
+   double            momentum_weight;      // score add-on when aligned (0 = feature off)
+   double            momentum_long_th;     // RSI must be above this for long alignment
+   double            momentum_short_th;    // RSI must be below this for short alignment
+   //--- trend-slope confluence (v2.45, F53)
+   bool              use_regression;       // score bonus for OLS slope agreeing with trade direction
+   int               regression_lookback;  // bars in the linear-regression window (20-50 typical)
+   double            regression_weight;    // score add-on when aligned and fit is strong (0 = feature off)
+   double            regression_min_r2;    // min R^2 for the slope to count as a real trend, not noise
+   //--- Ehlers cycle weight (v2.46, F54): was a hardcoded 0.20; now a
+   //--- sweepable input to test whether the frequency-domain cycle signal
+   //--- is underweighted relative to the bar-counting signals around it.
+   double            cycle_turn_weight;
+   //--- volatility-regime confluence (v2.47, F55): ATR14/ATR100 already
+   //--- exists for RISK SIZING (Risk.mqh, high ratio -> shrink size); this
+   //--- is a SEPARATE, directionless score input treating expansion after
+   //--- a squeeze as a movement signal in its own right.
+   bool              use_vol_regime;
+   double            vol_regime_min_ratio; // ATR14/ATR100 must exceed this to count as expansion
+   double            vol_regime_weight;    // score add-on when expanding (0 = feature off)
+   //--- persistence confluence (v2.48, F56): variance-ratio test
+   //--- (Lo-MacKinlay style) - tells us whether the regime is trending-
+   //--- persistent (VR>1) or mean-reverting (VR<1) before trusting a
+   //--- bar-based breakout signal at all. NOT a literal Hurst exponent
+   //--- (that needs multi-scale R/S regression); this is the simpler,
+   //--- equally standard variance-ratio proxy for the same question.
+   bool              use_persistence;
+   int               persistence_lookback; // total bars for the 1-period return series
+   int               persistence_q;        // block size for the q-period variance
+   double            persistence_min_vr;   // min variance ratio to count as "persistent"
+   double            persistence_weight;   // score add-on when persistent (0 = feature off)
+   //--- multi-timeframe agreement (v2.49, F57): does a higher TF (default
+   //--- H1) agree with the trade direction. The handle is only created
+   //--- when this is enabled (Init() checks the flag) - avoids pulling H1
+   //--- history at all when the feature is off, sidestepping the same
+   //--- "history cache build error" the H1 InpTF ablation configs hit.
+   bool              use_mtf;
+   ENUM_TIMEFRAMES   mtf_tf;               // higher timeframe to check agreement against
+   int               mtf_ma_period;        // EMA period on that timeframe
+   double            mtf_weight;           // score add-on when HTF agrees (0 = feature off)
    //--- stop management (v2.2)
    double            be_atr_trigger;       // BE also arms at k*ATR profit (0 = off)
    double            lock_start_pct;       // lock profit once this % of TP dist covered (0 = off)

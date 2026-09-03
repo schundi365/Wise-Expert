@@ -1,13 +1,23 @@
 {
- "symbol": "XAGUSD",
+ "symbol": "XAUUSD",
  "period": "2026.01.01-2026.07.08",
- "model": 4,
+ "model": 1,
  "configs": [
-  "S5_silver_tuned"
+  "Y1_mtf_h1_on"
  ],
- "current": "S5_silver_tuned",
- "done": [],
- "finished": false,
- "started": "2026-07-23 15:43:14",
- "updated": "2026-07-23 15:43:14"
+ "current": "",
+ "done": [
+  {
+   "config": "Y1_mtf_h1_on",
+   "net_profit": "",
+   "profit_factor": "",
+   "trades": "",
+   "max_dd": "",
+   "runtime_s": 96,
+   "error": "no report - see terminal log tail above"
+  }
+ ],
+ "finished": true,
+ "started": "2026-08-06 05:18:58",
+ "updated": "2026-08-06 05:20:34"
 }

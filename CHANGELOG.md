@@ -2,6 +2,267 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## Tooling — Console/wfe_score.py added — 2026-08-06
+
+### Added — F51 Walk-Forward Efficiency scoring (Python, no EA change)
+- New `Console/wfe_score.py`: reimplements the WFE scoring math from
+  "Implementing Walk-Forward Efficiency Ratio Scoring in MQL5 to Detect
+  Over-Optimized Strategies" (MQL5 Articles, 2026-07-09) - `WFE =
+  SR_OOS / SR_IS`, with the non-positive-IS guard (WFE=0, also blocks the
+  double-negative false positive) and near-zero-IS guard (WFE=0 below
+  Sharpe 0.25, avoids an exploding ratio from a near-zero denominator).
+  Pass threshold 0.5 (retains at least half of in-sample efficiency), per
+  the source article.
+- Deliberately reuses the Sharpe ratio MT5's own tester report already
+  computes (already sitting in `results/regression_history.csv`) instead
+  of re-deriving Sharpe from a per-bar equity series - no companion
+  EA/journal change needed, matching the Feature Log's own plan for a
+  lightweight first implementation.
+- First real test (4 known campaign pairs, hardcoded in `KNOWN_PAIRS`):
+  `A2_tuned` PASS (WFE 1.18), `W1_volregime_on` PASS (WFE 1.06 - confirms
+  F55 genuinely generalized, a more precise read than this session's
+  "parity" framing), `E9_eur_tuned` FAIL (WFE -0.68), `S5_silver_tuned`
+  FAIL (WFE -0.46) - correctly flags both known overfit collapses. Tool
+  works as intended - see Feature Log F51.
+- Supports ad-hoc scoring (`--is-sharpe`/`--oos-sharpe`) and CSV lookup by
+  config+symbol+period for future campaigns; IS/OOS role per config isn't
+  auto-detectable from the CSV (direction flips per campaign - E9's own
+  tuning window was 2025H2, everyone else's was the 2026 primary window),
+  so `KNOWN_PAIRS` is hand-curated and should be extended as new
+  campaigns land.
+
+## WiseTrader EA v2.51 — 2026-08-05
+
+### F52-F57 movement-signal series — closed out, none promoted
+- v2.51's diagnostic rerun (`Y1_mtf_h1_on`) failed outright (no report,
+  96s) - third attempt at F57 without ever producing usable evidence.
+  DEPRIORITIZED per user decision 2026-08-06 rather than keep spending
+  test cycles on what looks like a tester-environment/tooling issue
+  unrelated to the feature's own logic - not rejected on merit, just
+  unresolved.
+- Final scorecard: F52 (momentum) rejected, F53 (regression slope)
+  rejected, F54 (cycle weight) rejected (zero effect), F55 (vol-regime)
+  real in-sample edge but only at PARITY OOS - not promoted, F56
+  (persistence) rejected, F57 (MTF) inconclusive/deprioritized.
+- Demo account stays on `A2_tuned` unchanged - none of the six candidates
+  cleared the bar this project set for itself (genuine OOS improvement,
+  not just survival), and the demo's clock had just been reset 4 days
+  earlier for the [[wise-trader-demo-tracking]] journal-contamination
+  issue. All six inputs remain in the EA (default off/false) as
+  documented, gauntlet-tested candidates for future reconsideration
+  rather than being ripped out.
+
+### Debug — F57 still silent after two fix attempts, added instrumentation
+- Neither the v2.50 lazy-retry fix nor manually reloading H1 history in
+  MT5 resolved it: `Y1_mtf_h1_on` reran twice more (2026-08-02, 2026-08-05)
+  and the `|MTF...` evidence tag still never appeared once across any
+  evaluated setup in either run's isolated journal segment. Guessing a
+  third root cause isn't productive without evidence.
+- `MtfBias()` now takes a `string &dbg` out-param and always reports which
+  exact step failed (`handle_invalid`, `htf_close<=0`, or
+  `copybuffer_ret=N`, each with `GetLastError()`) or the actual close/MA
+  values on success. `Score()` appends this as `|MTFdbg:...` to EVERY
+  evaluated setup's evidence (not just aligned ones), so the next run's
+  journal will show the real cause directly instead of staying silent.
+  Temporary - remove once F57's actual failure mode is confirmed.
+
+## WiseTrader EA v2.50 — 2026-08-01
+
+### Fixed — F57 MtfBias() never fired (secondary-TF handle race)
+- `Y1_mtf_h1_on`'s first run (2026-08-01) produced results IDENTICAL to
+  `A2_tuned` across all 354 evaluated setups in the journal - the `|MTF...`
+  evidence tag never appeared once. Root cause: `m_mtf_ma_handle` (the H1
+  EMA handle) was only created once, in `Init()`; MT5's tester can return
+  `INVALID_HANDLE` for a SECONDARY timeframe's indicator handle if that
+  timeframe's history hasn't been built yet at the exact moment `OnInit`
+  runs (a known quirk - unlike the decision-TF handles, which the tester
+  always has ready). With no retry, the handle stayed invalid for the
+  entire run and `MtfBias()` silently returned `WT_DIR_NONE` every time -
+  indistinguishable from a genuine null result without checking the
+  journal directly.
+- Fix: `MtfBias()` now retries `iMA()` lazily on every call while the
+  handle is invalid, instead of only attempting creation once in `Init()`.
+  Self-healing, matches the project's existing restart-safe philosophy
+  elsewhere in the EA.
+- `Y1_mtf_h1_on` needs to be rerun against this fix before any real F57
+  verdict can be recorded - the prior run measured "the feature never
+  activated," not "the feature doesn't help."
+
+### F55 vol-regime - full gauntlet result
+- Model 4 confirm (2026.01.01-2026.07.08, in-sample): 107 trades, net
+  $925.60, PF 1.47, exp $8.65, Sharpe 4.91 - vs `A2_tuned`'s own model-4
+  primary-window number (106 trades, $794.23, PF 1.39, exp $7.49, Sharpe
+  4.80, from the original gauntlet): still a real edge (PF +0.08, exp
+  +15%), confirming the model-1 result wasn't a fill-model artifact.
+- OOS (2025.07.01-2025.12.31, untouched window), model 4: 155 trades, net
+  $1651.99, PF 1.51, exp $10.66, Sharpe 5.20, DD 5.28%/6.06% - vs
+  `A2_tuned`'s own OOS number on the same window (147 trades, $1647, PF
+  1.54, DD 4.8%, from the original 2026-07-17 gauntlet): essentially AT
+  PARITY, marginally behind on PF (1.51 vs 1.54) and DD (5.28% vs 4.8%).
+  Unlike `E9_eur_tuned` this does NOT collapse OOS - it's a real,
+  reproducible in-sample edge - but it also doesn't clearly beat the
+  existing validated baseline once OOS is accounted for. Verdict: NOT
+  promoted to default. `InpUseVolRegime` stays available (default false)
+  as a documented, gauntlet-tested candidate for future reconsideration
+  rather than being treated as either a win or a dead end.
+
+### F56 persistence - campaign verdict recorded
+- REJECTED: `X1_persistence_on` vs `A2_tuned` (XAUUSD M15,
+  2026.01.01-2026.07.08, model 1) - net $893->$790 (-12%), PF 1.44->1.36,
+  exp $8.43->$7.18 (-15%), max DD 2.94%->3.74%, Sharpe 5.34->4.51 (-16%),
+  n=106->110. Confirmed genuinely active in the journal (`VR=` tag present
+  on many setups, ranging 1.15-1.26+) - a real result, not a dead feature
+  like F57's bug. Same dilution pattern as F52/F53: admits more marginal
+  trades past `InpMinScore`, net negative. `InpUsePersistence` stays in
+  the EA (default false).
+
+## WiseTrader EA v2.49 — 2026-07-28
+
+### Added — F57 multi-timeframe agreement confluence score, OFF by default
+- New scored input in `SignalEngine::Score()`: a higher timeframe
+  (`InpMtfTf`, default H1) closing above/below its own EMA(`InpMtfMaPeriod`,
+  default 50) agreeing with the trade direction adds `InpMtfWeight`
+  (default 0.15) to the score. New helper `CSignalEngine::MtfBias()`.
+  Different failure mode than F52-F56 (all of which read the SAME
+  timeframe more carefully) - this catches "M15 broke a level but H1 is
+  still ranging/opposed," which no amount of M15-only signal work can see.
+- The HTF indicator handle is only created in `Init()` when
+  `InpUseMtf=true` - deliberately avoids pulling H1 history at all when
+  the feature is off (default), sidestepping the "history cache build
+  error" the earlier H1-`InpTF` ablation configs hit. When actually
+  testing this feature (`InpUseMtf=true`), that same error may still
+  surface since it now pulls H1 data regardless of chart period - if so,
+  open an H1 chart for the symbol once to force history download, per the
+  note already in `Y1_mtf_h1_on.set`.
+- `InpUseMtf=false` (default) reproduces v2.48 behavior exactly. All
+  `tests/configs/*.set` files updated. New ablation config:
+  `Y1_mtf_h1_on` vs `A2_tuned` at M15, XAUUSD. Status: Candidate, pending
+  backtest - see Feature Log F57. This is the last of the F52-F57
+  movement-signal candidate series.
+
+## WiseTrader EA v2.48 — 2026-07-28
+
+### Added — F56 persistence (variance-ratio) confluence score, OFF by default
+- New scored input in `SignalEngine::Score()`: a Lo-MacKinlay-style
+  variance-ratio test (`PersistenceRatio()`, non-overlapping q-blocks over
+  `InpPersistenceLookback`=60 bars, block size `InpPersistenceQ`=5)
+  exceeding `InpPersistenceMinVr` (default 1.15) adds
+  `InpPersistenceWeight` (default 0.15) to the score. VR>1 = trending/
+  persistent returns, VR<1 = mean-reverting, VR~1 = random walk.
+  Directionless, same style as F55 - this asks whether the CURRENT REGIME
+  deserves trust for a bar-based breakout at all, not which direction to
+  trade. NOT a literal Hurst exponent (that needs multi-scale R/S
+  regression) - documented honestly as the simpler, equally standard
+  variance-ratio proxy for the same "Feature Engineering Part 9:
+  Structural Break Tests" family of question.
+- `InpUsePersistence=false` (default) reproduces v2.47 behavior exactly.
+  All `tests/configs/*.set` files updated. New ablation config:
+  `X1_persistence_on` vs `A2_tuned` at M15, XAUUSD. Status: Candidate,
+  pending backtest - see Feature Log F56.
+
+## WiseTrader EA v2.47 — 2026-07-28
+
+### Added — F55 volatility-regime (ATR expansion) confluence score, OFF by default
+- New scored input in `SignalEngine::Score()`: ATR14/ATR100 ratio exceeding
+  `InpVolRegimeMinRatio` (default 1.3) adds `InpVolRegimeWeight` (default
+  0.15) to the confluence score. Directionless (applies to longs and shorts
+  alike) - unlike F52/F53 this isn't about trade direction, it's about
+  whether the market is in an expansion regime at all.
+- Deliberately a SEPARATE read from `Risk.mqh`'s own ATR14/ATR100 handles,
+  which drive position sizing (and treat high ratio as a reason to shrink
+  risk, currently disabled by default per the original campaign). Mixing
+  the sizing and scoring concerns into one shared value would have made
+  either change hard to attribute.
+- `InpUseVolRegime=false` (default) reproduces v2.46 behavior exactly. All
+  `tests/configs/*.set` files updated. New ablation config:
+  `W1_volregime_on` vs `A2_tuned` at M15, XAUUSD. Status: Candidate,
+  pending backtest - see Feature Log F55.
+
+## WiseTrader EA v2.46 — 2026-07-28
+
+### F54 Ehlers cycle weight - campaign verdict recorded
+- REJECTED (zero effect): 2026-07-28 campaign - `V1_cycleweight_030` (0.30)
+  and `V2_cycleweight_040` (0.40) produced results IDENTICAL to `A2_tuned`
+  (0.20) to the cent: net $893.38, PF 1.44, n=106, Sharpe 5.34, all three.
+  Root cause: `score` only gates entry via `InpMinScore=0.55`; no setup in
+  this window sat in the band the weight change could flip. Underweighting
+  hypothesis disproven cleanly. `InpCycleTurnWeight` stays in the EA
+  (default 0.20, reproduces pre-v2.46 behavior).
+
+### Added — F54 Ehlers cycle weight now sweepable (was hardcoded)
+- The Ehlers `CycleTurn` score bonus in `SignalEngine::Score()` was a
+  hardcoded `0.20`; now driven by `InpCycleTurnWeight` (default 0.20, so
+  v2.45 behavior is reproduced exactly). Motivation: the cycle signal is
+  frequency-domain, not bar-counting like most of the rest of the scorer -
+  worth testing whether it's underweighted relative to the information it
+  actually carries.
+- New sweep configs: `V1_cycleweight_030` (0.30), `V2_cycleweight_040`
+  (0.40), both vs `A2_tuned` (0.20) at XAUUSD M15. Status: Candidate,
+  pending backtest - see Feature Log F54.
+
+## WiseTrader EA v2.45 — 2026-07-28
+
+### F53 trend-slope - campaign verdict recorded
+- REJECTED: 2026-07-28 campaign (`U1_regression_on` vs `A2_tuned`, XAUUSD M15,
+  2026.01.01-2026.07.08, model 1) - net profit/expectancy nudged up slightly
+  (+6%/+2%) but Sharpe fell 5.34->4.56 (-15%) and max DD ticked up
+  (2.94%->3.01%), n=106->110. Same "small in-sample delta, don't trust it"
+  pattern the project already learned from E9/S5 - not pursued to model
+  4/OOS. `InpUseRegression` stays in the EA (default false).
+
+### Added — F53 trend-slope (OLS regression) confluence score, OFF by default
+- New scored input in `SignalEngine::Score()`: OLS slope of closes over
+  `InpRegressionLookback` bars (default 30, closed bars only, no lookahead)
+  agreeing with the trade direction adds `InpRegressionWeight` (default 0.15)
+  to the confluence score, gated on `InpRegressionMinR2` (default 0.30) so a
+  flat/noisy window can't falsely claim a trend. New helper
+  `CSignalEngine::RegressionSlope()`.
+- Motivation: catches grinding, low-volatility trends that never trip a
+  clean structure swing break - a different blind spot than F52 (momentum
+  acceleration) or structure itself (did price break a level).
+- `InpUseRegression=false` (default) reproduces v2.44 behavior exactly. All
+  `tests/configs/*.set` files updated with explicit off-defaults. New
+  ablation config: `U1_regression_on` (compare vs `A2_tuned` at M15,
+  XAUUSD). Status: Candidate, pending backtest - see Feature Log F53.
+
+### F52 momentum - campaign verdict recorded
+- REJECTED as default on XAUUSD M15 (the validated deployment setup):
+  2026-07-28 campaign vs `A2_tuned` (2026.01.01-2026.07.08, model 1) - PF
+  1.44->1.19, expectancy $8.43->$4.01, net $893->$461, Sharpe 5.34->2.19
+  (n=106->115). Cause: the score is a pure additive bonus with no penalty
+  for misalignment, so on an already-tuned config it only admits more
+  marginal trades past `InpMinScore`, diluting quality rather than
+  filtering it. Notable but unvalidated side-finding: on M30 (itself an
+  unproven timeframe for this strategy - baseline alone loses, PF 0.86) the
+  same toggle flipped it to marginally profitable (PF 1.14) - filed as a
+  curiosity, not evidence, per Feature Log F52. `InpUseMomentum` stays in
+  the EA (default false) for future reference/reuse rather than being
+  ripped out - the RSI plumbing itself may be useful for a future filter-
+  style (not bonus-style) variant.
+
+## WiseTrader EA v2.44 — 2026-07-24
+
+### Added — F52 momentum (RSI) confluence score, OFF by default
+- New scored input in `SignalEngine::Score()`: RSI(`InpMomentumPeriod`, default
+  14) agreeing with the trade direction (`InpMomentumLongTh`=55 for longs,
+  `InpMomentumShortTh`=45 for shorts) adds `InpMomentumWeight` (default 0.15)
+  to the confluence score. Mirrors the existing ADX-handle pattern in
+  `SignalEngine.mqh` (`m_rsi_handle` via `iRSI`, released implicitly like
+  `m_adx_handle`).
+- Motivation: structure/BOS-CHoCH asks "did price break a level"; this asks
+  "is the move actually sustained," using a longer smoothed window (14+ bars)
+  instead of the last 3-4 candles the swing/structure logic already leans on.
+  First of a planned series of movement-signal candidates (F52-F57) requested
+  after observing visible chart moves the EA wasn't acting on early.
+- `InpUseMomentum=false` (default) reproduces v2.43 behavior exactly - no
+  change to the running XAUUSD demo. All 42 existing `tests/configs/*.set`
+  files were updated to carry the new inputs explicitly (off-defaults) so no
+  config silently falls back to compiled defaults.
+- New ablation configs: `T0_baseline_m30`/`T0_baseline_h1` (A2_tuned control
+  at M30/H1, momentum off) and `T1_momentum_m15`/`_m30`/`_h1` (momentum on),
+  to isolate the feature's effect independent of timeframe. Status: Candidate,
+  pending backtest - see Feature Log F52.
+
 ## WiseTrader EA v2.43 — 2026-07-20
 
 ### Added — per-symbol parameter overrides (SymbolProfile.mqh)

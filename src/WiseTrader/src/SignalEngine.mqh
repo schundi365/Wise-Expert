@@ -20,6 +20,10 @@ class CSignalEngine
 private:
    SSettings         m_cfg;
    int               m_adx_handle;  // ADX(14) trend-strength gate
+   int               m_rsi_handle;  // RSI(momentum_period) confluence (v2.44, F52)
+   int               m_atr14_handle; // ATR(14) for vol-regime confluence (v2.47, F55)
+   int               m_atr100_handle; // ATR(100) baseline for vol-regime confluence
+   int               m_mtf_ma_handle; // higher-TF EMA for MTF agreement (v2.49, F57)
 
    double            Adx(void)
      {
@@ -28,6 +32,148 @@ private:
          CopyBuffer(m_adx_handle, MAIN_LINE, 1, 1, buf) != 1)
          return -1.0;   // unavailable: gate stands down gracefully
       return buf[0];
+     }
+
+   // F52: sustained-pressure read over momentum_period bars (default 14),
+   // independent of structure's swing-based break detection. -1 = unavailable.
+   double            Momentum(void)
+     {
+      double buf[];
+      if(m_rsi_handle == INVALID_HANDLE ||
+         CopyBuffer(m_rsi_handle, 0, 1, 1, buf) != 1)
+         return -1.0;
+      return buf[0];
+     }
+
+   // F53: OLS slope + R^2 of closes over the last 'n' CLOSED bars (shift
+   // 1..n, no lookahead). Catches grinding trends that never produce a
+   // clean swing break - structure's own blind spot. Returns false if
+   // not enough history is available yet.
+   bool              RegressionSlope(const int n, double &slope, double &r2)
+     {
+      double closes[];
+      ArraySetAsSeries(closes, true);
+      if(CopyClose(m_cfg.symbol, m_cfg.tf, 1, n, closes) != n)
+         return false;
+      //--- x = 0..n-1 in chronological order (oldest first); closes[] is
+      //--- series-ordered (index 0 = most recent), so reverse the mapping.
+      double xbar = (n - 1) / 2.0, ybar = 0.0;
+      for(int i = 0; i < n; i++)
+         ybar += closes[n - 1 - i];
+      ybar /= n;
+      double sxy = 0.0, sxx = 0.0, syy = 0.0;
+      for(int i = 0; i < n; i++)
+        {
+         const double y  = closes[n - 1 - i];
+         const double dx = i - xbar;
+         const double dy = y - ybar;
+         sxy += dx * dy;
+         sxx += dx * dx;
+         syy += dy * dy;
+        }
+      if(sxx <= 0 || syy <= 0)
+         return false;
+      slope = sxy / sxx;
+      const double r = sxy / MathSqrt(sxx * syy);
+      r2 = r * r;
+      return true;
+     }
+
+   // F55: ATR14/ATR100 ratio - a SEPARATE read from Risk.mqh's own handles
+   // (that one drives position sizing, treating high ratio as a reason to
+   // shrink risk; this one treats expansion-after-squeeze as a movement
+   // signal in its own right). -1 = unavailable.
+   double            VolRatio(void)
+     {
+      double f[], s[];
+      if(m_atr14_handle == INVALID_HANDLE || m_atr100_handle == INVALID_HANDLE ||
+         CopyBuffer(m_atr14_handle, 0, 1, 1, f) != 1 ||
+         CopyBuffer(m_atr100_handle, 0, 1, 1, s) != 1 || s[0] <= 0)
+         return -1.0;
+      return f[0] / s[0];
+     }
+
+   // F56: variance-ratio persistence test (Lo-MacKinlay style, non-
+   // overlapping blocks for simplicity). VR > 1 = trending/persistent
+   // returns, VR < 1 = mean-reverting, VR ~ 1 = random walk. Answers "is
+   // this regime the kind where a bar-based breakout deserves trust at
+   // all" - independent of structure's own break-detection logic.
+   // Returns -1 if there isn't enough clean history.
+   double            PersistenceRatio(const int lookback, const int q)
+     {
+      if(q < 2 || lookback < q * 5)
+         return -1.0;
+      double closes[];
+      ArraySetAsSeries(closes, true);
+      if(CopyClose(m_cfg.symbol, m_cfg.tf, 1, lookback + 1, closes) != lookback + 1)
+         return -1.0;
+      //--- chronological 1-period log returns, oldest to newest
+      double r[];
+      ArrayResize(r, lookback);
+      for(int i = 0; i < lookback; i++)
+        {
+         const double newer = closes[lookback - 1 - i];
+         const double older = closes[lookback - i];
+         if(older <= 0 || newer <= 0)
+            return -1.0;
+         r[i] = MathLog(newer / older);
+        }
+      double mu = 0.0;
+      for(int i = 0; i < lookback; i++) mu += r[i];
+      mu /= lookback;
+      double var1 = 0.0;
+      for(int i = 0; i < lookback; i++) var1 += (r[i] - mu) * (r[i] - mu);
+      var1 /= (lookback - 1);
+      if(var1 <= 0)
+         return -1.0;
+      //--- non-overlapping q-period sums
+      const int m = lookback / q;
+      if(m < 2)
+         return -1.0;
+      double Rk[];
+      ArrayResize(Rk, m);
+      for(int k = 0; k < m; k++)
+        {
+         double s = 0.0;
+         for(int j = 0; j < q; j++) s += r[k * q + j];
+         Rk[k] = s;
+        }
+      double muq = 0.0;
+      for(int k = 0; k < m; k++) muq += Rk[k];
+      muq /= m;
+      double varq = 0.0;
+      for(int k = 0; k < m; k++) varq += (Rk[k] - muq) * (Rk[k] - muq);
+      varq /= (m - 1);
+      return varq / (q * var1);
+     }
+
+   // F57: higher-TF bias via close vs EMA (e.g. H1 close vs H1 EMA50).
+   // Catches "M15 broke a level but H1 is still ranging/opposed" - a
+   // failure mode no amount of extra M15 bar-counting can see. Returns
+   // WT_DIR_NONE if the feature is off or data isn't ready yet.
+   // v2.51: 'dbg' out-param pinpoints exactly which step is failing - two
+   // prior fixes (retry-on-invalid-handle, then asking to reload H1
+   // history) both still produced zero MTF tags across every evaluated
+   // setup, so guessing further isn't productive; log the real cause.
+   ENUM_WT_DIR       MtfBias(string &dbg)
+     {
+      if(m_mtf_ma_handle == INVALID_HANDLE)
+        {
+         m_mtf_ma_handle = iMA(m_cfg.symbol, m_cfg.mtf_tf, m_cfg.mtf_ma_period, 0, MODE_EMA, PRICE_CLOSE);
+         if(m_mtf_ma_handle == INVALID_HANDLE)
+           { dbg = StringFormat("handle_invalid err=%d", GetLastError()); return WT_DIR_NONE; }
+        }
+      const double htf_close = iClose(m_cfg.symbol, m_cfg.mtf_tf, 1);
+      if(htf_close <= 0)
+        { dbg = StringFormat("htf_close<=0 val=%.5f err=%d", htf_close, GetLastError()); return WT_DIR_NONE; }
+      double ma[];
+      const int copied = CopyBuffer(m_mtf_ma_handle, 0, 1, 1, ma);
+      if(copied != 1)
+        { dbg = StringFormat("copybuffer_ret=%d err=%d", copied, GetLastError()); return WT_DIR_NONE; }
+      dbg = StringFormat("close=%.2f ma=%.2f", htf_close, ma[0]);
+      if(htf_close > ma[0]) return WT_DIR_LONG;
+      if(htf_close < ma[0]) return WT_DIR_SHORT;
+      return WT_DIR_NONE;
      }
 
    // score one candidate 0..1 and append evidence.
@@ -71,13 +217,82 @@ private:
          const double wp = ehlers.WavePrev();
          const bool aligned = (s.dir == WT_DIR_LONG  && w > wp && w <  0.8) ||
                               (s.dir == WT_DIR_SHORT && w < wp && w > -0.8);
-         if(aligned) { score += 0.20; ev += StringFormat("|CycleTurn w=%.2f<-%.2f", w, wp); }
+         if(aligned) { score += m_cfg.cycle_turn_weight; ev += StringFormat("|CycleTurn w=%.2f<-%.2f", w, wp); }
         }
 
       //--- trend strength bonus: strong regime rewards continuation entries
       const double adx = Adx();
       if(adx > 30 && s.signal == WT_SIG_BOS)
         { score += 0.10; ev += StringFormat("|ADX=%.0f", adx); }
+
+      //--- F52 (candidate, OFF by default): sustained pressure over
+      //--- momentum_period bars agreeing with trade direction. Distinct
+      //--- from structure (did price break a level) and from ADX (is
+      //--- there a trend at all) - this asks "is the move actually
+      //--- building, not just the last 3-4 candles."
+      if(m_cfg.use_momentum)
+        {
+         const double rsi = Momentum();
+         if(rsi >= 0)
+           {
+            const bool aligned = (s.dir == WT_DIR_LONG  && rsi > m_cfg.momentum_long_th) ||
+                                 (s.dir == WT_DIR_SHORT && rsi < m_cfg.momentum_short_th);
+            if(aligned) { score += m_cfg.momentum_weight; ev += StringFormat("|RSI=%.0f", rsi); }
+           }
+        }
+
+      //--- F53 (candidate, OFF by default): OLS trend slope over
+      //--- regression_lookback bars (default 30), gated on R^2 so a flat
+      //--- or noisy window can't falsely claim a trend. Catches grinding
+      //--- moves that never trip a structure swing break.
+      if(m_cfg.use_regression)
+        {
+         double slope = 0.0, r2 = 0.0;
+         if(RegressionSlope(m_cfg.regression_lookback, slope, r2) && r2 >= m_cfg.regression_min_r2)
+           {
+            const bool aligned = (s.dir == WT_DIR_LONG && slope > 0) ||
+                                 (s.dir == WT_DIR_SHORT && slope < 0);
+            if(aligned) { score += m_cfg.regression_weight; ev += StringFormat("|Slope=%.4f R2=%.2f", slope, r2); }
+           }
+        }
+
+      //--- F55 (candidate, OFF by default): ATR14/ATR100 expansion as a
+      //--- movement signal in its own right, independent of direction and
+      //--- independent of where swing pivots happen to fall. Distinct from
+      //--- Risk.mqh's use of the same ratio family for sizing.
+      if(m_cfg.use_vol_regime)
+        {
+         const double vr = VolRatio();
+         if(vr >= m_cfg.vol_regime_min_ratio)
+            { score += m_cfg.vol_regime_weight; ev += StringFormat("|VolExp=%.2f", vr); }
+        }
+
+      //--- F56 (candidate, OFF by default): variance-ratio persistence.
+      //--- Directionless, like F55 - asks whether THIS regime is the kind
+      //--- where a bar-based breakout deserves trust, independent of
+      //--- structure's own break-detection logic.
+      if(m_cfg.use_persistence)
+        {
+         const double vr = PersistenceRatio(m_cfg.persistence_lookback, m_cfg.persistence_q);
+         if(vr >= m_cfg.persistence_min_vr)
+            { score += m_cfg.persistence_weight; ev += StringFormat("|VR=%.2f", vr); }
+        }
+
+      //--- F57 (candidate, OFF by default): does a higher timeframe agree
+      //--- with the trade direction. Different failure mode than every
+      //--- other signal here - all of them read the SAME timeframe more
+      //--- carefully; this one asks a DIFFERENT timeframe entirely.
+      if(m_cfg.use_mtf)
+        {
+         string dbg = "";
+         const ENUM_WT_DIR bias = MtfBias(dbg);
+         //--- v2.51 temporary diagnostic - always logged (not just on
+         //--- alignment) so the journal shows the real cause instead of
+         //--- staying silent. Remove once F57's failure mode is confirmed.
+         ev += "|MTFdbg:" + dbg;
+         if(bias == s.dir)
+            { score += m_cfg.mtf_weight; ev += StringFormat("|MTF%s", EnumToString(m_cfg.mtf_tf)); }
+        }
 
       s.evidence = ev;
       return MathMin(score, 1.0);
@@ -116,6 +331,15 @@ public:
      {
       m_cfg = cfg;
       m_adx_handle = iADX(m_cfg.symbol, m_cfg.tf, 14);
+      m_rsi_handle = iRSI(m_cfg.symbol, m_cfg.tf, m_cfg.momentum_period, PRICE_CLOSE);
+      m_atr14_handle  = iATR(m_cfg.symbol, m_cfg.tf, 14);
+      m_atr100_handle = iATR(m_cfg.symbol, m_cfg.tf, 100);
+      //--- only pull higher-TF history when the feature is actually on -
+      //--- avoids the "history cache build error" the H1-InpTF ablation
+      //--- configs hit, for every run where this feature is off (default).
+      m_mtf_ma_handle = m_cfg.use_mtf
+                       ? iMA(m_cfg.symbol, m_cfg.mtf_tf, m_cfg.mtf_ma_period, 0, MODE_EMA, PRICE_CLOSE)
+                       : INVALID_HANDLE;
      }
 
    // Evaluate one structure break event into a scored setup, using
