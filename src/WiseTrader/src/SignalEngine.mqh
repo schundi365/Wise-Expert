@@ -14,6 +14,7 @@
 #include "Vwap.mqh"
 #include "VolumeProfile.mqh"
 #include "Ehlers.mqh"
+#include "SpreadGate.mqh"   // WT_SPREAD_Z_NA sentinel used by the F58 veto
 
 class CSignalEngine
   {
@@ -374,6 +375,7 @@ public:
    bool              EvaluateBreak(CMarketStructure &ms, CSessionVwap &vwap,
                                    CSessionProfile &prof, CEhlers &ehlers,
                                    const double atr, const double relvol,
+                                   const double spread_z,
                                    const double entry_price,
                                    const SStructureEvent &e,
                                    SSetup &s, string &reject_reason)
@@ -391,6 +393,15 @@ public:
       if(m_cfg.min_relvol > 0 && relvol >= 0 && relvol < m_cfg.min_relvol)
         {
          reject_reason = StringFormat("volume: relVol %.2f < %.2f", relvol, m_cfg.min_relvol);
+         return false;
+        }
+      //--- F58 spread gate: a break firing while the spread is an outlier
+      //--- high = toxic flow (wide/thin/expensive). Entering here bleeds
+      //--- the edge on market/stop fills. spread_z == WT_SPREAD_Z_NA means
+      //--- no baseline yet - stand down, never veto on missing data.
+      if(m_cfg.spread_z_max > 0 && spread_z > WT_SPREAD_Z_NA && spread_z >= m_cfg.spread_z_max)
+        {
+         reject_reason = StringFormat("spread: Z %.2f >= %.2f (toxic flow)", spread_z, m_cfg.spread_z_max);
          return false;
         }
 
@@ -450,6 +461,7 @@ public:
    bool              Poll(CMarketStructure &ms, CQuasimodo &qm,
                           CSessionVwap &vwap, CSessionProfile &prof,
                           CEhlers &ehlers, const double atr, const double relvol,
+                          const double spread_z,
                           SSetup &out, string &reject_reason)
      {
       SSetup best;
@@ -462,7 +474,7 @@ public:
          SStructureEvent e;
          ms.GetEvent(e);
          SSetup s;
-         if(EvaluateBreak(ms, vwap, prof, ehlers, atr, relvol,
+         if(EvaluateBreak(ms, vwap, prof, ehlers, atr, relvol, spread_z,
                           iClose(m_cfg.symbol, m_cfg.tf, 1), e, s, reject_reason))
             if(s.score > best.score)
                best = s;

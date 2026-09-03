@@ -70,4 +70,6 @@ InpStopBufferAtr=0.05
 InpBeAtrTrigger=1.0
 InpLockStartPct=80
 InpLockPct=33
+InpSpreadZMax=0
+InpSpreadPeriod=40
 InpTestTag=D2_soft_lock

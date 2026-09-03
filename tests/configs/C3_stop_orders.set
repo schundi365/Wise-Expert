@@ -70,4 +70,6 @@ InpStopBufferAtr=0.05
 InpBeAtrTrigger=0
 InpLockStartPct=0
 InpLockPct=50
+InpSpreadZMax=0
+InpSpreadPeriod=40
 InpTestTag=C3_stop_orders

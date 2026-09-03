@@ -2,6 +2,38 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## WiseTrader EA v2.53 — 2026-09-03
+
+### Added — F58 spread Z-score entry gate (execution-cost veto), OFF by default
+- New `src/SpreadGate.mqh` (`CSpreadGate`): rolling mean/stddev of the
+  per-bar spread (`CopySpread`, points) over `InpSpreadPeriod` (default 40)
+  bars; `ZScore()` returns how far the just-closed bar's spread sits above
+  its recent baseline. A BOS/CHoCH break firing while the spread is an
+  outlier high = "toxic flow" (wide, thin, expensive fills that bleed the
+  edge on market/stop entries). New veto in `SignalEngine::EvaluateBreak()`,
+  right after the F10 relative-volume gate: reject when
+  `spread_z >= InpSpreadZMax`. Applies to structure breaks only (not QM),
+  same scope as the relvol gate.
+- Distinct from the F16 price-outlier mask (that masks abnormal PRICE
+  candles; this watches bid/ask COST only) and from `Risk.mqh`'s gap buffer
+  (that sizes for slippage; this refuses the trade outright). Clean-room
+  reimplementation of the rolling-spread-Z idea — not derived from any
+  third-party source.
+- Follows the `RelVolume` "no data = stand down" convention: `ZScore()`
+  returns the `WT_SPREAD_Z_NA` sentinel when fewer than 10 valid samples
+  exist or the window has zero dispersion, and the veto treats that as NO
+  gate, never a rejection.
+- `InpSpreadZMax=0` (default) disables the gate and reproduces v2.52
+  behavior exactly. New inputs `InpSpreadZMax` (0 = off) and
+  `InpSpreadPeriod` (40). All `tests/configs/*.set` updated. New ablation
+  config `Z1_spread_gate` (= `A2_tuned` + `InpSpreadZMax=2.0`) vs `A2_tuned`
+  at XAUUSD M15. Status: Candidate, pending backtest — see Feature Log F58.
+- Housekeeping: moved 5 third-party/standalone `.mq5` programs (Spread
+  Monitor, Volatility Regime, Global Macro Soros, two Quantora managers)
+  out of `src/WiseTrader/src/` to `reference/thirdparty_mql5/` so they can
+  never contaminate the EA build. F58 is an original reimplementation of
+  the spread-Z concept those files inspired, not their code.
+
 ## WiseTrader EA v2.52 — 2026-08-07
 
 ### Fixed — F57 MtfBias() 4805 (ERR_INDICATOR_CANNOT_CREATE): prime H1 history before iMA()

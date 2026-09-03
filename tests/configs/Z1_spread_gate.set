@@ -1,16 +1,12 @@
-; XAGUSD combined config: only ONE toggle beat the S0_baseline (PF 1.43)
-; in the ablation series - ADX gate ON (S1: PF 1.57, exp $11.01, n=37).
-; Every other toggle (vol-scaling on, no-retest-limit, no-friday-flatten)
-; made things worse, so S0's other choices are kept as-is; this is
-; S0 + the one genuine improvement.
-; Run: python autotest.py --model 1 --symbol XAGUSD S5_silver_tuned
-; n=37 in S1 was above the 30-trade floor but on the low side - confirm
-; this holds with more data before treating it as settled.
+; WiseTrader v2.53 config: Z1_spread_gate - A2_tuned + F58 spread Z-score
+; entry gate ON (InpSpreadZMax=2.0, 40-bar window). Vetoes a BOS/CHoCH
+; break when the just-closed bar's spread sits >= 2 stddev above its
+; recent baseline ("toxic flow" / wide-spread). Compare vs A2_tuned at
+; XAUUSD M15. Z=2.0 is a moderate first cut - if it helps, sweep 1.5/2.5.
 
 InpSymbol=
 InpMagic=20260707
 InpTF=15
-InpUseSymbolOverrides=true
 InpRiskPerTrade=1.0
 InpMaxDailyLoss=3.0
 InpMaxTotalDD=10.0
@@ -39,7 +35,7 @@ InpSessionEnd=20
 InpMaxChaseAtr=0.75
 InpRetestTolAtr=0.25
 InpRetestMaxBars=8
-InpMinAdx=22.0
+InpMinAdx=0
 InpNewsFilter=true
 InpNewsBlockMin=30
 InpMinRelVol=1.0
@@ -78,6 +74,6 @@ InpLockStartPct=0
 InpLockPct=50
 InpNewsFlattenMin=0
 InpFridayFlattenHour=22
-InpSpreadZMax=0
+InpSpreadZMax=2.0
 InpSpreadPeriod=40
-InpTestTag=S5_silver_tuned
+InpTestTag=Z1_spread_gate

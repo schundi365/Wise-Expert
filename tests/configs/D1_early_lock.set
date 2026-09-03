@@ -70,4 +70,6 @@ InpStopBufferAtr=0.05
 InpBeAtrTrigger=1.0
 InpLockStartPct=60
 InpLockPct=50
+InpSpreadZMax=0
+InpSpreadPeriod=40
 InpTestTag=D1_early_lock

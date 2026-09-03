@@ -114,6 +114,9 @@ struct SSettings
    double            min_relvol;           // min relative volume for BOS/CHoCH (0 = off)
    int               relvol_days;          // sessions in the time-of-day baseline
    double            outlier_z;            // modified Z outlier threshold (0 = off)
+   //--- spread gate (v2.53, F58)
+   double            spread_z_max;         // veto entry if spread Z >= this (0 = off)
+   int               spread_period;        // rolling window (bars) for spread mean/stddev
    //--- early entry (v2.1)
    ENUM_WT_ENTRY_MODE entry_mode;          // how breaks become entries
    bool              retest_limit;         // resting limit order at the retest price

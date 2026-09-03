@@ -74,4 +74,6 @@ InpLockStartPct=0
 InpLockPct=50
 InpNewsFlattenMin=0
 InpFridayFlattenHour=0
+InpSpreadZMax=0
+InpSpreadPeriod=40
 InpTestTag=E6_no_friday_flatten

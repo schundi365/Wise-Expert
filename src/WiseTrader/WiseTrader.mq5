@@ -15,13 +15,13 @@
 //|    stops, so recovery is automatic.                              |
 //+------------------------------------------------------------------+
 #property copyright "Wise Trader project"
-#property version   "2.52"
+#property version   "2.53"
 #property description "Rule-based autonomous bot: market structure + Quasimodo signals, VWAP/volume-profile/cycle confluence, disciplined authorization, hard risk limits."
 
 // Single source of truth for the version string used in logs/journals.
 // Keep this equal to #property version above - #property values are not
 // readable at runtime, so this is duplicated by necessity, not choice.
-#define WT_VERSION "2.52"
+#define WT_VERSION "2.53"
 
 #include "src/Config.mqh"
 #include "src/Journal.mqh"
@@ -39,6 +39,7 @@
 #include "src/NewsFilter.mqh"
 #include "src/RelVolume.mqh"
 #include "src/Outliers.mqh"
+#include "src/SpreadGate.mqh"
 #include "src/SymbolProfile.mqh"
 
 //--- inputs ---------------------------------------------------------
@@ -102,6 +103,10 @@ input double   InpMinRelVol        = 1.0;        // Min relative volume for BOS/
 input int      InpRelVolDays       = 20;         // Sessions for time-of-day volume baseline
 input double   InpOutlierZ         = 3.5;        // Outlier bar threshold, modified Z (0 = off)
 
+input group "Spread gate (v2.53, F58)"
+input double   InpSpreadZMax       = 0;          // Veto BOS/CHoCH entry if spread Z >= this (0 = off; candidate, not yet validated)
+input int      InpSpreadPeriod     = 40;         // Rolling window (bars) for spread mean/stddev
+
 input group "Momentum confluence (v2.44, F52)"
 input bool     InpUseMomentum      = false;      // Score bonus for RSI agreeing with trade direction (OFF by default - REJECTED 2026-07-28 M15 campaign, PF 1.44->1.19; kept as toggle for reference)
 input int      InpMomentumPeriod   = 14;         // RSI period - sustained pressure over 14+ bars, not last 3-4
@@ -164,6 +169,7 @@ CCommandBridge    g_bridge;
 CNewsFilter       g_news;
 CRelVolume        g_relvol;
 COutlierMask      g_outliers;
+CSpreadGate       g_spread;
 double            g_atr = 0;             // outlier-clean ATR for the current bar
 
 datetime          g_last_bar = 0;        // decision-TF new-bar gate
@@ -218,6 +224,8 @@ int OnInit(void)
    g_cfg.min_relvol          = InpMinRelVol;
    g_cfg.relvol_days         = InpRelVolDays;
    g_cfg.outlier_z           = InpOutlierZ;
+   g_cfg.spread_z_max        = InpSpreadZMax;
+   g_cfg.spread_period       = InpSpreadPeriod;
    g_cfg.entry_mode          = InpBreakEntryMode;
    g_cfg.retest_limit        = InpRetestLimit;
    g_cfg.stop_buffer_atr     = InpStopBufferAtr;
@@ -275,6 +283,7 @@ int OnInit(void)
    g_news.Init(g_cfg);
    g_relvol.Init(g_cfg.symbol, g_cfg.tf, InpRelVolDays);
    g_outliers.Init(g_cfg.symbol, g_cfg.tf, 100);
+   g_spread.Init(g_cfg.symbol, g_cfg.tf, g_cfg.spread_period);
 
    //--- register incremental jobs (order = execution priority)
    g_sched.Register(GetPointer(g_vwap));
@@ -409,7 +418,7 @@ void OnNewBar(void)
    SSetup setup;
    string reject;
    if(g_engine.Poll(g_structure, g_qm, g_vwap, g_profile, g_ehlers, atr,
-                    g_relvol.Ratio(), setup, reject))
+                    g_relvol.Ratio(), g_spread.ZScore(), setup, reject))
      {
       g_discipline.Register(setup);
       g_journal.Log("DECISION", StringFormat("setup %s score=%.2f entry=%.2f inv=%.2f tgt=%.2f%s [%s]",
@@ -522,7 +531,7 @@ void OnNewM1(void)
    string reject;
    const double atr = (g_atr > 0) ? g_atr : g_manager.AtrValue();
    if(!g_engine.EvaluateBreak(g_structure, g_vwap, g_profile, g_ehlers,
-                              atr, g_relvol.Ratio(),
+                              atr, g_relvol.Ratio(), g_spread.ZScore(),
                               iClose(g_cfg.symbol, PERIOD_M1, 1), e, s, reject))
      {
       g_journal.Log("VETO", "M1 break rejected: " + reject);
@@ -592,7 +601,7 @@ void MaintainStopOrders(void)
    SSetup s;
    string reject;
    if(!g_engine.EvaluateBreak(g_structure, g_vwap, g_profile, g_ehlers,
-                              atr, g_relvol.Ratio(), entry, e, s, reject))
+                              atr, g_relvol.Ratio(), g_spread.ZScore(), entry, e, s, reject))
      {
       g_last_veto = "stop-order: " + reject;
       return;

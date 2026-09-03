@@ -68,4 +68,6 @@ InpResetRiskState=false
 InpBeAtrTrigger=0
 InpLockStartPct=0
 InpLockPct=50
+InpSpreadZMax=0
+InpSpreadPeriod=40
 InpTestTag=B6_no_outlier_mask

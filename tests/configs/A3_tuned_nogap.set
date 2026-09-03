@@ -74,4 +74,6 @@ InpLockStartPct=0
 InpLockPct=50
 InpNewsFlattenMin=0
 InpFridayFlattenHour=22
+InpSpreadZMax=0
+InpSpreadPeriod=40
 InpTestTag=A3_tuned_nogap
