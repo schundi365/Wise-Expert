@@ -348,6 +348,10 @@ private:
      }
 
 public:
+   // Public wrapper so other entry paths (e.g. F59 momentum) reuse the
+   // exact same min-stop-floor + min-RR validation as structure breaks.
+   bool              ValidateSetup(SSetup &s, const double atr) { return Validate(s, atr); }
+
    void              Init(const SSettings &cfg)
      {
       m_cfg = cfg;

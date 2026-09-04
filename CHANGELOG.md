@@ -2,6 +2,51 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## WiseTrader EA v2.54 — 2026-09-03
+
+### Added — F59 aggressive volume-confirmed momentum-breakout entry, OFF by default
+- New `src/MomentumBreak.mqh` (`CMomentumBreak`): a deliberate INVERSION of
+  the F16 outlier mask. Where the rest of the engine treats a high-sigma
+  bar as noise to veto, F59 treats a sharp, volume-backed, directional
+  expansion bar as the start of a run to ride. Motivation: A2_tuned
+  structurally sits out fast directional moves (a $50 XAUUSD run vetoed as
+  a z=9.9 outlier); this is the opt-in path that participates — cautiously,
+  gated on volume.
+- Trigger (all required, on the just-closed bar): true-range modified-Z
+  `>= InpMomExpansionZ` (expansion), close in the top/bottom
+  `InpMomCloseFrac` of the bar range (conviction, not a rejection wick), and
+  relative volume `>= InpMomMinRelVol` (real participation — this is the
+  "consider volumes" filter separating genuine runs from fakeouts). Spread
+  gate (F58) is applied on top and is mandatory here — never chase into
+  toxic flow.
+- **Stop-loss precautions (the whole point of "aggressive but safe"):**
+  1) MANDATORY hard SL — the setup routes through `CRiskManager::CanOpen`
+     exactly like every other entry, which rejects a zero/absent stop and
+     sizes off it; a stopless F59 position is impossible by construction.
+  2) Tight stop — the opposite extreme of the expansion bar, floored to
+     `InpMomStopAtr * ATR`; the engine's global ATR stop-floor + min-RR
+     (`ValidateSetup`) still apply on top.
+  3) Time-based STALL EXIT — an F59 trade not yet at breakeven within
+     `InpMomMaxBars` decision bars is closed early (`CTradeManager::Manage`,
+     restart-safe via `POSITION_TIME` + order comment).
+  4) Full risk gating — same daily-loss / total-drawdown / streak locks,
+     session window, and news blackout as structure entries; managed by the
+     same breakeven / trailing / profit-lock.
+- Evaluated in `OnNewBar` BEFORE the outlier mask (so it can act on the very
+  bars the mask rejects). `InpUseMomBreak=false` (default) makes
+  `TryMomentumBreak()` a no-op — v2.53 behavior is reproduced exactly.
+- New inputs: `InpUseMomBreak` (off), `InpMomExpansionZ` (3.0),
+  `InpMomCloseFrac` (0.30), `InpMomMinRelVol` (1.8), `InpMomStopAtr` (1.0),
+  `InpMomMaxBars` (6). Added `WT_SIG_MOMENTUM` signal type and a `SetupTag()`
+  order-comment helper. All `tests/configs/*.set` updated; new ablation
+  config `M1_momentum_breakout` (= `A2_tuned` + `InpUseMomBreak=true` +
+  spread gate on) vs `A2_tuned`.
+- Status: Candidate, pending backtest — see Feature Log F59. HONEST
+  EXPECTATION: momentum entries collapse out-of-sample more than most
+  (cf. F52/F53 rejections); this must clear standalone -> OOS -> model-4 ->
+  WFE overfit scoring before it earns a demo slot, and should run on its own
+  magic number so it never entangles with A2_tuned's risk state.
+
 ## WiseTrader EA v2.53 — 2026-09-03
 
 ### Added — F58 spread Z-score entry gate (execution-cost veto), OFF by default

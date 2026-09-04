@@ -19,7 +19,8 @@ enum ENUM_WT_SIGNAL
    WT_SIG_NONE = 0,
    WT_SIG_BOS,          // structure continuation break
    WT_SIG_CHOCH,        // change of character (reversal break)
-   WT_SIG_QM            // Quasimodo reversal
+   WT_SIG_QM,           // Quasimodo reversal
+   WT_SIG_MOMENTUM      // volume-confirmed volatility-expansion breakout (v2.54, F59)
   };
 
 //--- setup lifecycle (Discipline layer FSM)
@@ -117,6 +118,13 @@ struct SSettings
    //--- spread gate (v2.53, F58)
    double            spread_z_max;         // veto entry if spread Z >= this (0 = off)
    int               spread_period;        // rolling window (bars) for spread mean/stddev
+   //--- momentum breakout entry (v2.54, F59)
+   bool              use_mom_break;        // enable the volume-confirmed momentum entry
+   double            mom_expansion_z;      // TR modified-Z that counts as an expansion bar
+   double            mom_close_frac;       // close must be in this top/bottom fraction of the bar range (0..1)
+   double            mom_min_relvol;       // required relative volume (participation) for the expansion bar
+   double            mom_stop_atr;         // hard-stop distance floor for the entry, ATR mult
+   int               mom_max_bars;         // time-based stall exit: close if not at breakeven within N bars (0 = off)
    //--- early entry (v2.1)
    ENUM_WT_ENTRY_MODE entry_mode;          // how breaks become entries
    bool              retest_limit;         // resting limit order at the retest price

@@ -15,13 +15,13 @@
 //|    stops, so recovery is automatic.                              |
 //+------------------------------------------------------------------+
 #property copyright "Wise Trader project"
-#property version   "2.53"
+#property version   "2.54"
 #property description "Rule-based autonomous bot: market structure + Quasimodo signals, VWAP/volume-profile/cycle confluence, disciplined authorization, hard risk limits."
 
 // Single source of truth for the version string used in logs/journals.
 // Keep this equal to #property version above - #property values are not
 // readable at runtime, so this is duplicated by necessity, not choice.
-#define WT_VERSION "2.53"
+#define WT_VERSION "2.54"
 
 #include "src/Config.mqh"
 #include "src/Journal.mqh"
@@ -40,6 +40,7 @@
 #include "src/RelVolume.mqh"
 #include "src/Outliers.mqh"
 #include "src/SpreadGate.mqh"
+#include "src/MomentumBreak.mqh"
 #include "src/SymbolProfile.mqh"
 
 //--- inputs ---------------------------------------------------------
@@ -107,6 +108,14 @@ input group "Spread gate (v2.53, F58)"
 input double   InpSpreadZMax       = 0;          // Veto BOS/CHoCH entry if spread Z >= this (0 = off; candidate, not yet validated)
 input int      InpSpreadPeriod     = 40;         // Rolling window (bars) for spread mean/stddev
 
+input group "Momentum breakout entry (v2.54, F59)"
+input bool     InpUseMomBreak      = false;      // Aggressive volume-confirmed momentum entry (OFF by default - candidate, unvalidated; catches sharp runs A2 filters out, but momentum entries collapse OOS more than most - gauntlet before any demo)
+input double   InpMomExpansionZ    = 3.0;        // TR modified-Z that counts as an expansion bar (F16 mask uses 3.5 as a VETO; this uses it as a TRIGGER)
+input double   InpMomCloseFrac     = 0.30;       // Close must be in the top/bottom this-fraction of the bar range (0.30 = strong directional close)
+input double   InpMomMinRelVol     = 1.8;        // Required relative volume on the expansion bar (participation; separates real runs from fakeouts)
+input double   InpMomStopAtr       = 1.0;        // Hard-stop floor for the entry, ATR mult (tight - aggressive entries demand it; global ATR floor + min-RR still apply on top)
+input int      InpMomMaxBars       = 6;          // Stall exit: close an F59 trade not yet at breakeven within N bars (0 = off)
+
 input group "Momentum confluence (v2.44, F52)"
 input bool     InpUseMomentum      = false;      // Score bonus for RSI agreeing with trade direction (OFF by default - REJECTED 2026-07-28 M15 campaign, PF 1.44->1.19; kept as toggle for reference)
 input int      InpMomentumPeriod   = 14;         // RSI period - sustained pressure over 14+ bars, not last 3-4
@@ -170,6 +179,7 @@ CNewsFilter       g_news;
 CRelVolume        g_relvol;
 COutlierMask      g_outliers;
 CSpreadGate       g_spread;
+CMomentumBreak    g_mom;
 double            g_atr = 0;             // outlier-clean ATR for the current bar
 
 datetime          g_last_bar = 0;        // decision-TF new-bar gate
@@ -226,6 +236,12 @@ int OnInit(void)
    g_cfg.outlier_z           = InpOutlierZ;
    g_cfg.spread_z_max        = InpSpreadZMax;
    g_cfg.spread_period       = InpSpreadPeriod;
+   g_cfg.use_mom_break       = InpUseMomBreak;
+   g_cfg.mom_expansion_z     = InpMomExpansionZ;
+   g_cfg.mom_close_frac      = InpMomCloseFrac;
+   g_cfg.mom_min_relvol      = InpMomMinRelVol;
+   g_cfg.mom_stop_atr        = InpMomStopAtr;
+   g_cfg.mom_max_bars        = InpMomMaxBars;
    g_cfg.entry_mode          = InpBreakEntryMode;
    g_cfg.retest_limit        = InpRetestLimit;
    g_cfg.stop_buffer_atr     = InpStopBufferAtr;
@@ -284,6 +300,7 @@ int OnInit(void)
    g_relvol.Init(g_cfg.symbol, g_cfg.tf, InpRelVolDays);
    g_outliers.Init(g_cfg.symbol, g_cfg.tf, 100);
    g_spread.Init(g_cfg.symbol, g_cfg.tf, g_cfg.spread_period);
+   g_mom.Init(g_cfg);
 
    //--- register incremental jobs (order = execution priority)
    g_sched.Register(GetPointer(g_vwap));
@@ -377,6 +394,13 @@ void OnNewBar(void)
 
    //--- structure update is cheap; run inline
    g_structure.Update();
+
+   //--- F59 momentum breakout: evaluated BEFORE the outlier mask, because
+   //--- it deliberately WANTS the high-sigma expansion bars the mask
+   //--- rejects (gated instead by volume + directional close + spread).
+   //--- Off by default; TryMomentumBreak() is a no-op when use_mom_break
+   //--- is false, so the outlier-mask flow below is unchanged for A2.
+   TryMomentumBreak();
 
    //--- F16 outlier mask: a news/flash candle is not a signal. The bar is
    //--- ignored entirely: no FSM aging, no retest confirmation (a spike
@@ -673,15 +697,109 @@ void TryExecute(void)
      }
 
    //--- execute
-   const string comment = StringFormat("WT|%s|%.2f",
-                          s.signal == WT_SIG_QM ? "QM" : (s.signal == WT_SIG_CHOCH ? "CHOCH" : "BOS"),
-                          s.score);
+   const string comment = StringFormat("WT|%s|%.2f", SetupTag(s.signal), s.score);
    if(g_exec.OpenMarket(s.dir, lots, sl, tp, comment))
      {
       g_journal.Log("RISK", "sizing: " + g_risk.SizingNote());
       g_discipline.Consume();
       g_last_veto = "";
      }
+  }
+
+//+------------------------------------------------------------------+
+//| Short tag for a signal type, used in the order comment.           |
+//+------------------------------------------------------------------+
+string SetupTag(const ENUM_WT_SIGNAL sig)
+  {
+   switch(sig)
+     {
+      case WT_SIG_QM:       return "QM";
+      case WT_SIG_CHOCH:    return "CHOCH";
+      case WT_SIG_MOMENTUM: return "MOM";
+      default:              return "BOS";
+     }
+  }
+
+//+------------------------------------------------------------------+
+//| F59 momentum breakout: aggressive, volume-confirmed entry on a    |
+//| volatility-expansion bar. Runs BEFORE the outlier mask so it can  |
+//| act on the very bars the mask rejects. No-op when disabled. Every |
+//| entry carries a mandatory hard stop (CanOpen enforces it) and is  |
+//| gated by session / news / risk-lock / spread exactly like others. |
+//+------------------------------------------------------------------+
+void TryMomentumBreak(void)
+  {
+   if(!g_cfg.use_mom_break)
+      return;
+   //--- authorization: same gates as any other entry
+   if(g_bridge.Paused() || g_risk.Locked())
+      return;
+   if(!g_discipline.InSession())
+      return;
+   if(g_risk.OpenPositions() >= g_cfg.max_positions)
+      return;
+   if(g_exec.PendingCount() > 0)
+      return;
+   string news;
+   if(g_news.Blocked(news))
+     { g_journal.Log("VETO", "mom: " + news); g_last_veto = news; return; }
+
+   //--- clean ATR (same convention as the main pipeline)
+   double atr = g_manager.AtrValue();
+   const double atr_clean = g_outliers.CleanAtr(14, InpOutlierZ);
+   if(atr_clean > 0) atr = atr_clean;
+
+   const double expansion_z = g_outliers.ZScore(1);   // TR modified-Z of the closed bar
+
+   SSetup s;
+   string reject;
+   if(!g_mom.Scan(atr, expansion_z, g_relvol.Ratio(), s, reject))
+     {
+      if(reject != "" && StringFind(reject, "no expansion") < 0)
+        { g_journal.Log("VETO", reject); g_last_veto = reject; }  // don't spam on every quiet bar
+      return;
+     }
+
+   //--- spread gate (mandatory for an aggressive spike entry): never chase
+   //--- into toxic flow even if the momentum signal is otherwise valid
+   const double spz = g_spread.ZScore();
+   if(g_cfg.spread_z_max > 0 && spz > WT_SPREAD_Z_NA && spz >= g_cfg.spread_z_max)
+     {
+      g_journal.Log("VETO", StringFormat("mom: spread Z %.2f >= %.2f (toxic flow)", spz, g_cfg.spread_z_max));
+      g_last_veto = "mom spread";
+      return;
+     }
+
+   //--- enforce min stop distance + min RR via the engine's own validator
+   //--- (widens the stop to the global ATR floor if the tight stop is too
+   //--- close). A setup that still fails is rejected before any order.
+   if(!g_engine.ValidateSetup(s, atr))
+     {
+      g_journal.Log("VETO", "mom: failed validation [" + s.evidence + "]");
+      g_last_veto = "mom validation";
+      return;
+     }
+
+   s.score = 1.0;   // passed its own strict gates; not confluence-scored
+   g_journal.Log("DECISION", StringFormat("MOM setup %s entry=%.2f inv=%.2f [%s]",
+                 s.dir == WT_DIR_LONG ? "LONG" : "SHORT", s.entry, s.invalidation, s.evidence));
+
+   //--- market entry at current price, hard stop = s.invalidation
+   const double price = (s.dir == WT_DIR_LONG)
+                        ? SymbolInfoDouble(g_cfg.symbol, SYMBOL_ASK)
+                        : SymbolInfoDouble(g_cfg.symbol, SYMBOL_BID);
+   const double tp = ComputeTp(s.dir, price, s.invalidation, s.target);
+   double lots = 0;
+   string veto;
+   if(!g_risk.CanOpen(s.dir, price, s.invalidation, lots, veto))
+     {
+      g_journal.Log("VETO", "mom risk veto: " + veto);
+      g_last_veto = "mom risk: " + veto;
+      return;
+     }
+   const string comment = StringFormat("WT|MOM|%.2f", s.score);
+   if(g_exec.OpenMarket(s.dir, lots, s.invalidation, tp, comment))
+      g_journal.Log("RISK", "mom sizing: " + g_risk.SizingNote());
   }
 
 //+------------------------------------------------------------------+

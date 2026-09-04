@@ -67,6 +67,22 @@ public:
       return false;
      }
 
+   // close a single position by ticket (used by the F59 stall exit);
+   // returns true on success, logs on failure. Safe if already gone.
+   bool              CloseTicket(const ulong ticket, const string reason)
+     {
+      if(!PositionSelectByTicket(ticket))
+         return false;
+      if(m_trade.PositionClose(ticket))
+        {
+         m_journal.Log("ORDER", StringFormat("closed #%I64u: %s", ticket, reason));
+         return true;
+        }
+      m_journal.Log("ERROR", StringFormat("close #%I64u failed rc=%u (%s)",
+                    ticket, m_trade.ResultRetcode(), reason));
+      return false;
+     }
+
    // flatten everything for this symbol+magic (total-DD hard stop)
    void              CloseAll(const string reason)
      {
@@ -249,6 +265,30 @@ public:
          //--- restart-aware state inference: BE already applied iff the
          //--- stop is at/beyond entry. No runtime memory needed.
          const bool be_done = (sl > 0) && (is_long ? (sl >= entry) : (sl <= entry));
+
+         //--- F59 stall exit: an aggressive momentum entry that hasn't
+         //--- reached breakeven within mom_max_bars decision bars is not
+         //--- following through - cut it before the tight stop bleeds. The
+         //--- hard SL still protects it meanwhile; this only exits EARLIER.
+         //--- Restart-safe: bars-in-trade is derived from POSITION_TIME, and
+         //--- F59 positions are identified by their order comment, so no
+         //--- runtime memory is needed. Only fires while not yet at BE.
+         if(m_cfg.mom_max_bars > 0 && !be_done)
+           {
+            const string cmt = PositionGetString(POSITION_COMMENT);
+            if(StringFind(cmt, "|MOM|") >= 0)
+              {
+               const datetime opened = (datetime)PositionGetInteger(POSITION_TIME);
+               const int held = iBarShift(m_cfg.symbol, m_cfg.tf, opened, false);
+               if(held >= m_cfg.mom_max_bars)
+                 {
+                  m_journal.Log("MANAGE", StringFormat("#%I64u MOM stall exit after %d bars (no BE)",
+                                ticket, held));
+                  m_exec.CloseTicket(ticket, "mom stall");
+                  continue;   // position gone; skip further management this pass
+                 }
+              }
+           }
 
          double new_sl = sl;
          bool   partial_due = false;
