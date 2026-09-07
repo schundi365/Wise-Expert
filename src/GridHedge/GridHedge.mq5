@@ -23,22 +23,22 @@
 #define LVLS 4     // grid levels per side: index 0=Gap2, 1=Gap3, 2=Gap4, 3=ProS
 
 //--- inputs (seed values; panel edits them live) --------------------
-input group "Base (seeds level 1 + defaults)"
+input group "Base (seeds level 1 + defaults). NOTE: inputs are POINTS; the panel shows/edits PIPS (points/10)."
 input double InpLot          = 0.10;    // Base lot per position
-input int    InpGapPoints    = 500;     // Base gap between levels, POINTS (500 = $5.00 XAUUSD)
-input int    InpTpPoints     = 700;     // Base per-position profit-close, POINTS
-input int    InpLockPoints   = 700;     // Base lock-and-book distance, POINTS
+input int    InpGapPoints    = 500;     // Base gap, POINTS (500 pts = 50.00 pips on panel)
+input double InpTpMoney      = 6.0;     // Profit: close each position at this MONEY profit (£, panel Profit/Tgt = 6; configurable)
+input double InpLockMoney     = 50.0;   // Lock/Book: close/book at this MONEY (£, panel Lock/Book = 50; configurable, 0 = off)
 input bool   InpTradeBuy     = true;    // Enable BUY side at start
 input bool   InpTradeSell    = true;    // Enable SELL side at start
 
 input group "Management (Prot / B+S)"
-input int    InpProtPoints   = 300;     // Prot: arm break-even once position +this pts (0 = off)
-input int    InpBSStepPoints = 50;      // B+S: trailing step after break-even, points (0 = static BE)
+input int    InpProtPoints   = 200;     // Prot: arm break-even once position +this pts (200 = 20.00 pips, panel Prot)
+input int    InpBSStepPoints = 100;     // B+S: trailing step after break-even, points (100 = 10.00 pips, panel B+S = 10)
 input int    InpBeOffsetPoints = 10;    // Break-even offset beyond entry, points
 
 input group "Basket (Start / Target / SL) - JNS Target = book winners keep top-2"
-input double InpBuyTarget    = 0.0;     // BUY target price: book winners, keep top-N (0 = off)
-input double InpSellTarget   = 0.0;     // SELL target price: book winners, keep top-N (0 = off)
+input double InpBuyTarget    = 4550.0;  // BUY target price: book winners, keep top-N (panel Target 4550; 0 = off)
+input double InpSellTarget   = 4300.0;  // SELL target price: book winners, keep top-N (panel Target 4300; 0 = off)
 input int    InpKeepHedge    = 2;       // How many highest-profit positions to keep on Target
 input double InpSideSL       = 0.0;     // Basket SL: close a side if its floating loss <= -this (0 = off)
 
@@ -57,7 +57,8 @@ input bool   InpShowPanel    = true;       // Draw dashboard
 input bool   InpEnableLog    = true;       // Log to Experts tab
 
 //--- per-level parameters (Gap2/3/4/ProS). Level 1 uses base inputs.
-struct SLevel { int gap; double lot; int tp; int lock; bool on; };
+//--- gap = entry spacing (POINTS); tp/lock = per-position MONEY targets (acct ccy).
+struct SLevel { int gap; double lot; double tp; double lock; bool on; };
 
 //--- per-side runtime state
 struct SSide
@@ -70,7 +71,7 @@ struct SSide
 //--- global runtime
 struct SLive
   {
-   double lot; int gap; int tp; int lock;  // base level-1 params
+   double lot; int gap; double tp; double lock;  // base: gap=points, tp/lock=money
    int    prot; int bs;                     // management
    bool   running;                          // master
    SSide  buy;
@@ -84,13 +85,29 @@ string   m_sym;
 double   m_point;
 int      m_digits;
 double   m_start_equity = 0.0;
+double   m_start_balance = 0.0;                      // balance at session start (for Daily P/L)
 bool     m_halted = false;
 uint     m_last_draw = 0;
+
+//--- session trade counters, per side (index 0 = BUY, 1 = SELL).
+//--- scalp = profitable close, bad = losing close, total = every close.
+int      m_scalp[2] = {0,0};
+int      m_bad[2]   = {0,0};
+int      m_total[2] = {0,0};
+double   m_booked[2]= {0,0};                          // realized P/L booked this session, per side
 
 void Log(const string s){ if(InpEnableLog) Print("[GridHedge] ", s); }
 double Ask(){ return SymbolInfoDouble(m_sym,SYMBOL_ASK); }
 double Bid(){ return SymbolInfoDouble(m_sym,SYMBOL_BID); }
 double Nz(double p){ return NormalizeDouble(p,m_digits); }
+
+//--- pip <-> point conversion. JNS displays distances in PIPS (e.g. Gap 50.00);
+//--- the engine works in POINTS. On 3/5-digit symbols 1 pip = 10 points,
+//--- on 2/4-digit 1 pip = 10 points too; on 1-digit = 1. Use digit parity.
+int    g_ppp = 10;                                   // points per pip (set in OnInit)
+double PtsToPips(int pts){ return (double)pts / g_ppp; }
+int    PipsToPts(double pips){ return (int)MathRound(pips * g_ppp); }
+string PipStr(int pts){ return DoubleToString(PtsToPips(pts), 2); }   // panel display
 
 #define PFX "GH_"
 void PanelCreate(); void PanelUpdate(); void PanelDestroy();
@@ -101,29 +118,38 @@ void PanelCreate(); void PanelUpdate(); void PanelDestroy();
 void SeedSide(SSide &s, bool en, double tgt)
   {
    s.enabled = en; s.target = tgt;
-   //--- default per-level params derived from base; ProS = big TP scalp
+   //--- Defaults matched to the JNS panel: Gap2/3/4 all identical
+   //--- (Gap 50.00 pips = 500 pts, Lot 0.10, Profit £10, Lock £7).
    for(int i=0;i<LVLS;i++)
      {
-      s.lv[i].gap  = g.gap;
-      s.lv[i].lot  = g.lot;
-      s.lv[i].tp   = g.tp;
-      s.lv[i].lock = g.lock;
+      s.lv[i].gap  = g.gap;    // 500 pts = 50.00 pips
+      s.lv[i].lot  = g.lot;    // 0.10
+      s.lv[i].tp   = g.tp;     // £10 money profit-close
+      s.lv[i].lock = g.lock;   // £7 lock
       s.lv[i].on   = true;
      }
-   //--- ProS (index 3): a wide profit-scalp target by default
-   s.lv[LVLS-1].tp = g.tp * 5;
+   //--- ProS (index 3 = 5th+ position): the profit-scalp tier. The JNS panel
+   //--- shows its Profit/Tgt as a PRICE (4550/4400) = the basket Target, which
+   //--- this EA already handles via s.target (book winners, keep top-2). So we
+   //--- keep ProS's money profit-close relaxed (won't pre-empt the basket close)
+   //--- and lock at £7 like the others. Gap stays base so it still ladders.
+   s.lv[LVLS-1].tp   = g.tp * 5.0;   // relaxed money target; basket Target owns the price exit
+   s.lv[LVLS-1].lock = g.lock;       // £ lock (panel Lock/Book)
+   s.lv[LVLS-1].lot  = g.lot * 2.0;  // ProS uses double lot (panel ProS Lot = 0.2 vs 0.1)
   }
 
 int OnInit()
   {
    m_sym=_Symbol; m_point=SymbolInfoDouble(m_sym,SYMBOL_POINT);
    m_digits=(int)SymbolInfoInteger(m_sym,SYMBOL_DIGITS);
-   if(InpLot<=0||InpGapPoints<=0||InpTpPoints<=0)
-     { Print("[GridHedge] bad inputs"); return INIT_PARAMETERS_INCORRECT; }
+   //--- 1 pip = 10 points on 3/5-digit (and gold's typical 2-digit) quotes; 1 on whole-point
+   g_ppp = (m_digits==3 || m_digits==5 || m_digits==2) ? 10 : 1;
+   if(InpLot<=0||InpGapPoints<=0||InpTpMoney<=0)
+     { Print("[GridHedge] bad inputs (lot/gap/profit must be > 0)"); return INIT_PARAMETERS_INCORRECT; }
    if((ENUM_ACCOUNT_MARGIN_MODE)AccountInfoInteger(ACCOUNT_MARGIN_MODE)!=ACCOUNT_MARGIN_MODE_RETAIL_HEDGING)
       Print("[GridHedge] WARNING: not a hedging account - buy/sell will net off.");
 
-   g.lot=InpLot; g.gap=InpGapPoints; g.tp=InpTpPoints; g.lock=InpLockPoints;
+   g.lot=InpLot; g.gap=InpGapPoints; g.tp=InpTpMoney; g.lock=InpLockMoney;
    g.prot=InpProtPoints; g.bs=InpBSStepPoints; g.running=InpStartRunning;
    SeedSide(g.buy,  InpTradeBuy,  InpBuyTarget);
    SeedSide(g.sell, InpTradeSell, InpSellTarget);
@@ -131,15 +157,40 @@ int OnInit()
    m_trade.SetExpertMagicNumber(InpMagic);
    m_trade.SetDeviationInPoints(InpSlippage);
    m_trade.SetTypeFillingBySymbol(m_sym);
-   m_start_equity=AccountInfoDouble(ACCOUNT_EQUITY); m_halted=false;
+   m_start_equity=AccountInfoDouble(ACCOUNT_EQUITY);
+   m_start_balance=AccountInfoDouble(ACCOUNT_BALANCE); m_halted=false;
 
    if(InpShowPanel) PanelCreate();
    ChartRedraw(0);
-   Log(StringFormat("init v3.00 lot=%.2f gap=%d tp=%d lock=%d prot=%d bs=%d run=%s",
+   Log(StringFormat("init v3.1 lot=%.2f gap=%d profit(£)=%.2f lock(£)=%.2f prot=%d bs=%d run=%s",
         g.lot,g.gap,g.tp,g.lock,g.prot,g.bs,g.running?"on":"off"));
    return INIT_SUCCEEDED;
   }
 void OnDeinit(const int r){ PanelDestroy(); ChartRedraw(0); }
+
+//--- Session tally: every time one of OUR positions is (partly) closed a deal
+//--- with entry==OUT lands in history. Classify it profit vs loss per side.
+void OnTradeTransaction(const MqlTradeTransaction &trans,
+                        const MqlTradeRequest &req,
+                        const MqlTradeResult &res)
+  {
+   if(trans.type!=TRADE_TRANSACTION_DEAL_ADD) return;
+   ulong ticket=trans.deal;
+   if(ticket==0 || !HistoryDealSelect(ticket)) return;
+   if(HistoryDealGetInteger(ticket,DEAL_MAGIC)!=InpMagic) return;
+   if(HistoryDealGetString(ticket,DEAL_SYMBOL)!=m_sym)    return;
+   if(HistoryDealGetInteger(ticket,DEAL_ENTRY)!=DEAL_ENTRY_OUT) return;   // only closing deals
+
+   //--- a closing BUY position produces a SELL deal, and vice-versa
+   long dt = HistoryDealGetInteger(ticket,DEAL_TYPE);
+   int  si = (dt==DEAL_TYPE_SELL) ? 0 : 1;   // sell-out closes a BUY(0); buy-out closes a SELL(1)
+   double pl = HistoryDealGetDouble(ticket,DEAL_PROFIT)
+             + HistoryDealGetDouble(ticket,DEAL_SWAP)
+             + HistoryDealGetDouble(ticket,DEAL_COMMISSION);
+   m_total[si]++;
+   m_booked[si]+=pl;
+   if(pl>=0) m_scalp[si]++; else m_bad[si]++;
+  }
 
 //====================================================================
 //  POSITION HELPERS
@@ -187,6 +238,24 @@ void LevelFor(const ENUM_POSITION_TYPE side,const int count,SLevel &out)
    if(count<=1){ out.gap=g.gap; out.lot=g.lot; out.tp=g.tp; out.lock=g.lock; out.on=true; return; }
    int idx = count-2; if(idx>=LVLS) idx=LVLS-1;
    out = s.lv[idx];
+  }
+
+//--- parse a position's level number from its "P<n>" comment (1 if unknown)
+int PosLevel(const string cmt)
+  {
+   if(StringLen(cmt)>=2 && StringGetCharacter(cmt,0)=='P')
+     { int v=(int)StringToInteger(StringSubstr(cmt,1)); if(v>0) return v; }
+   return 1;
+  }
+
+//--- per-position money targets (tp, lock) for a position at 'level' on 'side'.
+//--- level 1 -> base g.tp/g.lock; level 2.. -> that side's lv[level-2] (clamp ProS)
+void MoneyTargetsFor(const ENUM_POSITION_TYPE side,const int level,double &tp_out,double &lock_out)
+  {
+   if(level<=1){ tp_out=g.tp; lock_out=g.lock; return; }
+   SSide s = (side==POSITION_TYPE_BUY)? g.buy : g.sell;
+   int idx=level-2; if(idx>=LVLS) idx=LVLS-1;
+   tp_out=s.lv[idx].tp; lock_out=s.lv[idx].lock;
   }
 
 //====================================================================
@@ -248,12 +317,18 @@ void ManagePositions()
       double entry=PositionGetDouble(POSITION_PRICE_OPEN);
       double sl=PositionGetDouble(POSITION_SL);
       double cur= lng?Bid():Ask();
-      double ppt=(lng?(cur-entry):(entry-cur))/m_point;
+      double ppt=(lng?(cur-entry):(entry-cur))/m_point;   // still used by Prot/B+S (distance)
+      double pmoney=PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP); // account ccy
 
-      //--- profit close (code TP, per base params - simplification: base tp)
-      if(g.tp>0 && ppt>=g.tp){ if(m_trade.PositionClose(t))Log(StringFormat("#%I64u PROFIT +%.0f",t,ppt)); continue; }
-      //--- lock & book (only if above tp)
-      if(g.lock>0 && g.lock!=g.tp && ppt>=g.lock){ if(m_trade.PositionClose(t))Log(StringFormat("#%I64u LOCK +%.0f",t,ppt)); continue; }
+      //--- per-position targets from THIS position's own level (via P<n> comment)
+      int    lvl = PosLevel(PositionGetString(POSITION_COMMENT));
+      double tpM, lockM; MoneyTargetsFor(type, lvl, tpM, lockM);
+
+      //--- PROFIT CLOSE: book this position when its MONEY profit reaches its
+      //--- level's target (£), regardless of pip distance.
+      if(tpM>0 && pmoney>=tpM){ if(m_trade.PositionClose(t))Log(StringFormat("#%I64u P%d PROFIT %.2f>=%.2f",t,lvl,pmoney,tpM)); continue; }
+      //--- lock & book: level's own larger money target for a runner (if set above its Profit)
+      if(lockM>0 && lockM!=tpM && pmoney>=lockM){ if(m_trade.PositionClose(t))Log(StringFormat("#%I64u P%d LOCK %.2f>=%.2f",t,lvl,pmoney,lockM)); continue; }
 
       //--- Prot: arm break-even; B+S: trail the stop in steps once armed
       if(g.prot>0 && ppt>=g.prot)
@@ -395,6 +470,29 @@ void oBtn(string n,int x,int y,int w,int h,string t,color bg)
 
 string LvName(int i){ return (i==0?"Gap2":i==1?"Gap3":i==2?"Gap4":"ProS"); }
 
+//--- short broker/company label for the header (e.g. "Vantage")
+string BrokerName()
+  {
+   string co = AccountInfoString(ACCOUNT_COMPANY);
+   if(co=="") co = AccountInfoString(ACCOUNT_SERVER);
+   //--- keep it short: first word only (e.g. "Vantage Global ..." -> "Vantage")
+   int sp = StringFind(co," ");
+   if(sp>0) co = StringSubstr(co,0,sp);
+   //--- strip common suffixes/markers
+   StringReplace(co,"-Demo","");
+   if(co=="") co="Broker";
+   return co;
+  }
+
+//--- "BUY - Vantage | Opened Buy = 30"  (side = "BUY" or "SELL")
+string HeaderText(const string side)
+  {
+   ENUM_POSITION_TYPE pt = (side=="BUY")? POSITION_TYPE_BUY : POSITION_TYPE_SELL;
+   int n = SideCount(pt);
+   string word = (side=="BUY")? "Buy" : "Sell";
+   return StringFormat("%s - %s | Opened %s = %d", side, BrokerName(), word, n);
+  }
+
 //--- build one side; k = "b" or "s"; returns bottom Y used.
 //--- All columns are computed from GH_W with fixed gutters so NOTHING
 //--- overflows the panel (usable inner width = GH_W - 2*GH_PAD = 316px).
@@ -405,7 +503,8 @@ int BuildSide(int bx,string side,string k,color hc,color bg,const SSide &s)
    int y = GH_Y;
    int H = 26 + GH_RH + GH_RH*2 + 18 + (LVLS)*GH_LRH + 20 + GH_RH + GH_RH + 14;
    oRect(PFX+k+"bg",bx,y,GH_W,H,bg,hc);
-   oLbl(PFX+k+"hd",L,y+5,side+" - GridHedge",hc,GH_FS+1,true); y+=26;
+   //--- header: "<SIDE> - <broker> | Opened <Side> = <n>" (JNS style, live count)
+   oLbl(PFX+k+"hd",L,y+5,HeaderText(side),hc,GH_FS+1,true); y+=26;
 
    //--- button row: ST PU CL SY RE  (5 buttons across the inner width)
    int bgap=6, bw=(316 - 4*bgap)/5;        // equal-width buttons that fit exactly
@@ -421,13 +520,17 @@ int BuildSide(int bx,string side,string k,color hc,color bg,const SSide &s)
    //--- field rows: 3 columns evenly across the inner width
    int colw=316/3, ew=52;
    int fc0=L, fc1=L+colw, fc2=L+2*colw;
+   //--- Row 1: Lot | Profit(money) | Lock(money)
    oLbl (PFX+k+"lLot",fc0,   y+3,"Lot", CMUTE); oEdit(PFX+k+"eLot",fc0+36, y, ew,17, DoubleToString(g.lot,2));
-   oLbl (PFX+k+"lPrt",fc1,   y+3,"Prot",CMUTE); oEdit(PFX+k+"ePrt",fc1+36, y, ew,17, IntegerToString(g.prot));
-   oLbl (PFX+k+"lLk", fc2,   y+3,"Lock",CMUTE); oEdit(PFX+k+"eLk", fc2+36, y, ew,17, IntegerToString(g.lock));
+   oLbl (PFX+k+"lPrf",fc1,   y+3,"Prof",CMUTE); oEdit(PFX+k+"ePrf",fc1+36, y, ew,17, DoubleToString(g.tp,2));
+   oLbl (PFX+k+"lLk", fc2,   y+3,"Lock",CMUTE); oEdit(PFX+k+"eLk", fc2+36, y, ew,17, DoubleToString(g.lock,2));
    y += GH_RH;
-   oLbl (PFX+k+"lBS", fc0,   y+3,"B+S", CMUTE); oEdit(PFX+k+"eBS", fc0+36, y, ew,17, IntegerToString(g.bs));
-   oLbl (PFX+k+"lTgt",fc1,   y+3,"Tgt", CMUTE); oEdit(PFX+k+"eTgt",fc1+36, y, ew+14,17, DoubleToString(s.target,2));
-   oLbl (PFX+k+"lSL", fc2,   y+3,"SL",  CMUTE);
+   //--- Row 2: Prot(pips) | B+S/S+B(pips) | Target(price)
+   //--- JNS labels this field "B+S" on the BUY side and "S+B" on the SELL side
+   string bsLabel = (k=="b") ? "B+S" : "S+B";
+   oLbl (PFX+k+"lPrt",fc0,   y+3,"Prot",  CMUTE); oEdit(PFX+k+"ePrt",fc0+36, y, ew,17, PipStr(g.prot));
+   oLbl (PFX+k+"lBS", fc1,   y+3,bsLabel, CMUTE); oEdit(PFX+k+"eBS", fc1+36, y, ew,17, PipStr(g.bs));
+   oLbl (PFX+k+"lTgt",fc2,   y+3,"Tgt", CMUTE); oEdit(PFX+k+"eTgt",fc2+36, y, ew,17, DoubleToString(s.target,2));
    y += GH_RH+4;
 
    //--- grid table: 6 columns fitted inside the inner width.
@@ -443,10 +546,10 @@ int BuildSide(int bx,string side,string k,color hc,color bg,const SSide &s)
      {
       int ry=y+i*GH_LRH;
       oLbl (PFX+k+"n"+(string)i, xLv,  ry+2, LvName(i), CTXT);
-      oEdit(PFX+k+"g"+(string)i, xGap, ry, wGap-4,16, IntegerToString(s.lv[i].gap));
+      oEdit(PFX+k+"g"+(string)i, xGap, ry, wGap-4,16, PipStr(s.lv[i].gap));
       oEdit(PFX+k+"l"+(string)i, xLot, ry, wLot-4,16, DoubleToString(s.lv[i].lot,2));
-      oEdit(PFX+k+"p"+(string)i, xProf,ry, wProf-4,16,IntegerToString(s.lv[i].tp));
-      oEdit(PFX+k+"k"+(string)i, xLock,ry, wLock-4,16,IntegerToString(s.lv[i].lock));
+      oEdit(PFX+k+"p"+(string)i, xProf,ry, wProf-4,16,DoubleToString(s.lv[i].tp,2));
+      oEdit(PFX+k+"k"+(string)i, xLock,ry, wLock-4,16,DoubleToString(s.lv[i].lock,2));
       oBtn (PFX+k+"o"+(string)i, xOn,  ry, wOn,16,  s.lv[i].on?"ON":"OFF", s.lv[i].on?CON:COFF);
      }
    y += LVLS*GH_LRH + 8;
@@ -458,30 +561,48 @@ int BuildSide(int bx,string side,string k,color hc,color bg,const SSide &s)
    return y;
   }
 
-//--- live position table (both sides). Use a MONOSPACE font so the fixed-
-//--- width columns actually line up under the header.
+//--- monospace label helper for the log grid (fixed-width columns line up)
+void oMono(string n,int x,int y,string t,color c,int fs=GH_FS+1)
+  {
+   if(ObjectFind(0,n)<0) ObjectCreate(0,n,OBJ_LABEL,0,0,0);
+   ObjectSetInteger(0,n,OBJPROP_CORNER,CORNER_LEFT_UPPER);
+   ObjectSetInteger(0,n,OBJPROP_XDISTANCE,x); ObjectSetInteger(0,n,OBJPROP_YDISTANCE,y);
+   ObjectSetString (0,n,OBJPROP_TEXT,t);
+   ObjectSetString (0,n,OBJPROP_FONT,"Consolas"); ObjectSetInteger(0,n,OBJPROP_FONTSIZE,fs);
+   ObjectSetInteger(0,n,OBJPROP_COLOR,c);
+   ObjectSetInteger(0,n,OBJPROP_SELECTABLE,false); ObjectSetInteger(0,n,OBJPROP_HIDDEN,true);
+  }
+
+#define PT_ROWS 8              // trade rows shown per side in the bottom log
+//--- 7-column monospace header for the per-side trade log
+string PtHeader(){ return StringFormat("%-4s %-5s %-6s %-6s %-6s %-8s %-4s",
+                        "Row","Lot","Prof","Book","State","P&L","Safe"); }
+
+//--- Bottom log: an account line, then BUY (left) and SELL (right) trade
+//--- tables with a per-side summary line under each. Monospace so columns
+//--- align. Guessed columns (Book, State WAIT/STUCK, Safe) are best-effort.
 void BuildPosTable(int x,int y,int w)
   {
-   oRect(PFX"pt_bg",x,y,w,26+18*10,C'16,18,24',CGOLD);
-   //--- header rendered in the same monospace layout as the rows
-   string hdr = StringFormat("%-3s %-5s %-6s %-10s %-9s %-6s","#","Side","Lot","Entry","P/L","State");
-   if(ObjectFind(0,PFX"pt_h")<0) ObjectCreate(0,PFX"pt_h",OBJ_LABEL,0,0,0);
-   ObjectSetInteger(0,PFX"pt_h",OBJPROP_CORNER,CORNER_LEFT_UPPER);
-   ObjectSetInteger(0,PFX"pt_h",OBJPROP_XDISTANCE,x+10); ObjectSetInteger(0,PFX"pt_h",OBJPROP_YDISTANCE,y+6);
-   ObjectSetString(0,PFX"pt_h",OBJPROP_TEXT,hdr);
-   ObjectSetString(0,PFX"pt_h",OBJPROP_FONT,"Consolas"); ObjectSetInteger(0,PFX"pt_h",OBJPROP_FONTSIZE,GH_FS+1);
-   ObjectSetInteger(0,PFX"pt_h",OBJPROP_COLOR,CGOLD); ObjectSetInteger(0,PFX"pt_h",OBJPROP_SELECTABLE,false);
-   ObjectSetInteger(0,PFX"pt_h",OBJPROP_HIDDEN,true);
-   for(int i=0;i<10;i++)
+   int half = (w-GH_GAP)/2;
+   int hgt  = 20 + 16 + 18*PT_ROWS + 4 + 34;      // acct + header + rows + summary
+   oRect(PFX"pt_bg",x,y,w,hgt,C'16,18,24',CGOLD);
+
+   //--- account status line (spans full width)
+   oMono(PFX"pt_acct",x+10,y+5,"Balance: -   Equity: -   Daily P/L: -",CGOLD,GH_FS+1);
+
+   int ty = y+22;                                  // table top
+   string kk[2]={"b","s"}; string side[2]={"BUY","SELL"};
+   for(int c=0;c<2;c++)
      {
-      string nm=PFX"pt_"+(string)i;
-      if(ObjectFind(0,nm)<0) ObjectCreate(0,nm,OBJ_LABEL,0,0,0);
-      ObjectSetInteger(0,nm,OBJPROP_CORNER,CORNER_LEFT_UPPER);
-      ObjectSetInteger(0,nm,OBJPROP_XDISTANCE,x+10); ObjectSetInteger(0,nm,OBJPROP_YDISTANCE,y+26+i*18);
-      ObjectSetString(0,nm,OBJPROP_TEXT," ");                 // blank, not the object name
-      ObjectSetString(0,nm,OBJPROP_FONT,"Consolas"); ObjectSetInteger(0,nm,OBJPROP_FONTSIZE,GH_FS+1);
-      ObjectSetInteger(0,nm,OBJPROP_COLOR,CTXT); ObjectSetInteger(0,nm,OBJPROP_SELECTABLE,false);
-      ObjectSetInteger(0,nm,OBJPROP_HIDDEN,true);
+      int cx = x + 10 + c*(half);
+      oMono(PFX"pt_ttl_"+kk[c],cx,ty, side[c], c==0?CHBUY:CHSELL, GH_FS+1);
+      oMono(PFX"pt_hdr_"+kk[c],cx,ty+15,PtHeader(),CGOLD,GH_FS);
+      for(int r=0;r<PT_ROWS;r++)
+         oMono(PFX"pt_"+kk[c]+"_"+(string)r, cx, ty+31+r*17, " ", CTXT, GH_FS);
+      //--- per-side summary (two stacked lines) under the rows
+      int sy = ty+31+PT_ROWS*17+2;
+      oMono(PFX"pt_sum1_"+kk[c],cx,sy,   " ",CMUTE,GH_FS);
+      oMono(PFX"pt_sum2_"+kk[c],cx,sy+15," ",CMUTE,GH_FS);
      }
   }
 
@@ -521,6 +642,9 @@ void PanelDestroy(){ ObjectsDeleteAll(0,PFX); }
 void SidePanelUpdate(string k,const ENUM_POSITION_TYPE side,const SSide &s)
   {
    int n=SideCount(side); double pl=SideFloating(side);
+   //--- live header: "<SIDE> - <broker> | Opened <Side> = <n>"
+   if(ObjectFind(0,PFX+k+"hd")>=0)
+      ObjectSetString(0,PFX+k+"hd",OBJPROP_TEXT, HeaderText(side==POSITION_TYPE_BUY?"BUY":"SELL"));
    if(ObjectFind(0,PFX+k+"sLvl")>=0)ObjectSetString(0,PFX+k+"sLvl",OBJPROP_TEXT,StringFormat("Levels: %d/%d",n,InpMaxLevels));
    if(ObjectFind(0,PFX+k+"sPL")>=0){ObjectSetString(0,PFX+k+"sPL",OBJPROP_TEXT,StringFormat("P/L: %.2f",pl));
                                     ObjectSetInteger(0,PFX+k+"sPL",OBJPROP_COLOR,pl>=0?CON:CHSELL);}
@@ -531,33 +655,77 @@ void SidePanelUpdate(string k,const ENUM_POSITION_TYPE side,const SSide &s)
           ObjectSetInteger(0,PFX+k+"o"+(string)i,OBJPROP_BGCOLOR,s.lv[i].on?CON:COFF); }
   }
 
-void PosTableUpdate()
+//--- Fill one side's trade rows + summary lines. si: 0=BUY, 1=SELL.
+void SideTableUpdate(const string k,const ENUM_POSITION_TYPE side,const int si,const SSide &s)
   {
-   //--- gather up to 10 positions, oldest first
+   //--- collect THIS side's positions, oldest first
    ulong tk[]; int n=0;
    for(int i=0;i<PositionsTotal();i++)
      { ulong t=PositionGetTicket(i); if(t==0)continue;
        if(PositionGetString(POSITION_SYMBOL)!=m_sym)continue;
        if(PositionGetInteger(POSITION_MAGIC)!=InpMagic)continue;
-       ArrayResize(tk,n+1);tk[n]=t;n++; if(n>=10)break; }
-   for(int r=0;r<10;r++)
+       if((ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE)!=side)continue;
+       ArrayResize(tk,n+1); tk[n]=t; n++; }
+
+   //--- Safe = number of this side's positions sitting at/above break-even
+   //--- (best-guess for the JNS "Safe" column; a locked/protected leg).
+   int safe=0;
+   for(int i=0;i<n;i++)
+      if(PositionSelectByTicket(tk[i]))
+        { double slv=PositionGetDouble(POSITION_SL);
+          double pl =PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP);
+          if(slv>0 || pl>=0) safe++; }
+
+   for(int r=0;r<PT_ROWS;r++)
      {
-      string nm=PFX"pt_"+(string)r; if(ObjectFind(0,nm)<0)continue;
+      string nm=PFX"pt_"+k+"_"+(string)r; if(ObjectFind(0,nm)<0)continue;
       if(r<n && PositionSelectByTicket(tk[r]))
         {
-         bool lng=(ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE)==POSITION_TYPE_BUY;
-         double op=PositionGetDouble(POSITION_PRICE_OPEN);
-         double pl=PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP);
-         double vol=PositionGetDouble(POSITION_VOLUME);
-         double slv=PositionGetDouble(POSITION_SL);
-         string st = (slv>0)? "LOCK" : (pl>=0? "OPEN+" : "OPEN-");
-         //--- monospace, fixed-width columns to match the header
-         ObjectSetString(0,nm,OBJPROP_TEXT,StringFormat("%-3d %-5s %-6.2f %-10.*f %-9.2f %-6s",
-              r+1, lng?"BUY":"SELL", vol, m_digits, op, pl, st));
+         int    lvl = PosLevel(PositionGetString(POSITION_COMMENT));
+         string row = (lvl<=1)? "G1" : LvName(MathMin(lvl-2,LVLS-1));   // G1/Gap2../ProS
+         double vol = PositionGetDouble(POSITION_VOLUME);
+         double pl  = PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP);
+         double slv = PositionGetDouble(POSITION_SL);
+         double tpM,lockM; MoneyTargetsFor(side,lvl,tpM,lockM);        // Prof / Book(=lock)
+         //--- State (guessed): LOCK if SL set; OPEN if floating; WAIT at be; STUCK if deep loss
+         string st;
+         if(slv>0)                 st="LOCK";
+         else if(pl<=-InpSideSL*0.5 && InpSideSL>0) st="STUCK";
+         else if(MathAbs(pl)<0.01)  st="WAIT";
+         else                       st="OPEN";
+         ObjectSetString(0,nm,OBJPROP_TEXT,StringFormat("%-4s %-5.2f %-6.2f %-6.2f %-6s %-8.2f %-4d",
+              row, vol, tpM, lockM, st, pl, safe));
          ObjectSetInteger(0,nm,OBJPROP_COLOR, pl>=0?CTXT:CHSELL);
         }
       else ObjectSetString(0,nm,OBJPROP_TEXT," ");
      }
+
+   //--- summary lines under this side's table
+   double fl = SideFloating(side);
+   string s1 = StringFormat("Prot:%s Lock:%s | Scalp:%d Total:%d",
+                    PipStr(g.prot), DoubleToString(g.lock,2), m_scalp[si], m_total[si]);
+   string s2 = StringFormat("Bad:%d Booked:%.2f | Float:%.2f | SL:%s B+S:%s",
+                    m_bad[si], m_booked[si], fl,
+                    InpSideSL>0?DoubleToString(InpSideSL,0):"OFF", PipStr(g.bs));
+   if(ObjectFind(0,PFX"pt_sum1_"+k)>=0){ ObjectSetString(0,PFX"pt_sum1_"+k,OBJPROP_TEXT,s1); }
+   if(ObjectFind(0,PFX"pt_sum2_"+k)>=0){ ObjectSetString(0,PFX"pt_sum2_"+k,OBJPROP_TEXT,s2);
+                                         ObjectSetInteger(0,PFX"pt_sum2_"+k,OBJPROP_COLOR, fl>=0?CMUTE:CHSELL); }
+  }
+
+void PosTableUpdate()
+  {
+   //--- account status line
+   double bal=AccountInfoDouble(ACCOUNT_BALANCE);
+   double eq =AccountInfoDouble(ACCOUNT_EQUITY);
+   double day=(eq - m_start_balance);                 // session P/L vs start balance
+   if(ObjectFind(0,PFX"pt_acct")>=0)
+     { ObjectSetString(0,PFX"pt_acct",OBJPROP_TEXT,
+         StringFormat("Balance: %.2f   Equity: %.2f   Daily P/L: %.2f  | Magic %I64d",
+              bal,eq,day,(long)InpMagic));
+       ObjectSetInteger(0,PFX"pt_acct",OBJPROP_COLOR, day>=0?CGOLD:CHSELL); }
+
+   SideTableUpdate("b",POSITION_TYPE_BUY, 0, g.buy);
+   SideTableUpdate("s",POSITION_TYPE_SELL,1, g.sell);
   }
 
 void PanelUpdate()
@@ -595,18 +763,20 @@ double ReadNum(string n,double def){ if(ObjectFind(0,n)<0)return def; double v=S
 void PullSideEdits(string k,SSide &s)
   {
    //--- base fields (shared): lot/prot/lock/bs read from whichever side edited
+   //--- Lot=lots; Profit/Lock = MONEY (acct ccy); Prot/B+S/Gap = PIPS; Target = PRICE.
    double v;
-   v=ReadNum(PFX+k+"eLot",g.lot); if(v>0)g.lot=v;
-   v=ReadNum(PFX+k+"ePrt",g.prot);if(v>=0)g.prot=(int)v;
-   v=ReadNum(PFX+k+"eLk", g.lock);if(v>=0)g.lock=(int)v;
-   v=ReadNum(PFX+k+"eBS", g.bs);  if(v>=0)g.bs=(int)v;
-   v=ReadNum(PFX+k+"eTgt",s.target); s.target=v;   // 0 = off
-   //--- per-level rows
+   v=ReadNum(PFX+k+"eLot",g.lot);            if(v>0) g.lot=v;
+   v=ReadNum(PFX+k+"ePrf",g.tp);             if(v>0) g.tp=v;      // money
+   v=ReadNum(PFX+k+"eLk", g.lock);           if(v>=0)g.lock=v;    // money (0=off)
+   v=ReadNum(PFX+k+"ePrt",PtsToPips(g.prot));if(v>=0)g.prot=PipsToPts(v);
+   v=ReadNum(PFX+k+"eBS", PtsToPips(g.bs));  if(v>=0)g.bs=PipsToPts(v);
+   v=ReadNum(PFX+k+"eTgt",s.target);         s.target=v;          // 0 = off (a PRICE)
+   //--- per-level rows: gap in PIPS, profit/lock in MONEY
    for(int i=0;i<LVLS;i++)
-     { double gg=ReadNum(PFX+k+"g"+(string)i,s.lv[i].gap); if(gg>0)s.lv[i].gap=(int)gg;
-       double ll=ReadNum(PFX+k+"l"+(string)i,s.lv[i].lot); if(ll>0)s.lv[i].lot=ll;
-       double pp=ReadNum(PFX+k+"p"+(string)i,s.lv[i].tp);  if(pp>0)s.lv[i].tp=(int)pp;
-       double kk=ReadNum(PFX+k+"k"+(string)i,s.lv[i].lock);if(kk>=0)s.lv[i].lock=(int)kk; }
+     { double gg=ReadNum(PFX+k+"g"+(string)i,PtsToPips(s.lv[i].gap)); if(gg>0) s.lv[i].gap=PipsToPts(gg);
+       double ll=ReadNum(PFX+k+"l"+(string)i,s.lv[i].lot);            if(ll>0) s.lv[i].lot=ll;
+       double pp=ReadNum(PFX+k+"p"+(string)i,s.lv[i].tp);            if(pp>0) s.lv[i].tp=pp;
+       double kk=ReadNum(PFX+k+"k"+(string)i,s.lv[i].lock);          if(kk>=0)s.lv[i].lock=kk; }
   }
 
 void SideReport(const ENUM_POSITION_TYPE side)
