@@ -42,6 +42,12 @@ input double InpSellTarget   = 4300.0;  // SELL target price: book winners, keep
 input int    InpKeepHedge    = 2;       // How many highest-profit positions to keep on Target
 input double InpSideSL       = 0.0;     // Basket SL: close a side if its floating loss <= -this (0 = off)
 
+input group "Scalp mode (high-frequency: keep N slots per side, re-seed after each win)"
+input bool   InpScalpMode    = true;    // ON = keep InpScalpSlots positions open per side, tight spacing, re-seed after a win
+input int    InpScalpSlots   = 3;       // Target concurrent positions PER SIDE to keep open (clamped by InpMaxLevels)
+input double InpScalpGapPips = 8.0;     // Tight spacing between scalp entries, in PIPS (min price move before adding a slot)
+input int    InpScalpMinSecs = 5;       // Throttle: minimum seconds between opens on a side (stops one tick opening all slots)
+
 input group "Safety (defaults ON - the floor)"
 input int    InpMaxLevels        = 8;     // Max open positions PER SIDE (0 = unlimited - DANGEROUS)
 input double InpMaxFloatingLoss  = 800.0; // Close ALL if combined floating P/L <= -this (0 = off)
@@ -95,6 +101,7 @@ int      m_scalp[2] = {0,0};
 int      m_bad[2]   = {0,0};
 int      m_total[2] = {0,0};
 double   m_booked[2]= {0,0};                          // realized P/L booked this session, per side
+datetime m_lastOpen[2] = {0,0};                       // last entry time per side (scalp throttle)
 
 void Log(const string s){ if(InpEnableLog) Print("[GridHedge] ", s); }
 double Ask(){ return SymbolInfoDouble(m_sym,SYMBOL_ASK); }
@@ -160,10 +167,17 @@ int OnInit()
    m_start_equity=AccountInfoDouble(ACCOUNT_EQUITY);
    m_start_balance=AccountInfoDouble(ACCOUNT_BALANCE); m_halted=false;
 
+   //--- restore a saved panel position (if the user moved it before)
+   long sx=0, sy=0;
+   if(GlobalVariableCheck(PFX"ox")) g_ox=(int)GlobalVariableGet(PFX"ox");
+   if(GlobalVariableCheck(PFX"oy")) g_oy=(int)GlobalVariableGet(PFX"oy");
+   ChartSetInteger(0,CHART_EVENT_MOUSE_MOVE,true);   // needed for panel dragging
+
    if(InpShowPanel) PanelCreate();
    ChartRedraw(0);
-   Log(StringFormat("init v3.1 lot=%.2f gap=%d profit(£)=%.2f lock(£)=%.2f prot=%d bs=%d run=%s",
-        g.lot,g.gap,g.tp,g.lock,g.prot,g.bs,g.running?"on":"off"));
+   Log(StringFormat("init v3.2 lot=%.2f gap=%d profit(£)=%.2f lock(£)=%.2f prot=%d bs=%d run=%s | scalp=%s slots=%d sgap=%.1fpip throttle=%ds",
+        g.lot,g.gap,g.tp,g.lock,g.prot,g.bs,g.running?"on":"off",
+        InpScalpMode?"ON":"off",InpScalpSlots,InpScalpGapPips,InpScalpMinSecs));
    return INIT_SUCCEEDED;
   }
 void OnDeinit(const int r){ PanelDestroy(); ChartRedraw(0); }
@@ -266,6 +280,7 @@ bool OpenLevel(const ENUM_POSITION_TYPE side,const int level,const double lot)
    string cmt=StringFormat("P%d",level); bool ok;
    if(side==POSITION_TYPE_BUY) ok=m_trade.Buy(lot,m_sym,0,0,0,cmt);
    else                        ok=m_trade.Sell(lot,m_sym,0,0,0,cmt);
+   if(ok) m_lastOpen[side==POSITION_TYPE_BUY?0:1]=TimeCurrent();   // scalp throttle stamp
    Log(StringFormat("%s %s lot=%.2f: %s rc=%u",side==POSITION_TYPE_BUY?"BUY":"SELL",cmt,lot,
         ok?"opened":"FAILED",m_trade.ResultRetcode()));
    return ok;
@@ -384,11 +399,44 @@ void BasketChecks()
 void ManageSide(const ENUM_POSITION_TYPE side,const SSide &s)
   {
    if(!s.enabled) return;
+   int si=(side==POSITION_TYPE_BUY?0:1);
    int count=SideCount(side);
-   if(InpMaxLevels>0 && count>=InpMaxLevels) return;
-   if(count==0){ OpenLevel(side,1,g.lot); return; }
+   if(InpMaxLevels>0 && count>=InpMaxLevels) return;   // hard safety cap always wins
 
-   //--- next level's params
+   //================= SCALP MODE (high-frequency, Option A) =================
+   //--- Keep up to InpScalpSlots positions open per side (clamped by the max-
+   //--- levels floor). Space each new slot by a TIGHT scalp gap, and throttle
+   //--- opens by InpScalpMinSecs so a single volatile tick can't fire the whole
+   //--- stack at once. When a winner closes, count drops and the next tick
+   //--- re-seeds a fresh slot automatically -> the churn that books many wins.
+   if(InpScalpMode)
+     {
+      int slots=InpScalpSlots;
+      if(InpMaxLevels>0 && slots>InpMaxLevels) slots=InpMaxLevels;
+      if(slots<1) slots=1;
+      if(count>=slots) return;                          // side already full
+
+      //--- throttle: enforce a minimum interval between opens on this side
+      if(InpScalpMinSecs>0 && m_lastOpen[si]>0 &&
+         (TimeCurrent()-m_lastOpen[si]) < InpScalpMinSecs) return;
+
+      if(count==0){ OpenLevel(side,1,g.lot); return; }  // first slot: seed at market
+
+      //--- subsequent slots: require a tight price move from the last entry so
+      //--- we don't stack several at the exact same price.
+      bool found=false; double last=LastEntryPrice(side,found); if(!found)return;
+      double sgap=PipsToPts(InpScalpGapPips)*m_point;
+      bool add=false;
+      if(side==POSITION_TYPE_BUY  && Ask()<=last-sgap) add=true;   // stack lower on dips
+      if(side==POSITION_TYPE_SELL && Bid()>=last+sgap) add=true;   // stack higher on rallies
+      if(add)
+        { SLevel nx; LevelFor(side,count+1,nx);
+          OpenLevel(side,count+1, nx.lot>0?nx.lot:g.lot); }
+      return;
+     }
+
+   //================= CLASSIC DCA MODE (wide gap, one leg per move) =========
+   if(count==0){ OpenLevel(side,1,g.lot); return; }
    SLevel nx; LevelFor(side,count+1,nx);
    if(!nx.on) return;
    bool found=false; double last=LastEntryPrice(side,found); if(!found)return;
@@ -418,16 +466,26 @@ void OnTick()
 //  Fields: Lot / Prot / Lock / B+S ; basket: Start(disp) / Target / SL
 //  Grid table: Gap2/3/4/ProS x (Gap | Lot | Profit | Lock | ON)
 //====================================================================
-#define GH_X    8      // panel left edge
-#define GH_Y    22     // panel top edge
-#define GH_W    340    // side-panel width (wide enough that all columns fit inside)
-#define GH_PAD  12     // inner left/right padding inside a panel
-#define GH_GAP  14     // gap between the two side panels
-#define GH_FS   8      // base font size
-#define GH_RH   22     // row pitch (field rows)
-#define GH_LRH  20     // per-level table row pitch
+//--- Panel ORIGIN is now a live variable so the whole dashboard can be
+//--- dragged. Every build function reads GH_X/GH_Y, so shifting these two
+//--- globals moves everything together. Persisted to a chart-global so it
+//--- survives recompiles/re-attach.
+int  g_ox = 8;         // panel left edge (movable)
+int  g_oy = 22;        // panel top edge  (movable)
+#define GH_X    g_ox
+#define GH_Y    g_oy
+#define GH_W    440    // side-panel width (wide enough for the larger font + spacing)
+#define GH_PAD  14     // inner left/right padding inside a panel
+#define GH_GAP  16     // gap between the two side panels
+#define GH_FS   10     // base font size (bumped)
+#define GH_RH   28     // row pitch (field rows)
+#define GH_LRH  26     // per-level table row pitch
+#define DRAGH   24     // drag-handle bar height
 
-bool g_min = false;    // dashboard minimized state
+bool     g_min  = false;   // dashboard minimized state
+//--- drag state
+bool     g_drag = false;   // currently dragging the panel
+int      g_dragDX = 0, g_dragDY = 0;   // cursor offset from panel origin at grab
 
 color CBUYBG=C'12,28,54', CSELLBG=C'54,14,18', CHBUY=C'46,120,220', CHSELL=C'210,60,66';
 color CFLD=C'22,26,34', CTXT=C'230,232,238', CMUTE=C'150,160,175';
@@ -500,64 +558,68 @@ int BuildSide(int bx,string side,string k,color hc,color bg,const SSide &s)
   {
    const int L = bx + GH_PAD;              // inner left
    const int R = bx + GH_W - GH_PAD;       // inner right
-   int y = GH_Y;
+   int y = GH_Y + DRAGH + 2;               // sit below the drag handle
    int H = 26 + GH_RH + GH_RH*2 + 18 + (LVLS)*GH_LRH + 20 + GH_RH + GH_RH + 14;
    oRect(PFX+k+"bg",bx,y,GH_W,H,bg,hc);
    //--- header: "<SIDE> - <broker> | Opened <Side> = <n>" (JNS style, live count)
    oLbl(PFX+k+"hd",L,y+5,HeaderText(side),hc,GH_FS+1,true); y+=26;
 
+   const int IW = GH_W - 2*GH_PAD;         // usable inner width (derived, not hardcoded)
+
    //--- button row: ST PU CL SY RE  (5 buttons across the inner width)
-   int bgap=6, bw=(316 - 4*bgap)/5;        // equal-width buttons that fit exactly
+   int bgap=7, bw=(IW - 4*bgap)/5;         // equal-width buttons that fit exactly
    for(int bidx=0;bidx<5;bidx++)
      {
       int bxp = L + bidx*(bw+bgap);
       string nm[5]={"ST","PU","CL","SY","REP"}; string tx[5]={"ST","PU","CL","SY","RE"};
       color  bc = (bidx==0)?(s.enabled?CON:CBTN):(bidx==2?COFF:CBTN);
-      oBtn(PFX+k+nm[bidx], bxp, y, bw,18, tx[bidx], bc);
+      oBtn(PFX+k+nm[bidx], bxp, y, bw,22, tx[bidx], bc);
      }
-   y += GH_RH+4;
+   y += GH_RH+6;
 
-   //--- field rows: 3 columns evenly across the inner width
-   int colw=316/3, ew=52;
+   //--- field rows: 3 columns. Each column = a label then a wide edit box,
+   //--- with a real gap so text never collides. lw = label width, ew = edit.
+   int colw=IW/3, lw=42, ew=colw-lw-6, eh=20;
    int fc0=L, fc1=L+colw, fc2=L+2*colw;
    //--- Row 1: Lot | Profit(money) | Lock(money)
-   oLbl (PFX+k+"lLot",fc0,   y+3,"Lot", CMUTE); oEdit(PFX+k+"eLot",fc0+36, y, ew,17, DoubleToString(g.lot,2));
-   oLbl (PFX+k+"lPrf",fc1,   y+3,"Prof",CMUTE); oEdit(PFX+k+"ePrf",fc1+36, y, ew,17, DoubleToString(g.tp,2));
-   oLbl (PFX+k+"lLk", fc2,   y+3,"Lock",CMUTE); oEdit(PFX+k+"eLk", fc2+36, y, ew,17, DoubleToString(g.lock,2));
+   oLbl (PFX+k+"lLot",fc0,   y+4,"Lot", CMUTE); oEdit(PFX+k+"eLot",fc0+lw, y, ew,eh, DoubleToString(g.lot,2));
+   oLbl (PFX+k+"lPrf",fc1,   y+4,"Prof",CMUTE); oEdit(PFX+k+"ePrf",fc1+lw, y, ew,eh, DoubleToString(g.tp,2));
+   oLbl (PFX+k+"lLk", fc2,   y+4,"Lock",CMUTE); oEdit(PFX+k+"eLk", fc2+lw, y, ew,eh, DoubleToString(g.lock,2));
    y += GH_RH;
    //--- Row 2: Prot(pips) | B+S/S+B(pips) | Target(price)
    //--- JNS labels this field "B+S" on the BUY side and "S+B" on the SELL side
    string bsLabel = (k=="b") ? "B+S" : "S+B";
-   oLbl (PFX+k+"lPrt",fc0,   y+3,"Prot",  CMUTE); oEdit(PFX+k+"ePrt",fc0+36, y, ew,17, PipStr(g.prot));
-   oLbl (PFX+k+"lBS", fc1,   y+3,bsLabel, CMUTE); oEdit(PFX+k+"eBS", fc1+36, y, ew,17, PipStr(g.bs));
-   oLbl (PFX+k+"lTgt",fc2,   y+3,"Tgt", CMUTE); oEdit(PFX+k+"eTgt",fc2+36, y, ew,17, DoubleToString(s.target,2));
-   y += GH_RH+4;
+   oLbl (PFX+k+"lPrt",fc0,   y+4,"Prot",  CMUTE); oEdit(PFX+k+"ePrt",fc0+lw, y, ew,eh, PipStr(g.prot));
+   oLbl (PFX+k+"lBS", fc1,   y+4,bsLabel, CMUTE); oEdit(PFX+k+"eBS", fc1+lw, y, ew,eh, PipStr(g.bs));
+   oLbl (PFX+k+"lTgt",fc2,   y+4,"Tgt", CMUTE); oEdit(PFX+k+"eTgt",fc2+lw, y, ew,eh, DoubleToString(s.target,2));
+   y += GH_RH+6;
 
-   //--- grid table: 6 columns fitted inside the inner width.
-   //--- widths: Lv 40 | Gap 52 | Lot 52 | Prof 52 | Lock 48 | ON 44  + gutters
-   int gcnt=6, gg=4;
-   int wLv=38, wGap=52, wLot=52, wProf=50, wLock=46, wOn=44;
-   int xLv=L, xGap=xLv+wLv+gg, xLot=xGap+wGap+gg, xProf=xLot+wLot+gg, xLock=xProf+wProf+gg, xOn=xLock+wLock+gg;
+   //--- grid table: 6 columns derived from the inner width with gutters so
+   //--- Lv | Gap | Lot | Prof | Lock | ON always span exactly IW.
+   int gg=6;
+   int wLv=40, wOn=52;
+   int wData=(IW - wLv - wOn - 5*gg)/4;    // Gap/Lot/Prof/Lock share the rest
+   int xLv=L, xGap=xLv+wLv+gg, xLot=xGap+wData+gg, xProf=xLot+wData+gg, xLock=xProf+wData+gg, xOn=xLock+wData+gg;
    oLbl(PFX+k+"tv",xLv,  y,"Lv",  CMUTE); oLbl(PFX+k+"tg",xGap, y,"Gap", CMUTE);
    oLbl(PFX+k+"tl",xLot, y,"Lot", CMUTE); oLbl(PFX+k+"tp",xProf,y,"Prof",CMUTE);
    oLbl(PFX+k+"tk",xLock,y,"Lock",CMUTE); oLbl(PFX+k+"to",xOn,  y,"ON",  CMUTE);
-   y += 18;
+   y += 20;
    for(int i=0;i<LVLS;i++)
      {
       int ry=y+i*GH_LRH;
-      oLbl (PFX+k+"n"+(string)i, xLv,  ry+2, LvName(i), CTXT);
-      oEdit(PFX+k+"g"+(string)i, xGap, ry, wGap-4,16, PipStr(s.lv[i].gap));
-      oEdit(PFX+k+"l"+(string)i, xLot, ry, wLot-4,16, DoubleToString(s.lv[i].lot,2));
-      oEdit(PFX+k+"p"+(string)i, xProf,ry, wProf-4,16,DoubleToString(s.lv[i].tp,2));
-      oEdit(PFX+k+"k"+(string)i, xLock,ry, wLock-4,16,DoubleToString(s.lv[i].lock,2));
-      oBtn (PFX+k+"o"+(string)i, xOn,  ry, wOn,16,  s.lv[i].on?"ON":"OFF", s.lv[i].on?CON:COFF);
+      oLbl (PFX+k+"n"+(string)i, xLv,  ry+3, LvName(i), CTXT);
+      oEdit(PFX+k+"g"+(string)i, xGap, ry, wData,18, PipStr(s.lv[i].gap));
+      oEdit(PFX+k+"l"+(string)i, xLot, ry, wData,18, DoubleToString(s.lv[i].lot,2));
+      oEdit(PFX+k+"p"+(string)i, xProf,ry, wData,18,DoubleToString(s.lv[i].tp,2));
+      oEdit(PFX+k+"k"+(string)i, xLock,ry, wData,18,DoubleToString(s.lv[i].lock,2));
+      oBtn (PFX+k+"o"+(string)i, xOn,  ry, wOn,18,  s.lv[i].on?"ON":"OFF", s.lv[i].on?CON:COFF);
      }
-   y += LVLS*GH_LRH + 8;
+   y += LVLS*GH_LRH + 10;
 
    //--- live status rows
-   oLbl(PFX+k+"sLvl",L,y,"Levels: 0",CTXT); y+=18;
+   oLbl(PFX+k+"sLvl",L,y,"Levels: 0",CTXT); y+=20;
    oLbl(PFX+k+"sPL", L,y,"P/L: 0.00",CTXT); y+=GH_RH;
-   oBtn(PFX+k+"clsAll",L,y,GH_W-2*GH_PAD,20,"CLOSE "+side,COFF); y+=GH_RH+2;
+   oBtn(PFX+k+"clsAll",L,y,IW,24,"CLOSE "+side,COFF); y+=GH_RH+2;
    return y;
   }
 
@@ -584,49 +646,62 @@ string PtHeader(){ return StringFormat("%-4s %-5s %-6s %-6s %-6s %-8s %-4s",
 void BuildPosTable(int x,int y,int w)
   {
    int half = (w-GH_GAP)/2;
-   int hgt  = 20 + 16 + 18*PT_ROWS + 4 + 34;      // acct + header + rows + summary
+   int rp   = 21;                                  // monospace row pitch (bigger font)
+   int hgt  = 26 + 20 + rp*PT_ROWS + 8 + 42;       // acct + header + rows + summary
    oRect(PFX"pt_bg",x,y,w,hgt,C'16,18,24',CGOLD);
 
    //--- account status line (spans full width)
-   oMono(PFX"pt_acct",x+10,y+5,"Balance: -   Equity: -   Daily P/L: -",CGOLD,GH_FS+1);
+   oMono(PFX"pt_acct",x+12,y+7,"Balance: -   Equity: -   Daily P/L: -",CGOLD,GH_FS+1);
 
-   int ty = y+22;                                  // table top
+   int ty = y+30;                                  // table top
    string kk[2]={"b","s"}; string side[2]={"BUY","SELL"};
    for(int c=0;c<2;c++)
      {
-      int cx = x + 10 + c*(half);
+      int cx = x + 12 + c*(half);
       oMono(PFX"pt_ttl_"+kk[c],cx,ty, side[c], c==0?CHBUY:CHSELL, GH_FS+1);
-      oMono(PFX"pt_hdr_"+kk[c],cx,ty+15,PtHeader(),CGOLD,GH_FS);
+      oMono(PFX"pt_hdr_"+kk[c],cx,ty+19,PtHeader(),CGOLD,GH_FS);
       for(int r=0;r<PT_ROWS;r++)
-         oMono(PFX"pt_"+kk[c]+"_"+(string)r, cx, ty+31+r*17, " ", CTXT, GH_FS);
+         oMono(PFX"pt_"+kk[c]+"_"+(string)r, cx, ty+40+r*rp, " ", CTXT, GH_FS);
       //--- per-side summary (two stacked lines) under the rows
-      int sy = ty+31+PT_ROWS*17+2;
+      int sy = ty+40+PT_ROWS*rp+6;
       oMono(PFX"pt_sum1_"+kk[c],cx,sy,   " ",CMUTE,GH_FS);
-      oMono(PFX"pt_sum2_"+kk[c],cx,sy+15," ",CMUTE,GH_FS);
+      oMono(PFX"pt_sum2_"+kk[c],cx,sy+18," ",CMUTE,GH_FS);
      }
+  }
+
+//--- The drag handle. Grabbing anywhere on this bar and moving the mouse
+//--- repositions the whole panel. Height DRAGH; width passed in.
+void BuildDragBar(int x,int y,int w)
+  {
+   oRect(PFX"drag",x,y,w,DRAGH,C'30,34,44',CGOLD);
+   oLbl (PFX"drag_t",x+8,y+4,"::  GridHedge  -  drag to move",CGOLD,GH_FS,true);
   }
 
 //--- minimized layout: just a compact title bar with the [+] and RUN/basket
 void BuildMinimized()
   {
-   int w=300, h=26;
+   int w=320, h=28;
    oRect(PFX"mini_bg",GH_X,GH_Y,w,h,C'18,20,26',CGOLD);
-   oBtn (PFX"minbtn", GH_X+6, GH_Y+4, 22,18, "+", CBTN);   // maximize
-   oLbl (PFX"mini_t", GH_X+34,GH_Y+6, "GridHedge", CGOLD, GH_FS+1, true);
-   oBtn (PFX"m_run",  GH_X+120,GH_Y+4, 80,18, g.running?"RUN":"STOP", g.running?CON:COFF);
-   oLbl (PFX"m_bskt", GH_X+208,GH_Y+7, "P/L: 0.00", CGOLD, GH_FS, true);
+   //--- the mini bar itself is the drag handle (grab the empty area)
+   oRect(PFX"drag",GH_X,GH_Y,w,h,C'18,20,26',CGOLD);
+   oBtn (PFX"minbtn", GH_X+6, GH_Y+5, 24,18, "+", CBTN);   // maximize
+   oLbl (PFX"mini_t", GH_X+36,GH_Y+7, "GridHedge", CGOLD, GH_FS+1, true);
+   oBtn (PFX"m_run",  GH_X+130,GH_Y+5, 80,18, g.running?"RUN":"STOP", g.running?CON:COFF);
+   oLbl (PFX"m_bskt", GH_X+222,GH_Y+8, "P/L: 0.00", CGOLD, GH_FS, true);
   }
 
 void PanelCreate()
   {
    if(g_min) { BuildMinimized(); return; }
 
+   int fw=GH_W*2+GH_GAP;
+   //--- drag handle across the very top, then push the panels below it
+   BuildDragBar(GH_X,GH_Y,fw);
    int bxB=GH_X, bxS=GH_X+GH_W+GH_GAP;
    int yb=BuildSide(bxB,"BUY","b",CHBUY,CBUYBG,g.buy);
    int ys=BuildSide(bxS,"SELL","s",CHSELL,CSELLBG,g.sell);
-   //--- minimize button on the BUY header (top-right of the whole panel)
-   int fw=GH_W*2+GH_GAP;
-   oBtn(PFX"minbtn", GH_X+fw-24, GH_Y+4, 20,18, "-", CBTN);   // minimize
+   //--- minimize button on the drag bar (top-right of the whole panel)
+   oBtn(PFX"minbtn", GH_X+fw-24, GH_Y+2, 20,16, "-", CBTN);   // minimize
 
    int y=MathMax(yb,ys)+6;
    oRect(PFX"m_bg",GH_X,y,fw,28,C'18,20,26',CGOLD);
@@ -789,6 +864,37 @@ void SideReport(const ENUM_POSITION_TYPE side)
 
 void OnChartEvent(const int id,const long &lp,const double &dp,const string &sp)
   {
+   //================= PANEL DRAG (mouse move) =================
+   //--- lp = mouse X, dp = mouse Y, sp = button/modifier state ("1" = left down)
+   if(id==CHARTEVENT_MOUSE_MOVE)
+     {
+      int mx=(int)lp, my=(int)dp;
+      bool ldown=(StringToInteger(sp) & 1)!=0;   // bit0 = left button held
+      if(ldown)
+        {
+         //--- start a drag if the press landed on the drag bar
+         if(!g_drag)
+           {
+            int bx=GH_X, by=GH_Y, bw=(g_min? 320 : (GH_W*2+GH_GAP)), bh=(g_min?28:DRAGH);
+            if(mx>=bx && mx<=bx+bw && my>=by && my<=by+bh)
+              { g_drag=true; g_dragDX=mx-GH_X; g_dragDY=my-GH_Y; }
+           }
+         if(g_drag)
+           {
+            g_ox = mx-g_dragDX; if(g_ox<0) g_ox=0;
+            g_oy = my-g_dragDY; if(g_oy<0) g_oy=0;
+            PanelDestroy(); PanelCreate(); PanelUpdate();
+           }
+        }
+      else if(g_drag)
+        {
+         //--- released: stop dragging and persist the new origin
+         g_drag=false;
+         GlobalVariableSet(PFX"ox",g_ox); GlobalVariableSet(PFX"oy",g_oy);
+        }
+      return;
+     }
+
    if(id==CHARTEVENT_OBJECT_ENDEDIT)
      { if(StringFind(sp,PFX)!=0)return;
        PullSideEdits("b",g.buy); PullSideEdits("s",g.sell);
