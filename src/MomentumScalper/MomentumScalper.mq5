@@ -187,10 +187,11 @@ double LotForRisk(double stopPoints)
   {
    double tickVal  = SymbolInfoDouble(m_sym,SYMBOL_TRADE_TICK_VALUE);
    double tickSize = SymbolInfoDouble(m_sym,SYMBOL_TRADE_TICK_SIZE);
-   if(tickVal<=0 || tickSize<=0 || stopPoints<=0) return InpMinLot;
+   //--- SAFETY: bad/zero specs -> refuse (0 lot = no trade), never guess.
+   if(tickVal<=0 || tickSize<=0 || stopPoints<=0) return 0;
    //--- money lost per 1.0 lot if price moves stopPoints
    double lossPerLot = (stopPoints*m_point/tickSize)*tickVal;
-   if(lossPerLot<=0) return InpMinLot;
+   if(lossPerLot<=0) return 0;
    double lot = InpRiskMoney / lossPerLot;
 
    //--- clamp to broker volume step/min/max and our caps
@@ -200,7 +201,13 @@ double LotForRisk(double stopPoints)
    if(vstep>0) lot = MathFloor(lot/vstep)*vstep;
    lot = MathMax(lot, MathMax(vmin,InpMinLot));
    lot = MathMin(lot, MathMin(vmax,InpMaxLot));
-   return NormalizeDouble(lot,2);
+   lot = NormalizeDouble(lot,2);
+
+   //--- HARD RISK CEILING (the XAUGBP bug): if the smallest allowed lot still
+   //--- risks more than 3x the intended money, REFUSE the trade rather than
+   //--- silently taking oversized risk that can blow the account.
+   if(lot*lossPerLot > 3.0*InpRiskMoney) return 0;
+   return lot;
   }
 
 //====================================================================
@@ -341,6 +348,7 @@ void TryEnter()
    double stopDist = atr*InpStopAtrMult;                 // price distance
    double stopPts  = stopDist/m_point;
    double lot      = LotForRisk(stopPts);
+   if(lot<=0){ g_lastSkip="sizing refused (unsafe on this symbol)"; return; }
 
    double sl,tp,entry;
    if(sig>0)

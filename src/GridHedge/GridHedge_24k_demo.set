@@ -1,0 +1,33 @@
+; GridHedge preset — the "+£24k OHLC" uncapped config, for DEMO observation.
+; This is the TRUE JNS behavior: book greens, let losers float freely, no caps.
+; PURPOSE: watch it on live demo fills. Expectation from real-tick test:
+;   it tracks toward a large drawdown / wipeout, NOT +£24k. The +£24k was an
+;   OHLC-model artifact that does not survive real fills.
+; Load via: attach GridHedge to XAUUSD M5 -> Inputs tab -> Load -> this file.
+InpLot=0.1
+InpGapPoints=500
+InpTpMoney=6.0
+InpLockMoney=50.0
+InpTradeBuy=true
+InpTradeSell=true
+InpProtPoints=200
+InpBSStepPoints=100
+InpBeOffsetPoints=10
+InpBuyTarget=0.0
+InpSellTarget=0.0
+InpKeepHedge=2
+InpSideSL=0.0
+InpScalpMode=true
+InpScalpSlots=3
+InpScalpGapPips=8.0
+InpScalpMinSecs=5
+InpMaxLevels=50
+InpMaxFloatingLoss=0.0
+InpEquityStopPct=0.0
+InpBasketTP=0.0
+InpCloseAllOnStop=false
+InpMagic=26023332
+InpSlippage=30
+InpStartRunning=true
+InpShowPanel=true
+InpEnableLog=true
