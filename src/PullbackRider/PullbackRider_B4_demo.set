@@ -1,0 +1,28 @@
+; PullbackRider B4 - demo forward-test preset
+; Trend EMA200 on H1, pullback to EMA20 on M15, ATR14 stop 1.5x, FIXED 2R take-profit (no trail).
+; Risk 0.5% per trade, MaxLot 0.10 safety cap, min stop 200 pts. Attach to XAUUSD M15.
+InpSlowMaPeriod=200
+InpSlowMaMethod=1
+InpTrendTF=16385
+InpSlopeLookback=5
+InpFastMaPeriod=20
+InpFastMaMethod=1
+InpEntryTF=15
+InpPullbackMaxBars=6
+InpAtrPeriod=14
+InpAtrStopMult=1.5
+InpMinStopPts=200
+InpAtrTrailMult=0.0
+InpTpRMult=2.0
+InpMoveToBE=true
+InpBEOffsetR=0.1
+InpRiskPct=0.5
+InpFixedLot=0.0
+InpMaxLot=0.10
+InpMaxSpreadPts=60
+InpStartHour=0
+InpEndHour=24
+InpOneTradePerBar=true
+InpMagic=77010001
+InpSlippage=30
+InpEnableLog=true
