@@ -1,0 +1,38 @@
+; JnsGrid preset — the EXACT real JNS Scalper V22 panel config, for DEMO forward-testing.
+; From the JNS panel screenshot: Lot 0.01, Gap 50pt(5pip), Profit £1, Lock £0.50,
+; Prot 20pt(2pip), B+S 10pt(1pip), deep stacking, JNS pullback entry ON.
+; FATAL-FLAW FIX kept ON (per-side SL £1500 + float/equity backstops) so demo can't wipe out.
+; PURPOSE: watch it on live demo fills. Backtest showed +£142k on OHLC but -13/-15% on
+; real ticks. The demo (real fills) will show which is true. Watch EQUITY, not banked green.
+; Load via: attach JnsGrid to XAUUSD M5 -> Inputs tab -> Load -> this file.
+InpLot=0.01
+InpGapPoints=50
+InpTpMoney=1.0
+InpLockMoney=0.5
+InpTradeBuy=true
+InpTradeSell=true
+InpProtPoints=20
+InpBSStepPoints=10
+InpBeOffsetPoints=5
+InpBuyTarget=0.0
+InpSellTarget=0.0
+InpKeepHedge=2
+InpSideSL=1500.0
+InpScalpMode=true
+InpScalpSlots=90
+InpScalpGapPips=5.0
+InpScalpMinSecs=5
+InpMaxLevels=90
+InpMaxFloatingLoss=3000.0
+InpEquityStopPct=15.0
+InpBasketTP=0.0
+InpCloseAllOnStop=true
+InpJnsPullback=true
+InpPullbackWaitSecs=30
+InpPullbackPoints=30
+InpJnsTriggerPoints=50
+InpMagic=26023332
+InpSlippage=30
+InpStartRunning=true
+InpShowPanel=true
+InpEnableLog=true
