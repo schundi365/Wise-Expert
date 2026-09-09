@@ -57,6 +57,7 @@ input group "Engine"
 input long   InpMagic        = 77010001;     // Magic number
 input int    InpSlippage     = 30;           // Max deviation, points
 input bool   InpEnableLog    = true;         // Log to Experts tab
+input int    InpHeartbeatSecs = 60;          // Heartbeat log interval (seconds) so you can see it's alive
 
 //--- state
 CTrade   m_trade;
@@ -103,16 +104,45 @@ int OnInit()
    m_trade.SetDeviationInPoints(InpSlippage);
    m_trade.SetTypeFillingBySymbol(m_sym);
 
-   Log(StringFormat("init v1.0 slowMA=%d(%s) fastMA=%d(%s) ATR=%d stop=%.1fx trail=%.1fx tpR=%.1f risk=%.2f%%",
-        InpSlowMaPeriod,EnumToString(InpTrendTF),InpFastMaPeriod,EnumToString(InpEntryTF),
-        InpAtrPeriod,InpAtrStopMult,InpAtrTrailMult,InpTpRMult,InpRiskPct));
+   //--- Heartbeat timer so you can SEE it's alive between (infrequent) trades.
+   EventSetTimer(MathMax(10,InpHeartbeatSecs));
+
+   //--- ALWAYS-ON startup banner (not gated by InpEnableLog) so attaching gives
+   //--- immediate confirmation in the Experts tab that the EA loaded and is running.
+   PrintFormat("[PBR] ATTACHED & RUNNING on %s. slowMA=%d(%s) fastMA=%d(%s) ATR=%d stop=%.1fx trail=%.1fx tpR=%.1f risk=%.2f%% | AlgoTrading=%s",
+        m_sym,InpSlowMaPeriod,EnumToString(InpTrendTF),InpFastMaPeriod,EnumToString(InpEntryTF),
+        InpAtrPeriod,InpAtrStopMult,InpAtrTrailMult,InpTpRMult,InpRiskPct,
+        (MQLInfoInteger(MQL_TRADE_ALLOWED)?"ON":"OFF (enable it!)"));
+   if(!MQLInfoInteger(MQL_TRADE_ALLOWED))
+      Print("[PBR] WARNING: Algo/Auto trading is DISABLED - the EA will evaluate but cannot place trades. Enable the 'Algo Trading' toolbar button.");
    return INIT_SUCCEEDED;
   }
 void OnDeinit(const int r)
   {
+   EventKillTimer();
    if(m_slowH!=INVALID_HANDLE) IndicatorRelease(m_slowH);
    if(m_fastH!=INVALID_HANDLE) IndicatorRelease(m_fastH);
    if(m_atrH !=INVALID_HANDLE) IndicatorRelease(m_atrH);
+  }
+
+//--- Heartbeat: prints current state so you can confirm it's alive and see WHY
+//--- it isn't trading (no trend / waiting for pullback / spread too wide).
+void OnTimer()
+  {
+   int dir=TrendDir();
+   string trend = (dir>0)?"UP":(dir<0)?"DOWN":"NONE(flat/no-trend => waiting)";
+   double sp=(Ask()-Bid())/m_point;
+   bool pos=HasPosition();
+   string why="";
+   if(!pos)
+     {
+      if(dir==0) why="no trend (slow MA flat or price wrong side)";
+      else if(InpMaxSpreadPts>0 && sp>InpMaxSpreadPts) why=StringFormat("spread %.0f > max %d",sp,InpMaxSpreadPts);
+      else if(!PullbackTrigger(dir)) why="trend OK, waiting for a pullback+resumption";
+      else why="conditions MET - will enter on next bar";
+     }
+   else why="in a position - managing exit";
+   PrintFormat("[PBR] heartbeat: trend=%s spread=%.0fpts position=%s | %s",trend,sp,pos?"YES":"no",why);
   }
 
 //====================================================================
