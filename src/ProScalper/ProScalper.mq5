@@ -24,6 +24,17 @@ input double InpStairStage2SLPct   = 5.0;    // P3 S/L after P2 closes, % of tra
 input double InpStairStage2TPPct   = 9.0;    // P3 T/P after P2 closes, % of trade value
 
 //==========================================================================
+//  AUTO SUPPORT/RESISTANCE (Target price, per side, on this chart's timeframe)
+//==========================================================================
+input int    InpSRLookbackBars = 200;  // Bars scanned for swing highs/lows on this chart's timeframe
+input int    InpSRFractalWidth = 2;    // Bars required on each side to confirm a swing point (2 = classic 5-bar fractal)
+
+//==========================================================================
+//  BACKTEST-ONLY AUTO START (never fires outside the Strategy Tester)
+//==========================================================================
+input bool   InpAutoStartForBacktest = false; // Testing only: at OnInit, auto-clicks Start on both sides and turns Auto S/R on, so a headless/optimizer backtest can run unattended. Gated to MQL_TESTER regardless of this flag.
+
+//==========================================================================
 //  ACCOUNT AUTHORIZATION
 //==========================================================================
 struct AccountAuth { long accNum; string name; datetime expiry; };
@@ -94,6 +105,8 @@ bool   bStopOn=false,sStopOn=false;
 bool bBasketClosed=false,sBasketClosed=false;
 bool bOppOn=false,sOppOn=false;
 double bOppMoney=1.00,sOppMoney=1.00;
+bool bAutoSR=false,sAutoSR=false;
+datetime gLastSRBarTime=0;
 
 ulong  bTicket1=0,sTicket1=0;
 double bEntry1=0,sEntry1=0,bStuck1=0,sStuck1=0;
@@ -1190,6 +1203,8 @@ void SaveState()
    GlobalVariableSet(GV_PREFIX+"sOppOn",sOppOn?1:0);
    GlobalVariableSet(GV_PREFIX+"bOppMoney",bOppMoney);
    GlobalVariableSet(GV_PREFIX+"sOppMoney",sOppMoney);
+   GlobalVariableSet(GV_PREFIX+"bAutoSR",bAutoSR?1:0);
+   GlobalVariableSet(GV_PREFIX+"sAutoSR",sAutoSR?1:0);
 
    GlobalVariableSet(GV_PREFIX+"bOn",bOn?1:0);GlobalVariableSet(GV_PREFIX+"bPaused",bPaused?1:0);
    GlobalVariableSet(GV_PREFIX+"bRepeat",bRepeat?1:0);GlobalVariableSet(GV_PREFIX+"bStartReached",bStartReached?1:0);
@@ -1267,6 +1282,8 @@ void RestoreState()
    sOppOn=GlobalVariableCheck(GV_PREFIX+"sOppOn")&&GlobalVariableGet(GV_PREFIX+"sOppOn")>0.5;
    bOppMoney=GlobalVariableCheck(GV_PREFIX+"bOppMoney")?GlobalVariableGet(GV_PREFIX+"bOppMoney"):1.00;
    sOppMoney=GlobalVariableCheck(GV_PREFIX+"sOppMoney")?GlobalVariableGet(GV_PREFIX+"sOppMoney"):1.00;
+   bAutoSR=GlobalVariableCheck(GV_PREFIX+"bAutoSR")&&GlobalVariableGet(GV_PREFIX+"bAutoSR")>0.5;
+   sAutoSR=GlobalVariableCheck(GV_PREFIX+"sAutoSR")&&GlobalVariableGet(GV_PREFIX+"sAutoSR")>0.5;
 
    bOn=GlobalVariableGet(GV_PREFIX+"bOn")>0.5;bPaused=GlobalVariableGet(GV_PREFIX+"bPaused")>0.5;
    bRepeat=GlobalVariableGet(GV_PREFIX+"bRepeat")>0.5;
@@ -1516,6 +1533,7 @@ bool SyncBuy()
    double start=ObjNum("UI_B_START_PRICE"),target=ObjNum("UI_B_TARGET_PRICE");
    double lot1=ObjectFind(0,"UI_B_MAIN_LOT")>=0?ObjNum("UI_B_MAIN_LOT"):bLot1;
    if(start<0) start=0;if(target<0) target=0;
+   if(bAutoSR){ start=bStart;target=bTarget; }
    if(!ValidateSide(true,start,target,lot1)) return false;
    bStart=start>0?NormalizeDouble(start,_Digits):0;bTarget=target;
    bLot1=NormalizeLot(lot1);
@@ -1542,6 +1560,7 @@ bool SyncSell()
    double start=ObjNum("UI_S_START_PRICE"),target=ObjNum("UI_S_TARGET_PRICE");
    double lot1=ObjectFind(0,"UI_S_MAIN_LOT")>=0?ObjNum("UI_S_MAIN_LOT"):sLot1;
    if(start<0) start=0;if(target<0) target=0;
+   if(sAutoSR){ start=sStart;target=sTarget; }
    if(!ValidateSide(false,start,target,lot1)) return false;
    sStart=start>0?NormalizeDouble(start,_Digits):0;sTarget=target;
    sLot1=NormalizeLot(lot1);
@@ -1613,6 +1632,79 @@ void RefreshInputs()
    SetObjText("UI_S_SL_LOCK",CompactPrice(sStopPrice));
    SetObjText("UI_B_OPP_MONEY",Dbl(bOppMoney,2));
    SetObjText("UI_S_OPP_MONEY",Dbl(sOppMoney,2));
+}
+
+//==========================================================================
+//  AUTO SUPPORT/RESISTANCE
+//==========================================================================
+// Nearest confirmed swing high above `price`, scanning this chart's timeframe.
+// A swing high needs InpSRFractalWidth bars lower on both sides (classic fractal).
+// Returns 0 if none found within InpSRLookbackBars (caller should leave the
+// existing target untouched rather than treat 0 as a real price).
+double FindSwingResistanceAbove(double price)
+{
+   int width=MathMax(1,InpSRFractalWidth);
+   int bars=iBars(_Symbol,_Period);
+   int maxShift=MathMin(InpSRLookbackBars,bars-1-width);
+   double best=0;
+   for(int shift=1+width;shift<=maxShift;shift++)
+   {
+      double h=iHigh(_Symbol,_Period,shift);
+      if(h<=price) continue;
+      bool isSwing=true;
+      for(int k=1;k<=width;k++)
+      {
+         if(iHigh(_Symbol,_Period,shift-k)>=h||iHigh(_Symbol,_Period,shift+k)>=h){ isSwing=false;break; }
+      }
+      if(isSwing&&(best<=0||h<best)) best=h;
+   }
+   return best;
+}
+
+// Nearest confirmed swing low below `price`. Mirror of FindSwingResistanceAbove.
+double FindSwingSupportBelow(double price)
+{
+   int width=MathMax(1,InpSRFractalWidth);
+   int bars=iBars(_Symbol,_Period);
+   int maxShift=MathMin(InpSRLookbackBars,bars-1-width);
+   double best=0;
+   for(int shift=1+width;shift<=maxShift;shift++)
+   {
+      double l=iLow(_Symbol,_Period,shift);
+      if(l>=price) continue;
+      bool isSwing=true;
+      for(int k=1;k<=width;k++)
+      {
+         if(iLow(_Symbol,_Period,shift-k)<=l||iLow(_Symbol,_Period,shift+k)<=l){ isSwing=false;break; }
+      }
+      if(isSwing&&(best<=0||l>best)) best=l;
+   }
+   return best;
+}
+
+// Recomputes Target from swing S/R for one side when its Auto S/R toggle is on.
+// Start is forced to 0 (trade starts at market) per the Auto S/R design.
+// If no swing is found within the lookback, the existing Target is left as-is.
+void ApplyAutoSRSide(bool isBuy)
+{
+   if(isBuy)
+   {
+      if(!bAutoSR) return;
+      double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
+      double r=FindSwingResistanceAbove(bid);
+      bStart=0;
+      if(r>0) bTarget=NormalizeDouble(r,_Digits);
+   }
+   else
+   {
+      if(!sAutoSR) return;
+      double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK);
+      double s=FindSwingSupportBelow(ask);
+      sStart=0;
+      if(s>0) sTarget=NormalizeDouble(s,_Digits);
+   }
+   RefreshInputs();
+   SaveState();
 }
 
 bool SubmitMainLot(int dir)
@@ -2472,7 +2564,7 @@ void CreateInterface()
    ObjButton("UI_MIN",x,y-26,32,22,uiCollapsed?"+":"-",10);
    StyleMinButton();
 
-   int panelH=186+(MathMax(bGapCount,sGapCount)*25);
+   int panelH=211+(MathMax(bGapCount,sGapCount)*25);
    ObjRect("UI_PNLB",x,y,panelW,panelH,C'18,28,44');ObjRect("UI_HDRB",x,y,panelW,28,C'36,89,160');
    ObjLabel("UI_HB",x+10,y+7,"BUY - "+g_AccountName,clrWhite,10,"Arial Bold");
    int lx=x+10,by=y+38;
@@ -2501,6 +2593,8 @@ void CreateInterface()
    ObjLabel("UI_BL1",lx+102,by+3,"Target",C'145,230,145');ObjEdit("UI_B_TARGET_PRICE",lx+146,by,58,20,C'29,41,58');
    ObjButton("UI_B_SUBMIT_SL",lx+214,by-1,54,22,"SL OFF",7,"BUY market-price SL ON/OFF");
    ObjEdit("UI_B_SL_LOCK",lx+274,by,58,20,C'29,41,58');
+   by+=25;
+   ObjButton("UI_B_AUTOSR",lx,by,150,20,"AUTO S/R: OFF",7,"Auto-set Target from swing S/R on this chart's timeframe (recomputed each new bar). Start is forced to 0/market while ON.");
    by+=30;
    ObjLabel("UI_BH1",lx+36,by+3,"Gap/St",C'255,215,0',8,"Arial Bold");
    ObjLabel("UI_BH2",lx+88,by+3,"Lot",C'180,210,235',8,"Arial Bold");
@@ -2548,6 +2642,8 @@ void CreateInterface()
    ObjLabel("UI_SL1",slx+102,sy+3,"Target",C'145,230,145');ObjEdit("UI_S_TARGET_PRICE",slx+146,sy,58,20,C'48,32,36');
    ObjButton("UI_S_SUBMIT_SL",slx+214,sy-1,54,22,"SL OFF",7,"SELL market-price SL ON/OFF");
    ObjEdit("UI_S_SL_LOCK",slx+274,sy,58,20,C'48,32,36');
+   sy+=25;
+   ObjButton("UI_S_AUTOSR",slx,sy,150,20,"AUTO S/R: OFF",7,"Auto-set Target from swing S/R on this chart's timeframe (recomputed each new bar). Start is forced to 0/market while ON.");
    sy+=30;
    ObjLabel("UI_SH1",slx+36,sy+3,"Gap/St",C'255,215,0',8,"Arial Bold");
    ObjLabel("UI_SH2",slx+88,sy+3,"Lot",C'255,185,190',8,"Arial Bold");
@@ -2603,6 +2699,8 @@ void UpdateDisplay()
    SetButton("UI_S_SUBMIT_SL",sStopOn,C'45,150,80',C'75,75,75',sStopOn?"SL ON":"SL OFF");
    SetButton("UI_B_BASKET_ON",bBasketOn,C'45,150,80',C'75,75,75',bBasketOn?"BASK: ON":"BASK: OFF");
    SetButton("UI_S_BASKET_ON",sBasketOn,C'45,150,80',C'75,75,75',sBasketOn?"BASK: ON":"BASK: OFF");
+   SetButton("UI_B_AUTOSR",bAutoSR,C'45,150,80',C'75,75,75',bAutoSR?"AUTO S/R: ON":"AUTO S/R: OFF");
+   SetButton("UI_S_AUTOSR",sAutoSR,C'45,150,80',C'75,75,75',sAutoSR?"AUTO S/R: ON":"AUTO S/R: OFF");
    SetButtonColor("UI_B_RESTART",bBasketOn?(bBasketClosed?C'40,170,75':C'105,90,170'):C'45,45,45',bBasketOn?clrWhite:C'120,120,120',RESTART_BTN_TEXT);
    SetButtonColor("UI_S_RESTART",sBasketOn?(sBasketClosed?C'40,170,75':C'105,90,170'):C'45,45,45',sBasketOn?clrWhite:C'120,120,120',RESTART_BTN_TEXT);
    SetButton("UI_B_OPP_ON",bOppOn,C'35,150,210',C'75,75,75',"B+S");
@@ -2668,6 +2766,42 @@ void UpdateDisplay()
 
 //==========================================================================
 //  EVENTS
+// Testing only: replicates clicking Start on both sides plus turning Auto S/R on,
+// so InpAutoStartForBacktest can drive an unattended (non-visual/optimizer) backtest
+// through the full feature set: gap engine, staircase T/P, and Auto S/R Target.
+// Only ever called from OnInit behind an MQL_TESTER guard - see there.
+void AutoStartForBacktest()
+{
+   if(SyncBuy())
+   {
+      currBuyM++;bOn=true;bPaused=false;ResetBuyRunState();
+      if(bStart<=0){ bStartReached=true;bStartAbove=false; }
+      else
+      {
+         double cur=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_ASK),_Digits);
+         double st=NormalizeDouble(bStart,_Digits);
+         bStartAbove=(st>cur);bStartReached=bStartAbove?(cur>=st):(cur<=st);
+      }
+   }
+   if(SyncSell())
+   {
+      currSellM++;sOn=true;sPaused=false;ResetSellRunState();
+      if(sStart<=0){ sStartReached=true;sStartAbove=false; }
+      else
+      {
+         double cur=NormalizeDouble(SymbolInfoDouble(_Symbol,SYMBOL_BID),_Digits);
+         double st=NormalizeDouble(sStart,_Digits);
+         sStartAbove=(st>cur);sStartReached=sStartAbove?(cur>=st):(cur<=st);
+      }
+   }
+   bAutoSR=true;sAutoSR=true;
+   ApplyAutoSRSide(true);
+   ApplyAutoSRSide(false);
+   SaveState();
+   UpdateDisplay();
+   Print("InpAutoStartForBacktest: BUY on=",bOn," SELL on=",sOn," AutoSR B/S=",bAutoSR,"/",sAutoSR);
+}
+
 //==========================================================================
 int OnInit()
 {
@@ -2690,6 +2824,7 @@ int OnInit()
    SaveState();
    CreateInterface();
    UpdateDisplay();
+   if(InpAutoStartForBacktest&&MQLInfoInteger(MQL_TESTER)) AutoStartForBacktest();
    Print("Pro Scalper Terminal v22 ready. Auto trade removed. Account: ",g_AccountName);
    return INIT_SUCCEEDED;
 }
@@ -2709,6 +2844,16 @@ void OnTick()
 {
    if(!CanTrade()){ UpdateDisplay();return; }
    double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK),bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
+   if(bAutoSR||sAutoSR)
+   {
+      datetime curBar=iTime(_Symbol,_Period,0);
+      if(curBar!=gLastSRBarTime)
+      {
+         gLastSRBarTime=curBar;
+         ApplyAutoSRSide(true);
+         ApplyAutoSRSide(false);
+      }
+   }
    ReconcilePositions();
    CheckMarketStopLoss(ask,bid);
    if(bOn&&!bPaused) ManageBuy(ask,bid);
@@ -2814,6 +2959,22 @@ void OnChartEvent(const int id,const long &lparam,const double &dparam,const str
       sBasketOn=!sBasketOn;
       if(!sBasketOn)sBasketClosed=false;
       SaveState();
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
+   }
+   if(sparam=="UI_B_AUTOSR")
+   {
+      SyncControlInputs();
+      bAutoSR=!bAutoSR;
+      if(bAutoSR) ApplyAutoSRSide(true);
+      else SaveState();
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
+   }
+   if(sparam=="UI_S_AUTOSR")
+   {
+      SyncControlInputs();
+      sAutoSR=!sAutoSR;
+      if(sAutoSR) ApplyAutoSRSide(false);
+      else SaveState();
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
    }
    if(sparam=="UI_B_OPP_ON")
