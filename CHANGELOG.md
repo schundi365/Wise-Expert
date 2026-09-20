@@ -2,6 +2,102 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## ProScalper v22.7 — 2026-09-20
+
+### Added — diagnostic logging for "stuck" backtest runs
+- New `InpVerboseLog` input (default `true`), printing to the Experts/Journal
+  tab: `[BLOCKED]` once if `CanTrade()` is false (EA does nothing at all -
+  usually AutoTrading/"Allow live trading" not enabled for the run);
+  `[HB]` a once-per-bar heartbeat of BUY/SELL on/paused state, bad-close
+  counts, staircase stage, and P1 ticket; `[PAUSE]` the moment the 3-bad-
+  closes safety trips; `[CLOSE]` every position close with profit and the
+  running bad-close tally; `[STAIR]` staircase stage transitions;
+  `[AUTOSR]` each bar's swing-search result per side; `[INIT]` whether
+  `InpAutoStartForBacktest` actually fired.
+- Motivation: a headless/Visual backtest that stops progressing gives no
+  visible reason why - it could be a permanent auto-pause (no auto-resume
+  exists), `CanTrade()` never being true, or the tester itself stalling.
+  These logs let each be told apart from the Journal output alone.
+
+## ProScalper v22.6 — 2026-09-20
+
+### Added — sane defaults for `InpAutoStartForBacktest`, to stop it self-pausing immediately
+- Root cause found via v22.7's logging groundwork: the panel's placeholder
+  defaults (Gap $5, Profit-trigger $1, Lock $0.50, P1 Protect $2/Lock $1)
+  are sized for manual scalping with a human watching. Driven hands-off,
+  spread alone can flip a "locked" close into a loss, and `MAX_REOPEN_DELAY=0`
+  lets the position reopen the same tick - three such losses in a row trips
+  the pre-existing 3-bad-closes auto-pause almost instantly.
+- New inputs, applied only when `InpAutoStartForBacktest` fires (manual/
+  Visual Mode panel use is unaffected): `InpAutoStartGapDollars` (25),
+  `InpAutoStartGapLot` (0.01), `InpAutoStartGapProfitTrig` (15),
+  `InpAutoStartGapLockAmount` (6), `InpAutoStartProtectMoney` (15),
+  `InpAutoStartLockMoney` (6) - pushed into the panel's P2-P4 gap rows and
+  P1 Protect/Lock boxes before `Start` is auto-clicked.
+
+## ProScalper v22.5 — 2026-09-19
+
+### Added — `InpAutoStartForBacktest`: unattended backtest/optimizer support
+- MT5's Strategy Tester only fires chart-click events in Visual Mode; a
+  fast/headless backtest or an Optimizer run never clicks `Start`, so
+  `bOn`/`sOn` stay false and the EA never trades - none of its functionality
+  is exercisable that way as originally built.
+- New `InpAutoStartForBacktest` input (default `false`). When `true`, at
+  `OnInit`, `AutoStartForBacktest()` replicates clicking `Start` on both
+  BUY and SELL and turns Auto S/R on for both sides - gated to
+  `MQLInfoInteger(MQL_TESTER)` regardless of the input's value, so it can
+  never fire on a live/demo chart even if left on by mistake.
+
+## ProScalper v22.4 — 2026-09-19
+
+### Added — Auto S/R Target
+- New per-side "AUTO S/R" panel toggle (`UI_B_AUTOSR`/`UI_S_AUTOSR`, new
+  row under the SL box on each side). When on for a side: `Start` is forced
+  to `0` (immediate market entry) and `Target` auto-recomputes every new
+  bar of the chart's own timeframe from the nearest confirmed swing
+  high/low (classic 5-bar fractal) above/below price - resistance for BUY,
+  support for SELL. If no swing is found within the lookback, the existing
+  Target is left as-is rather than blanked to "unlimited".
+- New inputs: `InpSRLookbackBars` (200, bars scanned) and
+  `InpSRFractalWidth` (2, bars required each side to confirm a swing).
+- Manual typing into Start/Target is ignored for a side while its toggle
+  is on (`SyncBuy`/`SyncSell` keep the auto-computed values instead of
+  reading the textboxes), since it would be overwritten on the next bar
+  anyway.
+- New functions: `FindSwingResistanceAbove`, `FindSwingSupportBelow`,
+  `ApplyAutoSRSide`. State (`bAutoSR`/`sAutoSR`) persists across restarts
+  like the rest of the panel.
+
+## ProScalper v22.3 — 2026-09-19
+
+### Added — second backtest account
+- Whitelisted account `112886848` ("BACKTEST2") in `authAccounts[]`
+  (`CheckAuthorization()`), alongside the `BACKTEST` account added in v22.1.
+
+## ProScalper v22.2 — 2026-09-19
+
+### Added — staircase T/P/S/L for the P1/P2/P3 split order
+- New `InpStaircaseEnabled` input (default `true`) plus five percentage
+  inputs: `InpStairP1TPPct` (3%), `InpStairStage1SLPct`/`TPPct` (2.5%/6%),
+  `InpStairStage2SLPct`/`TPPct` (5%/9%).
+- P1 opens with T/P set to 3% of trade value immediately. Once P1 closes,
+  P2 and P3 (whichever is open) get S/L 2.5%/T/P 6%. Once P2 closes, P3
+  steps up to S/L 5%/T/P 9%. Percentages are real broker-side S/L/T/P price
+  fields - "X% of trade value" reduces mathematically to a price move of
+  exactly X% of entry price, regardless of lot size.
+- For P2/P3 only, this **replaces** the old trailing-lock protection
+  (`TryProtectPosition`/lock-profit-close) - P1 and any further gap levels
+  (P4/P5) are unaffected. Stage state (`bStairStage`/`sStairStage`)
+  persists across restarts.
+- New functions: `StaircasePrice`, `ModifyPositionSLTP`, `ApplyStaircaseLevel`.
+
+## ProScalper v22.1 — 2026-09-19
+
+### Added — first backtest account
+- Whitelisted account `5055445576` ("BACKTEST") in `authAccounts[]` so
+  `CheckAuthorization()` doesn't block backtesting with it (the account
+  list was otherwise a fixed set of specific live/demo logins).
+
 ## WiseTrader EA v2.54 — 2026-09-03
 
 ### Added — F59 aggressive volume-confirmed momentum-breakout entry, OFF by default

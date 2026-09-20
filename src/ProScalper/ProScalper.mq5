@@ -2,8 +2,15 @@
 //| Expert Advisor: Pro Scalper Terminal v22                         |
 //| Manual BUY/SELL scalper with dynamic gaps and mild recovery mode. |
 //| Auto/Athena trade engine removed.                                |
+//|                                                                    |
+//| Sub-version history for changes on top of the v22 baseline - see  |
+//| CHANGELOG.md ("ProScalper") at the repo root for full details.    |
+//| EA_VERSION is printed once at OnInit so a running/backtested      |
+//| instance can always be matched to its changelog entry.            |
 //+------------------------------------------------------------------+
 #property strict
+
+string EA_VERSION="22.7";
 
 input int    InpGap2PullbackWaitSeconds = 30;
 input int    InpGap2PullbackPoints      = 30;
@@ -33,6 +40,22 @@ input int    InpSRFractalWidth = 2;    // Bars required on each side to confirm 
 //  BACKTEST-ONLY AUTO START (never fires outside the Strategy Tester)
 //==========================================================================
 input bool   InpAutoStartForBacktest = false; // Testing only: at OnInit, auto-clicks Start on both sides and turns Auto S/R on, so a headless/optimizer backtest can run unattended. Gated to MQL_TESTER regardless of this flag.
+// The panel's built-in placeholder defaults (Gap $5, Profit-trigger $1, Lock $0.50) are sized for
+// manual scalping with a human watching. Driven hands-off, spread alone can flip a "locked" close
+// into a loss, and MAX_REOPEN_DELAY=0 lets it reopen the same tick - three of those in a row trips
+// the existing 3-bad-closes auto-pause almost immediately. These let you widen them for an
+// unattended run without touching the panel; they only apply when InpAutoStartForBacktest fires.
+input double InpAutoStartGapDollars    = 25.0; // Gap distance ($) per classic level (P2-P4)
+input double InpAutoStartGapLot        = 0.01; // Lot size per classic gap level
+input double InpAutoStartGapProfitTrig = 15.0; // $ profit that arms lock-in for a classic gap level
+input double InpAutoStartGapLockAmount = 6.0;  // $ locked-in profit for a classic gap level
+input double InpAutoStartProtectMoney  = 15.0; // $ profit trigger to start locking P1
+input double InpAutoStartLockMoney     = 6.0;  // $ locked-in profit for P1
+
+//==========================================================================
+//  DIAGNOSTIC LOGGING (Experts/Journal tab)
+//==========================================================================
+input bool   InpVerboseLog = true; // Print a once-per-bar heartbeat plus pause/close/stage/Auto-S/R events, to diagnose a run that stops progressing
 
 //==========================================================================
 //  ACCOUNT AUTHORIZATION
@@ -107,6 +130,7 @@ bool bOppOn=false,sOppOn=false;
 double bOppMoney=1.00,sOppMoney=1.00;
 bool bAutoSR=false,sAutoSR=false;
 datetime gLastSRBarTime=0;
+bool gWarnedCantTrade=false;
 
 ulong  bTicket1=0,sTicket1=0;
 double bEntry1=0,sEntry1=0,bStuck1=0,sStuck1=0;
@@ -1118,12 +1142,18 @@ void PauseBothAfterBadCloses(string reason)
 {
    bPaused=true;sPaused=true;
    SetError("Auto pause: "+reason+". BUY and SELL paused. Trades NOT closed.");
+   if(InpVerboseLog)
+      PrintFormat("[PAUSE] %s | bBadCloses=%d sBadCloses=%d | this is PERMANENT until a manual Pause/Resume click - the run will sit idle from here on in a headless backtest.",
+         reason,bBadCloses,sBadCloses);
 }
 
 void RegisterClosedProfit(bool isBuy,double profit)
 {
    if(isBuy){ if(profit<=0)bBadCloses++; else bBadCloses=0; }
    else     { if(profit<=0)sBadCloses++; else sBadCloses=0; }
+   if(InpVerboseLog)
+      PrintFormat("[CLOSE] %s profit=%.2f -> bBadCloses=%d sBadCloses=%d (limit=%d)",
+         isBuy?"BUY":"SELL",profit,bBadCloses,sBadCloses,BAD_CLOSE_LIMIT);
    if(bBadCloses>=BAD_CLOSE_LIMIT||sBadCloses>=BAD_CLOSE_LIMIT)
       PauseBothAfterBadCloses("3 continued loss/zero-profit closes");
 }
@@ -1150,10 +1180,10 @@ void OnTradeTransaction(const MqlTradeTransaction &trans,
    {
       bool p2BuyClose=(magic==currBuyM&&StringFind(comment,"P2")>=0);
       bool p2SellClose=(magic==currSellM&&StringFind(comment,"P2")>=0);
-      if(mainBuyClose&&bStairStage<1) bStairStage=1;
-      if(mainSellClose&&sStairStage<1) sStairStage=1;
-      if(p2BuyClose&&bStairStage<2) bStairStage=2;
-      if(p2SellClose&&sStairStage<2) sStairStage=2;
+      if(mainBuyClose&&bStairStage<1){ bStairStage=1;if(InpVerboseLog) Print("[STAIR] BUY stage -> 1 (P1 closed)"); }
+      if(mainSellClose&&sStairStage<1){ sStairStage=1;if(InpVerboseLog) Print("[STAIR] SELL stage -> 1 (P1 closed)"); }
+      if(p2BuyClose&&bStairStage<2){ bStairStage=2;if(InpVerboseLog) Print("[STAIR] BUY stage -> 2 (P2 closed)"); }
+      if(p2SellClose&&sStairStage<2){ sStairStage=2;if(InpVerboseLog) Print("[STAIR] SELL stage -> 2 (P2 closed)"); }
    }
    if(reason==DEAL_REASON_SL&&profit>=0)
    {
@@ -1694,6 +1724,7 @@ void ApplyAutoSRSide(bool isBuy)
       double r=FindSwingResistanceAbove(bid);
       bStart=0;
       if(r>0) bTarget=NormalizeDouble(r,_Digits);
+      if(InpVerboseLog) PrintFormat("[AUTOSR] BUY bid=%.2f -> %s bTarget=%.2f",bid,r>0?"found":"none, keeping",bTarget);
    }
    else
    {
@@ -1702,6 +1733,7 @@ void ApplyAutoSRSide(bool isBuy)
       double s=FindSwingSupportBelow(ask);
       sStart=0;
       if(s>0) sTarget=NormalizeDouble(s,_Digits);
+      if(InpVerboseLog) PrintFormat("[AUTOSR] SELL ask=%.2f -> %s sTarget=%.2f",ask,s>0?"found":"none, keeping",sTarget);
    }
    RefreshInputs();
    SaveState();
@@ -2772,6 +2804,21 @@ void UpdateDisplay()
 // Only ever called from OnInit behind an MQL_TESTER guard - see there.
 void AutoStartForBacktest()
 {
+   for(int i=0;i<bGapCount;i++)
+   {
+      if(IsProSIndex(i)) continue;
+      SetGapInputTexts(true,i,InpAutoStartGapDollars,InpAutoStartGapLot,InpAutoStartGapProfitTrig,InpAutoStartGapLockAmount);
+   }
+   for(int i=0;i<sGapCount;i++)
+   {
+      if(IsProSIndex(i)) continue;
+      SetGapInputTexts(false,i,InpAutoStartGapDollars,InpAutoStartGapLot,InpAutoStartGapProfitTrig,InpAutoStartGapLockAmount);
+   }
+   SetObjText("UI_B_PROTECT",Dbl(InpAutoStartProtectMoney,2));
+   SetObjText("UI_B_LOCK",Dbl(InpAutoStartLockMoney,2));
+   SetObjText("UI_S_PROTECT",Dbl(InpAutoStartProtectMoney,2));
+   SetObjText("UI_S_LOCK",Dbl(InpAutoStartLockMoney,2));
+   SyncControlInputs();
    if(SyncBuy())
    {
       currBuyM++;bOn=true;bPaused=false;ResetBuyRunState();
@@ -2824,8 +2871,12 @@ int OnInit()
    SaveState();
    CreateInterface();
    UpdateDisplay();
+   if(InpVerboseLog)
+      PrintFormat("[INIT] tester=%d InpAutoStartForBacktest=%d -> %s",
+         MQLInfoInteger(MQL_TESTER),InpAutoStartForBacktest,
+         (InpAutoStartForBacktest&&MQLInfoInteger(MQL_TESTER))?"will auto-start":"staying idle, click Start manually");
    if(InpAutoStartForBacktest&&MQLInfoInteger(MQL_TESTER)) AutoStartForBacktest();
-   Print("Pro Scalper Terminal v22 ready. Auto trade removed. Account: ",g_AccountName);
+   Print("Pro Scalper Terminal v22 (sub-version ",EA_VERSION,") ready. Auto trade removed. Account: ",g_AccountName,". Changelog: CHANGELOG.md, \"ProScalper\" section.");
    return INIT_SUCCEEDED;
 }
 
@@ -2842,17 +2893,29 @@ void OnDeinit(const int reason)
 
 void OnTick()
 {
-   if(!CanTrade()){ UpdateDisplay();return; }
-   double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK),bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
-   if(bAutoSR||sAutoSR)
+   if(!CanTrade())
    {
-      datetime curBar=iTime(_Symbol,_Period,0);
-      if(curBar!=gLastSRBarTime)
+      if(InpVerboseLog&&!gWarnedCantTrade)
       {
-         gLastSRBarTime=curBar;
-         ApplyAutoSRSide(true);
-         ApplyAutoSRSide(false);
+         gWarnedCantTrade=true;
+         PrintFormat("[BLOCKED] CanTrade() is false - EA will do NOTHING until this clears. TERMINAL_TRADE_ALLOWED=%d MQL_TRADE_ALLOWED=%d ask=%.5f bid=%.5f. Check the tester's AutoTrading/\"Allow live trading\" is enabled for this run.",
+            TerminalInfoInteger(TERMINAL_TRADE_ALLOWED),MQLInfoInteger(MQL_TRADE_ALLOWED),
+            SymbolInfoDouble(_Symbol,SYMBOL_ASK),SymbolInfoDouble(_Symbol,SYMBOL_BID));
       }
+      UpdateDisplay();return;
+   }
+   double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK),bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
+   datetime curBar=iTime(_Symbol,_Period,0);
+   if(curBar!=gLastSRBarTime)
+   {
+      gLastSRBarTime=curBar;
+      if(bAutoSR) ApplyAutoSRSide(true);
+      if(sAutoSR) ApplyAutoSRSide(false);
+      if(InpVerboseLog)
+         PrintFormat("[HB] bar=%s bid=%.2f | BUY on=%d paused=%d bad=%d/%d stage=%d P1=%I64u | SELL on=%d paused=%d bad=%d/%d stage=%d P1=%I64u",
+            TimeToString(curBar,TIME_DATE|TIME_MINUTES),bid,
+            bOn,bPaused,bBadCloses,BAD_CLOSE_LIMIT,bStairStage,bTicket1,
+            sOn,sPaused,sBadCloses,BAD_CLOSE_LIMIT,sStairStage,sTicket1);
    }
    ReconcilePositions();
    CheckMarketStopLoss(ask,bid);
