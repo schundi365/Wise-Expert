@@ -2,6 +2,30 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## ProScalper v22.13 — 2026-09-22
+
+### Changed — Target hit no longer force-closes losing legs
+- Traced V1's remaining realized losses (e.g. two BUY legs closed together at
+  14:30:04 for -$114.92 and -$116.27, comment `CLOSE`) to the Target-hit sweep:
+  `if(bTarget>0&&bid>=bTarget) CloseAllBuyPositions()` is a pure price trigger
+  that closed every position on the side at once, regardless of each leg's own
+  P/L - underwater gap legs and B+S/S+B hedges included. V0 has the identical
+  code but its manual, far Target is rarely touched; V1's Auto S/R Target (nearest
+  swing, recomputed each bar) is touched often, so the sweep fired far more.
+- New `CloseProfitableEnginePositions(dir)`: on Target hit, closes only legs with
+  P/L+swap > 0 and leaves losing legs open to keep riding (pending orders still
+  deleted). Returns how many losing legs remain.
+- If nothing is left open, behavior is unchanged (magic bump + run-state reset +
+  REP re-arm, or stop). If losing legs remain, the magic number is NOT bumped and
+  run state is NOT reset - both would orphan those legs (unmanaged, invisible to
+  every helper). The side keeps running so `ManageBuyLevel`/`ManageSellLevel`
+  keep trailing them to a profit-lock; REP re-arms the next range, REP-off sets
+  Target to 0 (unlimited) instead of stopping the side.
+- Deliberately untouched (closing at a loss IS their purpose): the manual `X`
+  Close button, the `SL` market stop, `BASK` basket close, and the v22.11
+  `MAXLOSS` breaker - all explicit user-armed actions, all off by default except
+  the button.
+
 ## ProScalper v22.12 — 2026-09-22
 
 ### Fixed — P1's old trailing-lock was silently fighting Staircase/Hard-S/L

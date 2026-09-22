@@ -10,7 +10,7 @@
 //+------------------------------------------------------------------+
 #property strict
 
-string EA_VERSION="22.12";
+string EA_VERSION="22.13";
 
 input int    InpGap2PullbackWaitSeconds = 0; // 0 = no wait before P2 opens once armed - maximize trade frequency (was 30)
 input int    InpGap2PullbackPoints      = 0; // 0 = no pullback required for P2's early entry (was 30)
@@ -1875,6 +1875,30 @@ void CloseAllSellPositions()
    }
 }
 
+// Target-hit variant of the two above: close only the legs that are in profit
+// (P/L + swap > 0) and leave losing legs open to keep riding. Returns how many
+// losing legs were left open. V0 never realizes a loss on a Target hit only
+// because its manual Target is rarely touched; V1's Auto S/R Target is touched
+// often, and the unconditional sweep was force-closing underwater gap legs and
+// B+S/S+B hedges at a loss. Pending orders are still removed (they have no P/L).
+int CloseProfitableEnginePositions(int dir)
+{
+   DeleteEAOrders(dir);
+   int remaining=0;
+   for(int i=PositionsTotal()-1;i>=0;i--)
+   {
+      ulong t=PositionGetTicket(i);
+      if(!PositionSelectByTicket(t)||PositionGetString(POSITION_SYMBOL)!=_Symbol) continue;
+      long magic=PositionGetInteger(POSITION_MAGIC);
+      if(dir==1&&!IsBuyEngineMagic(magic)) continue;
+      if(dir==-1&&!IsSellEngineMagic(magic)) continue;
+      double pl=PositionGetDouble(POSITION_PROFIT)+PositionGetDouble(POSITION_SWAP);
+      if(pl>0) ClosePosition(t);
+      else remaining++;
+   }
+   return remaining;
+}
+
 bool IsAbsoluteGapPrice(double value)
 {
    return (InpAbsoluteGapPriceLevel>0&&value>=InpAbsoluteGapPriceLevel);
@@ -2388,14 +2412,28 @@ void ManageBuy(double ask,double bid)
 
    if(bTarget>0&&bid>=bTarget)
    {
-      CloseAllBuyPositions();
-      gLastErrorText="BUY target price reached. All BUY EA positions closed.";
-      if(bRepeat)
+      int left=CloseProfitableEnginePositions(1);
+      double d=MathAbs(bTarget-bStart);
+      if(left==0)
       {
-         currBuyM++;ResetBuyRunState();
-         double d=MathAbs(bTarget-bStart);bStart=bid;bTarget=bStart+d;bStartReached=true;RefreshInputs();
+         gLastErrorText="BUY target price reached. All BUY EA positions closed.";
+         if(bRepeat)
+         {
+            currBuyM++;ResetBuyRunState();
+            bStart=bid;bTarget=bStart+d;bStartReached=true;RefreshInputs();
+         }
+         else{ bOn=false;ResetBuyRunState(); }
       }
-      else{ bOn=false;ResetBuyRunState(); }
+      else
+      {
+         // Losing legs stay open under the SAME magic so ManageBuyLevel keeps
+         // trailing them to a profit-lock. No magic bump / run-state reset here:
+         // that would orphan them (unmanaged, invisible to every helper).
+         gLastErrorText="BUY target reached: profitable legs closed, "+(string)left+" losing leg(s) left open to recover.";
+         if(bRepeat){ bStart=bid;bTarget=bStart+d;bStartReached=true; }
+         else bTarget=0;
+         RefreshInputs();
+      }
       SaveState();return;
    }
 
@@ -2429,14 +2467,25 @@ void ManageSell(double ask,double bid)
 
    if(sTarget>0&&ask<=sTarget)
    {
-      CloseAllSellPositions();
-      gLastErrorText="SELL target price reached. All SELL EA positions closed.";
-      if(sRepeat)
+      int left=CloseProfitableEnginePositions(-1);
+      double d=MathAbs(sStart-sTarget);
+      if(left==0)
       {
-         currSellM++;ResetSellRunState();
-         double d=MathAbs(sStart-sTarget);sStart=ask;sTarget=sStart-d;sStartReached=true;RefreshInputs();
+         gLastErrorText="SELL target price reached. All SELL EA positions closed.";
+         if(sRepeat)
+         {
+            currSellM++;ResetSellRunState();
+            sStart=ask;sTarget=sStart-d;sStartReached=true;RefreshInputs();
+         }
+         else{ sOn=false;ResetSellRunState(); }
       }
-      else{ sOn=false;ResetSellRunState(); }
+      else
+      {
+         gLastErrorText="SELL target reached: profitable legs closed, "+(string)left+" losing leg(s) left open to recover.";
+         if(sRepeat){ sStart=ask;sTarget=sStart-d;sStartReached=true; }
+         else sTarget=0;
+         RefreshInputs();
+      }
       SaveState();return;
    }
 
