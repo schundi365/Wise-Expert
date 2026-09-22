@@ -1,26 +1,28 @@
 ;ProScalper preset: Strategy Tester, FAST/HEADLESS single run, no clicking.
 ;Auto-starts both sides + Auto S/R at OnInit (MQL_TESTER-gated, see v22.5/22.6
 ;in CHANGELOG.md). Logging on since this is one run you'll want to inspect.
-InpGap2PullbackWaitSeconds=30
-InpGap2PullbackPoints=30
+InpGap2PullbackWaitSeconds=0
+InpGap2PullbackPoints=0
 InpGap2StartMatchPoints=100
-InpScalpPullbackWaitSeconds=30
-InpScalpPullbackPoints=30
+InpScalpPullbackWaitSeconds=0
+InpScalpPullbackPoints=0
 InpAbsoluteGapPriceLevel=1000.0
 InpProSTargetOffset=30.0
-InpStaircaseEnabled=true
+InpStaircaseEnabled=false
 InpStairP1TPPct=3.0
 InpStairStage1SLPct=2.5
 InpStairStage1TPPct=6.0
 InpStairStage2SLPct=5.0
 InpStairStage2TPPct=9.0
+InpP1HardSLEnabled=false
+InpP1HardSLPct=2.0
 InpSRLookbackBars=200
 InpSRFractalWidth=2
 InpAutoStartForBacktest=true
-InpAutoStartGapDollars=25.0
-InpAutoStartGapLot=0.01
-InpAutoStartGapProfitTrig=15.0
-InpAutoStartGapLockAmount=6.0
-InpAutoStartProtectMoney=15.0
-InpAutoStartLockMoney=6.0
+InpAutoStartGapDollars=50.0
+InpAutoStartGapLot=0.10
+InpAutoStartGapProfitTrig=10.0
+InpAutoStartGapLockAmount=7.0
+InpAutoStartProtectMoney=20.0
+InpAutoStartLockMoney=10.0
 InpVerboseLog=true

@@ -10,25 +10,43 @@
 //+------------------------------------------------------------------+
 #property strict
 
-string EA_VERSION="22.7";
+string EA_VERSION="22.12";
 
-input int    InpGap2PullbackWaitSeconds = 30;
-input int    InpGap2PullbackPoints      = 30;
+input int    InpGap2PullbackWaitSeconds = 0; // 0 = no wait before P2 opens once armed - maximize trade frequency (was 30)
+input int    InpGap2PullbackPoints      = 0; // 0 = no pullback required for P2's early entry (was 30)
 input int    InpGap2StartMatchPoints    = 100;
-input int    InpScalpPullbackWaitSeconds = 30;
-input int    InpScalpPullbackPoints      = 30;
+input int    InpScalpPullbackWaitSeconds = 0; // 0 = P1 reopens immediately after a win, no wait (was 30)
+input int    InpScalpPullbackPoints      = 0; // 0 = no pullback required before P1 reopens (was 30)
 input double InpAbsoluteGapPriceLevel    = 1000.0;
 input double InpProSTargetOffset         = 30.0;
 
 //==========================================================================
 //  STAIRCASE TP/SL (split order: P1/P2/P3)
 //==========================================================================
-input bool   InpStaircaseEnabled   = true;   // Enable staircase T/P for the P1/P2/P3 split order
+// Default OFF: real order history (account 10012783871, "V0" behavior) showed the
+// plain trailing-lock approach below closing 50 trades at a 98% win rate by just
+// letting a position ride until it drifts profitable, no fixed target. The staircase's
+// bigger fixed 3/6/9% targets fire far less often - the opposite of what's wanted here.
+// Flip true if you want bounded-risk fixed-percentage exits again.
+input bool   InpStaircaseEnabled   = false;  // Enable staircase T/P for the P1/P2/P3 split order
 input double InpStairP1TPPct       = 3.0;    // P1 T/P, % of trade value
 input double InpStairStage1SLPct   = 2.5;    // P2 & P3 S/L after P1 closes, % of trade value
 input double InpStairStage1TPPct   = 6.0;    // P2 & P3 T/P after P1 closes, % of trade value
 input double InpStairStage2SLPct   = 5.0;    // P3 S/L after P2 closes, % of trade value
 input double InpStairStage2TPPct   = 9.0;    // P3 T/P after P2 closes, % of trade value
+
+//==========================================================================
+//  P1 HARD STOP-LOSS
+//==========================================================================
+// Default OFF as of v22.10: this was added after ReportHistory-26023332.csv showed
+// naked P1 positions losing $70-$590 over hours with no S/L. But the same "no S/L,
+// let it ride until profitable" behavior is what account 10012783871's real run used
+// to close 50/50-ish trades at a 98% win rate - a 2% hard S/L stops P1 out on ordinary
+// noise before it gets the chance to drift into that small-profit lock. This is an
+// explicit, informed risk-tolerance choice (floating exposure is accepted as normal
+// here, not something to cap) - flip true if you want the worst-case floor back.
+input bool   InpP1HardSLEnabled = false; // Give P1 a hard S/L immediately on open
+input double InpP1HardSLPct     = 2.0;   // P1 hard S/L, % of trade value (only matters if enabled)
 
 //==========================================================================
 //  AUTO SUPPORT/RESISTANCE (Target price, per side, on this chart's timeframe)
@@ -40,17 +58,20 @@ input int    InpSRFractalWidth = 2;    // Bars required on each side to confirm 
 //  BACKTEST-ONLY AUTO START (never fires outside the Strategy Tester)
 //==========================================================================
 input bool   InpAutoStartForBacktest = false; // Testing only: at OnInit, auto-clicks Start on both sides and turns Auto S/R on, so a headless/optimizer backtest can run unattended. Gated to MQL_TESTER regardless of this flag.
-// The panel's built-in placeholder defaults (Gap $5, Profit-trigger $1, Lock $0.50) are sized for
-// manual scalping with a human watching. Driven hands-off, spread alone can flip a "locked" close
-// into a loss, and MAX_REOPEN_DELAY=0 lets it reopen the same tick - three of those in a row trips
-// the existing 3-bad-closes auto-pause almost immediately. These let you widen them for an
-// unattended run without touching the panel; they only apply when InpAutoStartForBacktest fires.
-input double InpAutoStartGapDollars    = 25.0; // Gap distance ($) per classic level (P2-P4)
-input double InpAutoStartGapLot        = 0.01; // Lot size per classic gap level
-input double InpAutoStartGapProfitTrig = 15.0; // $ profit that arms lock-in for a classic gap level
-input double InpAutoStartGapLockAmount = 6.0;  // $ locked-in profit for a classic gap level
-input double InpAutoStartProtectMoney  = 15.0; // $ profit trigger to start locking P1
-input double InpAutoStartLockMoney     = 6.0;  // $ locked-in profit for P1
+// v22.10 reverted the LIVE panel defaults back to V0's tight $5/$1/$0.50 values (see
+// InpStaircaseEnabled/InpP1HardSLEnabled above), but these auto-start-only ones stay
+// wider on purpose: v22.6 found that tight Lock $ vs spread + MAX_REOPEN_DELAY=0 can
+// flip a "locked" close into a loss and trip the 3-bad-closes auto-pause almost
+// instantly with nobody there to notice - a real risk only for a headless/optimizer
+// run, not live trading where you're watching the panel. They only apply when
+// InpAutoStartForBacktest fires; tune down if you want an unattended run to match
+// the live V0-like cadence exactly, but expect it to auto-pause more readily.
+input double InpAutoStartGapDollars    = 50.0; // Gap distance ($) per classic level (P2-P4)
+input double InpAutoStartGapLot        = 0.10; // Lot size per classic gap level
+input double InpAutoStartGapProfitTrig = 10.0; // $ profit that arms lock-in for a classic gap level
+input double InpAutoStartGapLockAmount = 7.0;  // $ locked-in profit for a classic gap level
+input double InpAutoStartProtectMoney  = 20.0; // $ profit trigger to start locking P1
+input double InpAutoStartLockMoney     = 10.0; // $ locked-in profit for P1
 
 //==========================================================================
 //  DIAGNOSTIC LOGGING (Experts/Journal tab)
@@ -86,15 +107,15 @@ int  MAX_GAPS     = 4;
 int  MAX_REOPEN_DELAY = 0;
 int  BAD_CLOSE_LIMIT  = 3;
 double DEFAULT_GAP_VALUE  = 5.00;
-double DEFAULT_GAP_LOT    = 0.01;
+double DEFAULT_GAP_LOT    = 0.10;
 double DEFAULT_GAP_PROFIT = 1.00;
 double DEFAULT_GAP_LOCK   = 0.50;
 int    PROS_INDEX         = 3;
-string RESTART_BTN_TEXT   = "⭮";
-string BTN_START_TEXT     = "▶";
-string BTN_PAUSE_TEXT     = "Ⅱ";
-string BTN_STOP_TEXT      = "■";
-string BTN_SYNC_TEXT      = "↻";
+string RESTART_BTN_TEXT   = "R";
+string BTN_START_TEXT     = "GO";
+string BTN_PAUSE_TEXT     = "||";
+string BTN_STOP_TEXT      = "X";
+string BTN_SYNC_TEXT      = "SYN";
 long   OSP_MAGIC           = 26090801;
 
 double minLot=0,maxLot=0,lotStep=0;
@@ -104,8 +125,8 @@ string gLastErrorText="";
 //==========================================================================
 //  SESSION STATE
 //==========================================================================
-bool bOn=false,bPaused=false,bRepeat=false,bStartReached=false,bStartAbove=false;
-bool sOn=false,sPaused=false,sRepeat=false,sStartReached=false,sStartAbove=false;
+bool bOn=false,bPaused=false,bRepeat=true,bStartReached=false,bStartAbove=false;
+bool sOn=false,sPaused=false,sRepeat=true,sStartReached=false,sStartAbove=false;
 bool uiCollapsed=false;
 bool ospExpanded=false,ospRunning=false,ospPaused=false;
 bool ospMAEnabled=true,ospRiskEnabled=false,ospSMCEnabled=false;
@@ -117,18 +138,21 @@ datetime ospLastBar=0;
 double ospTarget=1.00,ospQty=0.01,ospWidth=1.00,ospSL=1.00;
 string ospStatus="Ready";
 
-double bStart=0,bTarget=0,bLot1=0.01;
-double sStart=0,sTarget=0,sLot1=0.01;
+double bStart=0,bTarget=0,bLot1=0.10;
+double sStart=0,sTarget=0,sLot1=0.10;
 double bProtectMoney=2.00,sProtectMoney=2.00;
 double bLockMoney=1.00,sLockMoney=1.00;
 double bBasketMoney=100.00,sBasketMoney=100.00;
 bool   bBasketOn=false,sBasketOn=false;
+double bMaxLossMoney=500.00,sMaxLossMoney=500.00;
+bool   bMaxLossOn=false,sMaxLossOn=false;
+bool   bMaxLossHit=false,sMaxLossHit=false;
 double bStopPrice=0,sStopPrice=0;
 bool   bStopOn=false,sStopOn=false;
 bool bBasketClosed=false,sBasketClosed=false;
-bool bOppOn=false,sOppOn=false;
-double bOppMoney=1.00,sOppMoney=1.00;
-bool bAutoSR=false,sAutoSR=false;
+bool bOppOn=true,sOppOn=true;
+double bOppMoney=5.00,sOppMoney=1.00;
+bool bAutoSR=true,sAutoSR=true;
 datetime gLastSRBarTime=0;
 bool gWarnedCantTrade=false;
 
@@ -973,6 +997,32 @@ void CheckBasketClose()
    CheckBasketCloseSide(-1);
 }
 
+// Mirrors CheckBasketCloseSide, on the loss side: once combined floating P/L on a
+// side drops to -maxLossMoney or worse, close everything on that side and stop -
+// same "close and re-enable Restart" behavior as a basket-profit close. Disabled
+// by default (bMaxLossOn/sMaxLossOn=false) - opt-in circuit breaker, not a per-trade
+// stop; floating loss is otherwise fully unbounded by design (see CHANGELOG.md v22.10).
+void CheckMaxFloatLossSide(int dir)
+{
+   bool on=(dir==1?bMaxLossOn:sMaxLossOn);
+   bool hit=(dir==1?bMaxLossHit:sMaxLossHit);
+   double maxLoss=(dir==1?bMaxLossMoney:sMaxLossMoney);
+   if(!on||maxLoss<=0||hit) return;
+   double profit=EABasketProfit(dir);
+   if(profit>-maxLoss) return;
+   CloseAllEAPositions(dir);
+   if(dir==1){ bOn=false;bPaused=false;ResetBuyRunState();bMaxLossHit=true; }
+   else      { sOn=false;sPaused=false;ResetSellRunState();sMaxLossHit=true; }
+   gLastErrorText=(dir==1?"BUY":"SELL")+" max floating loss hit: EA positions closed at "+Dbl(profit,2)+". Restart is enabled.";
+   SaveState();
+}
+
+void CheckMaxFloatLoss()
+{
+   CheckMaxFloatLossSide(1);
+   CheckMaxFloatLossSide(-1);
+}
+
 void ApplyManualSLLock(int dir)
 {
    double stopPrice=(dir==1?bStopPrice:sStopPrice);
@@ -1223,6 +1273,12 @@ void SaveState()
    GlobalVariableSet(GV_PREFIX+"sBasketMoney",sBasketMoney);
    GlobalVariableSet(GV_PREFIX+"bBasketOn",bBasketOn?1:0);
    GlobalVariableSet(GV_PREFIX+"sBasketOn",sBasketOn?1:0);
+   GlobalVariableSet(GV_PREFIX+"bMaxLossMoney",bMaxLossMoney);
+   GlobalVariableSet(GV_PREFIX+"sMaxLossMoney",sMaxLossMoney);
+   GlobalVariableSet(GV_PREFIX+"bMaxLossOn",bMaxLossOn?1:0);
+   GlobalVariableSet(GV_PREFIX+"sMaxLossOn",sMaxLossOn?1:0);
+   GlobalVariableSet(GV_PREFIX+"bMaxLossHit",bMaxLossHit?1:0);
+   GlobalVariableSet(GV_PREFIX+"sMaxLossHit",sMaxLossHit?1:0);
    GlobalVariableSet(GV_PREFIX+"bStopPrice",bStopPrice);
    GlobalVariableSet(GV_PREFIX+"sStopPrice",sStopPrice);
    GlobalVariableSet(GV_PREFIX+"bStopOn",bStopOn?1:0);
@@ -1302,25 +1358,31 @@ void RestoreState()
    sBasketMoney=GlobalVariableCheck(GV_PREFIX+"sBasketMoney")?GlobalVariableGet(GV_PREFIX+"sBasketMoney"):100.00;
    bBasketOn=GlobalVariableCheck(GV_PREFIX+"bBasketOn")&&GlobalVariableGet(GV_PREFIX+"bBasketOn")>0.5;
    sBasketOn=GlobalVariableCheck(GV_PREFIX+"sBasketOn")&&GlobalVariableGet(GV_PREFIX+"sBasketOn")>0.5;
+   bMaxLossMoney=GlobalVariableCheck(GV_PREFIX+"bMaxLossMoney")?GlobalVariableGet(GV_PREFIX+"bMaxLossMoney"):500.00;
+   sMaxLossMoney=GlobalVariableCheck(GV_PREFIX+"sMaxLossMoney")?GlobalVariableGet(GV_PREFIX+"sMaxLossMoney"):500.00;
+   bMaxLossOn=GlobalVariableCheck(GV_PREFIX+"bMaxLossOn")&&GlobalVariableGet(GV_PREFIX+"bMaxLossOn")>0.5;
+   sMaxLossOn=GlobalVariableCheck(GV_PREFIX+"sMaxLossOn")&&GlobalVariableGet(GV_PREFIX+"sMaxLossOn")>0.5;
+   bMaxLossHit=GlobalVariableCheck(GV_PREFIX+"bMaxLossHit")&&GlobalVariableGet(GV_PREFIX+"bMaxLossHit")>0.5;
+   sMaxLossHit=GlobalVariableCheck(GV_PREFIX+"sMaxLossHit")&&GlobalVariableGet(GV_PREFIX+"sMaxLossHit")>0.5;
    bStopPrice=GlobalVariableCheck(GV_PREFIX+"bStopPrice")?GlobalVariableGet(GV_PREFIX+"bStopPrice"):0;
    sStopPrice=GlobalVariableCheck(GV_PREFIX+"sStopPrice")?GlobalVariableGet(GV_PREFIX+"sStopPrice"):0;
    bStopOn=GlobalVariableCheck(GV_PREFIX+"bStopOn")&&GlobalVariableGet(GV_PREFIX+"bStopOn")>0.5;
    sStopOn=GlobalVariableCheck(GV_PREFIX+"sStopOn")&&GlobalVariableGet(GV_PREFIX+"sStopOn")>0.5;
    bBasketClosed=GlobalVariableCheck(GV_PREFIX+"bBasketClosed")&&GlobalVariableGet(GV_PREFIX+"bBasketClosed")>0.5;
    sBasketClosed=GlobalVariableCheck(GV_PREFIX+"sBasketClosed")&&GlobalVariableGet(GV_PREFIX+"sBasketClosed")>0.5;
-   bOppOn=GlobalVariableCheck(GV_PREFIX+"bOppOn")&&GlobalVariableGet(GV_PREFIX+"bOppOn")>0.5;
-   sOppOn=GlobalVariableCheck(GV_PREFIX+"sOppOn")&&GlobalVariableGet(GV_PREFIX+"sOppOn")>0.5;
-   bOppMoney=GlobalVariableCheck(GV_PREFIX+"bOppMoney")?GlobalVariableGet(GV_PREFIX+"bOppMoney"):1.00;
+   bOppOn=GlobalVariableCheck(GV_PREFIX+"bOppOn")?GlobalVariableGet(GV_PREFIX+"bOppOn")>0.5:true;
+   sOppOn=GlobalVariableCheck(GV_PREFIX+"sOppOn")?GlobalVariableGet(GV_PREFIX+"sOppOn")>0.5:true;
+   bOppMoney=GlobalVariableCheck(GV_PREFIX+"bOppMoney")?GlobalVariableGet(GV_PREFIX+"bOppMoney"):5.00;
    sOppMoney=GlobalVariableCheck(GV_PREFIX+"sOppMoney")?GlobalVariableGet(GV_PREFIX+"sOppMoney"):1.00;
-   bAutoSR=GlobalVariableCheck(GV_PREFIX+"bAutoSR")&&GlobalVariableGet(GV_PREFIX+"bAutoSR")>0.5;
-   sAutoSR=GlobalVariableCheck(GV_PREFIX+"sAutoSR")&&GlobalVariableGet(GV_PREFIX+"sAutoSR")>0.5;
+   bAutoSR=GlobalVariableCheck(GV_PREFIX+"bAutoSR")?GlobalVariableGet(GV_PREFIX+"bAutoSR")>0.5:true;
+   sAutoSR=GlobalVariableCheck(GV_PREFIX+"sAutoSR")?GlobalVariableGet(GV_PREFIX+"sAutoSR")>0.5:true;
 
    bOn=GlobalVariableGet(GV_PREFIX+"bOn")>0.5;bPaused=GlobalVariableGet(GV_PREFIX+"bPaused")>0.5;
-   bRepeat=GlobalVariableGet(GV_PREFIX+"bRepeat")>0.5;
+   bRepeat=GlobalVariableCheck(GV_PREFIX+"bRepeat")?GlobalVariableGet(GV_PREFIX+"bRepeat")>0.5:true;
    bStartReached=GlobalVariableCheck(GV_PREFIX+"bStartReached")&&GlobalVariableGet(GV_PREFIX+"bStartReached")>0.5;
    bStartAbove=GlobalVariableCheck(GV_PREFIX+"bStartAbove")&&GlobalVariableGet(GV_PREFIX+"bStartAbove")>0.5;
    bStart=GlobalVariableGet(GV_PREFIX+"bStart");bTarget=GlobalVariableGet(GV_PREFIX+"bTarget");
-   bLot1=GlobalVariableGet(GV_PREFIX+"bLot1");
+   bLot1=GlobalVariableCheck(GV_PREFIX+"bLot1")?GlobalVariableGet(GV_PREFIX+"bLot1"):0.10;
    bBadCloses=(int)GlobalVariableGet(GV_PREFIX+"bBadCloses");
    bStairStage=GlobalVariableCheck(GV_PREFIX+"bStairStage")?(int)GlobalVariableGet(GV_PREFIX+"bStairStage"):0;
    bStuck1=GlobalVariableCheck(GV_PREFIX+"bStuck1")?GlobalVariableGet(GV_PREFIX+"bStuck1"):0;
@@ -1331,11 +1393,11 @@ void RestoreState()
    bGap2PullbackStart=GlobalVariableCheck(GV_PREFIX+"bGap2PBStart")?(datetime)GlobalVariableGet(GV_PREFIX+"bGap2PBStart"):0;
 
    sOn=GlobalVariableGet(GV_PREFIX+"sOn")>0.5;sPaused=GlobalVariableGet(GV_PREFIX+"sPaused")>0.5;
-   sRepeat=GlobalVariableGet(GV_PREFIX+"sRepeat")>0.5;
+   sRepeat=GlobalVariableCheck(GV_PREFIX+"sRepeat")?GlobalVariableGet(GV_PREFIX+"sRepeat")>0.5:true;
    sStartReached=GlobalVariableCheck(GV_PREFIX+"sStartReached")&&GlobalVariableGet(GV_PREFIX+"sStartReached")>0.5;
    sStartAbove=GlobalVariableCheck(GV_PREFIX+"sStartAbove")&&GlobalVariableGet(GV_PREFIX+"sStartAbove")>0.5;
    sStart=GlobalVariableGet(GV_PREFIX+"sStart");sTarget=GlobalVariableGet(GV_PREFIX+"sTarget");
-   sLot1=GlobalVariableGet(GV_PREFIX+"sLot1");
+   sLot1=GlobalVariableCheck(GV_PREFIX+"sLot1")?GlobalVariableGet(GV_PREFIX+"sLot1"):0.10;
    sBadCloses=(int)GlobalVariableGet(GV_PREFIX+"sBadCloses");
    sStairStage=GlobalVariableCheck(GV_PREFIX+"sStairStage")?(int)GlobalVariableGet(GV_PREFIX+"sStairStage"):0;
    sStuck1=GlobalVariableCheck(GV_PREFIX+"sStuck1")?GlobalVariableGet(GV_PREFIX+"sStuck1"):0;
@@ -1620,6 +1682,8 @@ bool SyncControlInputs()
    if(ObjectFind(0,"UI_S_LOCK")>=0){ double v=ObjNum("UI_S_LOCK"); if(v>0)sLockMoney=v; }
    if(ObjectFind(0,"UI_B_BASKET")>=0){ double v=ObjNum("UI_B_BASKET"); if(v>=0)bBasketMoney=v; }
    if(ObjectFind(0,"UI_S_BASKET")>=0){ double v=ObjNum("UI_S_BASKET"); if(v>=0)sBasketMoney=v; }
+   if(ObjectFind(0,"UI_B_MAXLOSS")>=0){ double v=ObjNum("UI_B_MAXLOSS"); if(v>=0)bMaxLossMoney=v; }
+   if(ObjectFind(0,"UI_S_MAXLOSS")>=0){ double v=ObjNum("UI_S_MAXLOSS"); if(v>=0)sMaxLossMoney=v; }
    if(ObjectFind(0,"UI_B_SL_LOCK")>=0){ double v=ObjNum("UI_B_SL_LOCK"); if(v>=0)bStopPrice=v; }
    if(ObjectFind(0,"UI_S_SL_LOCK")>=0){ double v=ObjNum("UI_S_SL_LOCK"); if(v>=0)sStopPrice=v; }
    if(ObjectFind(0,"UI_B_OPP_MONEY")>=0){ double v=ObjNum("UI_B_OPP_MONEY"); if(v>0)bOppMoney=v; }
@@ -1658,6 +1722,8 @@ void RefreshInputs()
    SetObjText("UI_S_LOCK",Dbl(sLockMoney,2));
    SetObjText("UI_B_BASKET",Dbl(bBasketMoney,2));
    SetObjText("UI_S_BASKET",Dbl(sBasketMoney,2));
+   SetObjText("UI_B_MAXLOSS",Dbl(bMaxLossMoney,2));
+   SetObjText("UI_S_MAXLOSS",Dbl(sMaxLossMoney,2));
    SetObjText("UI_B_SL_LOCK",CompactPrice(bStopPrice));
    SetObjText("UI_S_SL_LOCK",CompactPrice(sStopPrice));
    SetObjText("UI_B_OPP_MONEY",Dbl(bOppMoney,2));
@@ -1941,7 +2007,11 @@ bool OpenMainScalpNow(int dir,double ask,double bid)
          bTicket1=t;bEntry1=ask;bScalp1++;
          bScalpPullbackActive=false;bScalpPullbackStart=0;bScalpPullbackRef=0;
          bStairStage=0;
-         if(InpStaircaseEnabled) ModifyPositionSLTP(t,0,StaircasePrice(true,ask,InpStairP1TPPct,true));
+         {
+            double p1TP=InpStaircaseEnabled?StaircasePrice(true,ask,InpStairP1TPPct,true):0;
+            double p1SL=InpP1HardSLEnabled?StaircasePrice(true,ask,InpP1HardSLPct,false):0;
+            if(p1TP>0||p1SL>0) ModifyPositionSLTP(t,p1SL,p1TP);
+         }
          SaveState();
          return true;
       }
@@ -1954,7 +2024,11 @@ bool OpenMainScalpNow(int dir,double ask,double bid)
       sTicket1=t;sEntry1=bid;sScalp1++;
       sScalpPullbackActive=false;sScalpPullbackStart=0;sScalpPullbackRef=0;
       sStairStage=0;
-      if(InpStaircaseEnabled) ModifyPositionSLTP(t,0,StaircasePrice(false,bid,InpStairP1TPPct,true));
+      {
+         double sP1TP=InpStaircaseEnabled?StaircasePrice(false,bid,InpStairP1TPPct,true):0;
+         double sP1SL=InpP1HardSLEnabled?StaircasePrice(false,bid,InpP1HardSLPct,false):0;
+         if(sP1TP>0||sP1SL>0) ModifyPositionSLTP(t,sP1SL,sP1TP);
+      }
       SaveState();
       return true;
    }
@@ -2157,7 +2231,13 @@ void ManageBuyLevel(int level,double ask,double bid,datetime now)
             double ng=PriceGap(bGap[0]);
             if(ng>0&&ask<=bEntry1-ng){ bStuck1=bEntry1; SaveState(); }
          }
-         TryProtectPosition(t,bProtectMoney,bLockMoney);
+         // While staircase/hard-SL manage P1, its S/L and T/P are the fixed prices set
+         // once at open - this money-based trailing-lock must NOT also run on top: it
+         // was dragging the S/L up to a tiny locked profit on the very first profitable
+         // tick, so P1 never got the chance to reach its 3% T/P, while a P1 that never
+         // turned profitable still rode the full hard S/L down. That mismatch (small
+         // wins, full-sized losses) is exactly what made the real live run lose money.
+         if(!InpStaircaseEnabled&&!InpP1HardSLEnabled) TryProtectPosition(t,bProtectMoney,bLockMoney);
       }
       if(!hasMain) TryScalpPullbackEntry(1,ask,bid,now);
       return;
@@ -2234,7 +2314,7 @@ void ManageSellLevel(int level,double ask,double bid,datetime now)
             double ng=PriceGap(sGap[0]);
             if(ng>0&&bid>=sEntry1+ng){ sStuck1=sEntry1; SaveState(); }
          }
-         TryProtectPosition(t,sProtectMoney,sLockMoney);
+         if(!InpStaircaseEnabled&&!InpP1HardSLEnabled) TryProtectPosition(t,sProtectMoney,sLockMoney);
       }
       if(!hasMain) TryScalpPullbackEntry(-1,ask,bid,now);
       return;
@@ -2596,7 +2676,7 @@ void CreateInterface()
    ObjButton("UI_MIN",x,y-26,32,22,uiCollapsed?"+":"-",10);
    StyleMinButton();
 
-   int panelH=211+(MathMax(bGapCount,sGapCount)*25);
+   int panelH=236+(MathMax(bGapCount,sGapCount)*25);
    ObjRect("UI_PNLB",x,y,panelW,panelH,C'18,28,44');ObjRect("UI_HDRB",x,y,panelW,28,C'36,89,160');
    ObjLabel("UI_HB",x+10,y+7,"BUY - "+g_AccountName,clrWhite,10,"Arial Bold");
    int lx=x+10,by=y+38;
@@ -2620,6 +2700,9 @@ void CreateInterface()
    ObjEdit("UI_B_BASKET",lx+108,by,58,20,C'29,41,58');
    ObjButton("UI_B_RESTART",lx+172,by-1,36,22,RESTART_BTN_TEXT,12,"Restart BUY from market");
    ObjLabel("UI_BSTAT",lx+216,by+4,"",C'0,255,127',9,"Arial Bold");
+   by+=25;
+   ObjButton("UI_B_MAXLOSS_ON",lx,by-1,90,22,"MAXLOSS: OFF",7,"Max floating loss circuit breaker ON/OFF. Closes all BUY EA positions if combined floating P/L drops to -this many $. Disabled by default - floating loss is otherwise unbounded.");
+   ObjEdit("UI_B_MAXLOSS",lx+94,by,58,20,C'29,41,58');
    by+=29;
    ObjLabel("UI_BL0",lx,by+3,"Start",C'130,200,255');ObjEdit("UI_B_START_PRICE",lx+36,by,58,20,C'29,41,58');
    ObjLabel("UI_BL1",lx+102,by+3,"Target",C'145,230,145');ObjEdit("UI_B_TARGET_PRICE",lx+146,by,58,20,C'29,41,58');
@@ -2669,6 +2752,9 @@ void CreateInterface()
    ObjEdit("UI_S_BASKET",slx+108,sy,58,20,C'48,32,36');
    ObjButton("UI_S_RESTART",slx+172,sy-1,36,22,RESTART_BTN_TEXT,12,"Restart SELL from market");
    ObjLabel("UI_SSTAT",slx+216,sy+4,"",C'255,80,50',9,"Arial Bold");
+   sy+=25;
+   ObjButton("UI_S_MAXLOSS_ON",slx,sy-1,90,22,"MAXLOSS: OFF",7,"Max floating loss circuit breaker ON/OFF. Closes all SELL EA positions if combined floating P/L drops to -this many $. Disabled by default - floating loss is otherwise unbounded.");
+   ObjEdit("UI_S_MAXLOSS",slx+94,sy,58,20,C'48,32,36');
    sy+=29;
    ObjLabel("UI_SL0",slx,sy+3,"Start",C'255,185,190');ObjEdit("UI_S_START_PRICE",slx+36,sy,58,20,C'48,32,36');
    ObjLabel("UI_SL1",slx+102,sy+3,"Target",C'145,230,145');ObjEdit("UI_S_TARGET_PRICE",slx+146,sy,58,20,C'48,32,36');
@@ -2731,6 +2817,8 @@ void UpdateDisplay()
    SetButton("UI_S_SUBMIT_SL",sStopOn,C'45,150,80',C'75,75,75',sStopOn?"SL ON":"SL OFF");
    SetButton("UI_B_BASKET_ON",bBasketOn,C'45,150,80',C'75,75,75',bBasketOn?"BASK: ON":"BASK: OFF");
    SetButton("UI_S_BASKET_ON",sBasketOn,C'45,150,80',C'75,75,75',sBasketOn?"BASK: ON":"BASK: OFF");
+   SetButton("UI_B_MAXLOSS_ON",bMaxLossOn,C'190,60,60',C'75,75,75',bMaxLossOn?"MAXLOSS: ON":"MAXLOSS: OFF");
+   SetButton("UI_S_MAXLOSS_ON",sMaxLossOn,C'190,60,60',C'75,75,75',sMaxLossOn?"MAXLOSS: ON":"MAXLOSS: OFF");
    SetButton("UI_B_AUTOSR",bAutoSR,C'45,150,80',C'75,75,75',bAutoSR?"AUTO S/R: ON":"AUTO S/R: OFF");
    SetButton("UI_S_AUTOSR",sAutoSR,C'45,150,80',C'75,75,75',sAutoSR?"AUTO S/R: ON":"AUTO S/R: OFF");
    SetButtonColor("UI_B_RESTART",bBasketOn?(bBasketClosed?C'40,170,75':C'105,90,170'):C'45,45,45',bBasketOn?clrWhite:C'120,120,120',RESTART_BTN_TEXT);
@@ -2924,6 +3012,7 @@ void OnTick()
    OSPManage();
    ManageOppositeScalps();
    CheckBasketClose();
+   CheckMaxFloatLoss();
    UpdateDisplay();
 }
 
@@ -2936,7 +3025,7 @@ void OnChartEvent(const int id,const long &lparam,const double &dparam,const str
       if(StringFind(sparam,"UI_S_")==0) SyncSell();
       if(sparam=="UI_B_PROTECT"||sparam=="UI_S_PROTECT"||sparam=="UI_B_LOCK"||sparam=="UI_S_LOCK"||
          sparam=="UI_B_BASKET"||sparam=="UI_S_BASKET"||sparam=="UI_B_SL_LOCK"||sparam=="UI_S_SL_LOCK"||
-         sparam=="UI_B_OPP_MONEY"||sparam=="UI_S_OPP_MONEY")
+         sparam=="UI_B_OPP_MONEY"||sparam=="UI_S_OPP_MONEY"||sparam=="UI_B_MAXLOSS"||sparam=="UI_S_MAXLOSS")
          SyncControlInputs();
       UpdateDisplay();
       return;
@@ -3000,12 +3089,12 @@ void OnChartEvent(const int id,const long &lparam,const double &dparam,const str
    }
    if(sparam=="UI_B_RESTART")
    {
-      if(bBasketOn) RestartSideFromMarket(1);
+      if(bBasketOn||bMaxLossOn){ RestartSideFromMarket(1);bMaxLossHit=false; }
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
    }
    if(sparam=="UI_S_RESTART")
    {
-      if(sBasketOn) RestartSideFromMarket(-1);
+      if(sBasketOn||sMaxLossOn){ RestartSideFromMarket(-1);sMaxLossHit=false; }
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
    }
    if(sparam=="UI_B_BASKET_ON")
@@ -3021,6 +3110,22 @@ void OnChartEvent(const int id,const long &lparam,const double &dparam,const str
       SyncControlInputs();
       sBasketOn=!sBasketOn;
       if(!sBasketOn)sBasketClosed=false;
+      SaveState();
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
+   }
+   if(sparam=="UI_B_MAXLOSS_ON")
+   {
+      SyncControlInputs();
+      bMaxLossOn=!bMaxLossOn;
+      if(!bMaxLossOn)bMaxLossHit=false;
+      SaveState();
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
+   }
+   if(sparam=="UI_S_MAXLOSS_ON")
+   {
+      SyncControlInputs();
+      sMaxLossOn=!sMaxLossOn;
+      if(!sMaxLossOn)sMaxLossHit=false;
       SaveState();
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
    }

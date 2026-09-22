@@ -2,6 +2,113 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## ProScalper v22.12 — 2026-09-22
+
+### Fixed — P1's old trailing-lock was silently fighting Staircase/Hard-S/L
+- Root cause of why v22.2/v22.8 underperformed in real trading (see v22.10): the
+  `TryProtectPosition(t,bProtectMoney,bLockMoney)` call in `ManageBuyLevel`/
+  `ManageSellLevel`'s level-1 (P1) branch ran **unconditionally, every tick**,
+  regardless of `InpStaircaseEnabled`/`InpP1HardSLEnabled`. The moment P1 ticked
+  into any profit at all, it either candle-locked or `Prot`/`Lock`-locked the S/L to
+  a razor-thin level - dragging the stop up long before P1 could ever reach its
+  fixed 3% T/P, while a P1 that never turned profitable still rode the full hard
+  S/L down. Small wins, full-sized losses - exactly the pattern in the real
+  -$613.06 run. P2/P3 never had this bug (`ApplyStaircaseLevel` already fully
+  replaces their old management); only P1's own call site was missed.
+- Fix: `TryProtectPosition` on P1 now only runs when **both** `InpStaircaseEnabled`
+  and `InpP1HardSLEnabled` are off - i.e. only in the original/legacy mode. With
+  either one on, P1's fixed S/L/T/P (set once at open) is left alone to actually
+  run to target, exactly as designed.
+
+## ProScalper v22.11 — 2026-09-22
+
+### Added — optional max floating loss circuit breaker, disabled by default
+- New panel row per side: `MAXLOSS: ON/OFF` toggle + $ field (mirrors the existing
+  `BASK` basket-profit-close row, but on the loss side). When on, if combined
+  floating P/L on that side drops to `-`(the $ field) or worse, every EA position on
+  that side is closed and the side stops - same "closed, Restart re-enabled" pattern
+  as a basket close. New functions `CheckMaxFloatLossSide`/`CheckMaxFloatLoss` (called
+  from `OnTick` alongside `CheckBasketClose`), state `bMaxLossOn`/`bMaxLossMoney`/
+  `bMaxLossHit` (+ SELL-side equivalents), persisted like the rest of the panel.
+- **Off by default** (`bMaxLossOn=false`), per explicit instruction - v22.10 (below)
+  intentionally removed the last per-trade S/L, so this is the only backstop available
+  if a floating loss ever exceeds what's actually tolerable, but it's opt-in, not
+  forced. Default threshold $500 when enabled.
+
+## ProScalper v22.10 — 2026-09-22
+
+### Changed — reverted to V0's proven trailing-lock behavior (no per-trade S/L)
+- Real order history comparison: the original EA (no S/L, `TryProtectPosition`
+  trailing-lock only) closed 50 trades at a 98% win rate and +$332.08 net. The v22.2/
+  v22.8 staircase + P1 hard S/L, running live on account 112886848, closed 554 trades
+  at -$613.06 net (profit factor 0.77, avg loss -$14.41 vs avg win $5.67) - the fixed
+  2-9% stops let losses run ~2.5x bigger than the wins despite a 66% win rate. Confirmed
+  the hard S/L was actively making results worse, not better, for this trading style.
+- `InpStaircaseEnabled` default `true`→**`false`**, `InpP1HardSLEnabled` default
+  `true`→**`false`** - P1/P2/P3 fully revert to the original trailing-lock exits.
+  Both inputs still exist and work if flipped back on.
+- `InpScalpPullbackWaitSeconds`/`Points` and `InpGap2PullbackWaitSeconds`/`Points`
+  default `30`→**`0`** - P1/P2 reopen immediately with no wait, for higher trade
+  frequency (explicitly requested: "frequency of opening more trades is what needed").
+- Reverted to V0's original money defaults: `Prot` $20→**$2**, `Lock` $10→**$1**,
+  gap-level Profit-trigger $10→**$1**, Lock $7→**$0.50**, Gap distance (P2-P4 arm
+  spacing) $50→**$5**. Lot stays 0.10 (sizing, not behavior/frequency, left alone).
+- `InpAutoStartGapDollars`/`Lot`/`ProfitTrig`/`LockAmount`/`ProtectMoney`/`LockMoney`
+  (auto-start-only, Tester-gated) deliberately **left wider** - v22.6 found tight Lock $
+  vs spread + `MAX_REOPEN_DELAY=0` can trip the 3-bad-closes auto-pause almost instantly
+  with nobody watching, a risk specific to unattended runs, not live trading.
+- Explicit, informed choice: floating exposure is accepted as normal for this trading
+  style (not something to cap at the individual-trade level) - see v22.11's opt-in
+  max-floating-loss circuit breaker for the backstop that replaces the removed hard S/L.
+
+## ProScalper v22.9 — 2026-09-21
+
+### Changed — panel and auto-start defaults now match a live-tested setup
+- Replaced the original placeholder defaults with values taken directly from a
+  running live/demo panel (account BACKTEST2) after real testing: Lot 0.01→0.10,
+  Prot $2→$20, Lock $1→$10, classic Gap distance $5→$50, per-level Lot
+  0.01→0.10, Profit-trigger $1→$10, Lock $0.50→$7, B+S/S+B opposite-side
+  helper OFF→ON (Opp $5 on BUY, $1 on SELL - asymmetric in the source panel,
+  kept as-is), REP OFF→ON, AUTO S/R OFF→ON on both sides.
+- `InpAutoStartGapDollars/Lot/ProfitTrig/LockAmount` and
+  `InpAutoStartProtectMoney/LockMoney` (v22.6) updated to the same values, so a
+  headless/optimizer run and the live panel now start from the same baseline
+  instead of two different sets of numbers.
+- Fixed three `RestoreState()` fallbacks (`bOppOn`/`sOppOn`, `bAutoSR`/`sAutoSR`,
+  `bRepeat`/`sRepeat`, `bLot1`/`sLot1`) that used a pattern
+  (`GlobalVariableCheck(...) && GlobalVariableGet(...)>0.5`) which silently
+  defaulted to `false`/`0` on a truly fresh attach (no saved GlobalVariables)
+  regardless of the inline declaration's default - they now honor the same
+  default consistently whether or not prior state exists.
+- Start/Target and the individual Gap-table price levels are not `input`
+  parameters (they're panel/GlobalVariable state, or auto-computed while Auto
+  S/R is on) and were left alone - the screenshot's Target ~8724 in particular
+  looked like a stale/anomalous Auto S/R swing pick from the backtest's
+  historical data, not something to hardcode.
+
+## ProScalper v22.8 — 2026-09-21
+
+### Added — hard stop-loss for P1
+- Root cause of "orders closing in loss with no S/L set" (confirmed against
+  `ReportHistory-26023332.csv`: several P1-shaped positions with a blank S/L
+  column lost $70-$590 over hours before finally being closed): P1 opened with
+  **no stop-loss at all** - `TryProtectPosition` only ever moves a stop once
+  profit reaches Prot; a P1 that never turns profitable sat fully exposed
+  indefinitely. A second, unrelated mechanism was also found in the same
+  report - manual/terminal "Close By" hedge netting, which nets opposite
+  positions at their entry-price gap regardless of either one's own S/L; that
+  one isn't fixable in the EA since it's never triggered by the EA's own code
+  (confirmed via grep - no `CLOSE_BY` reference anywhere in `ProScalper.mq5`).
+- New inputs: `InpP1HardSLEnabled` (default `true`), `InpP1HardSLPct` (default
+  `2.0`). P1 now gets a real broker-side S/L the moment it opens, at
+  `entry ∓ 2%` (same "% of trade value = % of entry price" math as the
+  staircase). The existing profit-lock still runs on top and will tighten the
+  stop once price moves favorably; it never touches the T/P.
+- Known, deliberately not fixed here: the identical "no S/L until profitable"
+  gap still exists on P4 (the one classic gap level outside the staircase) and
+  P5/ProS (profit-only close, no S/L ever), and P2/P3 have no S/L/T/P at all
+  while P1 is still open (staircase stage 0).
+
 ## ProScalper v22.7 — 2026-09-20
 
 ### Added — diagnostic logging for "stuck" backtest runs
