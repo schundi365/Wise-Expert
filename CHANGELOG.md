@@ -2,6 +2,55 @@
 
 All notable changes to the Wise Trader components. Newest first.
 
+## ProScalper v22.15 — 2026-09-23
+
+### Added — per-side Auto S/R scan timeframe (CHART/M5/M15/M30/H1/H4)
+- Auto S/R previously always scanned `_Period`, so the Target was only ever the
+  nearest swing on whatever chart the EA happened to sit on. Side-by-side panels
+  showed why that matters: V1 on M30 had Target 4324.2 (~6 from price) against
+  V0's manual 4400 (~82), so V1's range re-armed constantly and kept opening
+  fresh P1 longs into a downtrend - 4 stacked underwater buys vs V0's 2, and
+  -1,057 floating vs -459.
+- New `S/R:` button beside each AUTO S/R toggle cycles
+  `CHART -> M5 -> M15 -> M30 -> H1 -> H4`, per side. Higher timeframe = swings
+  further apart = Target further out = range re-arms far less often.
+- `FindSwingResistanceAbove`/`FindSwingSupportBelow` now take the timeframe as a
+  parameter; `SRScanTimeframe()` resolves `CHART` to `_Period` at scan time. If
+  the chosen timeframe has no history loaded yet, `iBars` returns 0, the scan
+  finds nothing and the existing Target is left untouched (same safe path as
+  "no swing found").
+- New `InpSRTimeframe` input (default `PERIOD_CURRENT`) sets the starting value.
+  It is seeded before `RestoreState`'s early return so it still applies on a
+  first, never-run-before attach; after that the panel button owns it and the
+  choice persists in GlobalVariables per side.
+- Changing the timeframe re-targets immediately rather than waiting for the next
+  bar. The button greys out while that side's Auto S/R is off.
+- `[AUTOSR]` log lines now include the timeframe used.
+
+## ProScalper v22.14 — 2026-09-23
+
+### Fixed — Auto S/R + REP re-arm produced an unreachable Target (~2x price / 0)
+- Reported from the panel: BUY Start 4343.96, Target **8687.92** - exactly 2x the
+  Start price - with SELL showing Target 0 / UNLIMITED. Both sides' Targets were
+  effectively dead.
+- Cause: the REP re-arm after a Target hit shifted the range forward by its own
+  width, `d = |Target - Start|; Start = price; Target = Start +/- d`, which
+  assumes Start is the real bottom/top of a price range. Auto S/R deliberately
+  sets `Start = 0` ("start at market"), so `d` became the entire price
+  (|4343.96 - 0|) and the new Target landed at `bid + 4343.96 = 8687.92` on BUY,
+  and `ask - 4342 ~ 0` on SELL. An earlier screenshot showed the same signature
+  (price ~4362, Target 8724.95), so this predates v22.13 - it has been silently
+  disabling the Target on every REP cycle since Auto S/R was added in v22.4.
+- Fix: new `ReArmBuyRange`/`ReArmSellRange` decide by Target ownership - Auto S/R
+  on recomputes from swing S/R via `ApplyAutoSRSide` (and falls back to 0 /
+  unlimited if no confirmed swing is above/below yet, so the next bar sets one);
+  Auto S/R off with a real Start keeps the original shift-the-range behavior;
+  Auto S/R off with Start = 0 sets Target to 0 rather than inventing a width.
+  Both Target-hit branches (all legs closed / losing legs left open) now route
+  through the same helper.
+- Self-healing: the corrupted Target persisted in GlobalVariables is overwritten
+  by the next `ApplyAutoSRSide` pass after reload - no manual cleanup needed.
+
 ## ProScalper v22.13 — 2026-09-22
 
 ### Changed — Target hit no longer force-closes losing legs

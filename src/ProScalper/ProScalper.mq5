@@ -10,7 +10,7 @@
 //+------------------------------------------------------------------+
 #property strict
 
-string EA_VERSION="22.13";
+string EA_VERSION="22.15";
 
 input int    InpGap2PullbackWaitSeconds = 0; // 0 = no wait before P2 opens once armed - maximize trade frequency (was 30)
 input int    InpGap2PullbackPoints      = 0; // 0 = no pullback required for P2's early entry (was 30)
@@ -49,9 +49,15 @@ input bool   InpP1HardSLEnabled = false; // Give P1 a hard S/L immediately on op
 input double InpP1HardSLPct     = 2.0;   // P1 hard S/L, % of trade value (only matters if enabled)
 
 //==========================================================================
-//  AUTO SUPPORT/RESISTANCE (Target price, per side, on this chart's timeframe)
+//  AUTO SUPPORT/RESISTANCE (Target price, per side)
 //==========================================================================
-input int    InpSRLookbackBars = 200;  // Bars scanned for swing highs/lows on this chart's timeframe
+// The scan timeframe is picked per side on the panel (the "S/R:" button next to
+// each AUTO S/R toggle) and cycles CHART -> M5 -> M15 -> M30 -> H1 -> H4. It
+// decides how far out the Target lands: a higher timeframe's swings are further
+// apart, so Target sits further away and the range re-arms far less often. This
+// input is only the starting value before the panel button is used.
+input ENUM_TIMEFRAMES InpSRTimeframe = PERIOD_CURRENT; // Auto S/R scan timeframe (PERIOD_CURRENT = this chart's)
+input int    InpSRLookbackBars = 200;  // Bars of the scan timeframe searched for swing highs/lows
 input int    InpSRFractalWidth = 2;    // Bars required on each side to confirm a swing point (2 = classic 5-bar fractal)
 
 //==========================================================================
@@ -153,6 +159,8 @@ bool bBasketClosed=false,sBasketClosed=false;
 bool bOppOn=true,sOppOn=true;
 double bOppMoney=5.00,sOppMoney=1.00;
 bool bAutoSR=true,sAutoSR=true;
+// Auto S/R scan timeframe per side. PERIOD_CURRENT = follow the chart.
+ENUM_TIMEFRAMES bSRTF=PERIOD_CURRENT,sSRTF=PERIOD_CURRENT;
 datetime gLastSRBarTime=0;
 bool gWarnedCantTrade=false;
 
@@ -1289,6 +1297,8 @@ void SaveState()
    GlobalVariableSet(GV_PREFIX+"sOppOn",sOppOn?1:0);
    GlobalVariableSet(GV_PREFIX+"bOppMoney",bOppMoney);
    GlobalVariableSet(GV_PREFIX+"sOppMoney",sOppMoney);
+   GlobalVariableSet(GV_PREFIX+"bSRTF",(double)bSRTF);
+   GlobalVariableSet(GV_PREFIX+"sSRTF",(double)sSRTF);
    GlobalVariableSet(GV_PREFIX+"bAutoSR",bAutoSR?1:0);
    GlobalVariableSet(GV_PREFIX+"sAutoSR",sAutoSR?1:0);
 
@@ -1344,6 +1354,9 @@ void RestoreState()
 {
    currBuyM=BASE_BUY_MAGIC;currSellM=BASE_SELL_MAGIC;
    ResizeBuyGaps(DEFAULT_GAPS);ResizeSellGaps(DEFAULT_GAPS);
+   // Seeded before the early return below so the input still applies on a first,
+   // never-run-before attach (no saved GlobalVariables yet).
+   bSRTF=InpSRTimeframe;sSRTF=InpSRTimeframe;
 
    if(!GlobalVariableCheck(GV_PREFIX+"currBuyM")) return;
    currBuyM=(long)GlobalVariableGet(GV_PREFIX+"currBuyM");
@@ -1374,6 +1387,8 @@ void RestoreState()
    sOppOn=GlobalVariableCheck(GV_PREFIX+"sOppOn")?GlobalVariableGet(GV_PREFIX+"sOppOn")>0.5:true;
    bOppMoney=GlobalVariableCheck(GV_PREFIX+"bOppMoney")?GlobalVariableGet(GV_PREFIX+"bOppMoney"):5.00;
    sOppMoney=GlobalVariableCheck(GV_PREFIX+"sOppMoney")?GlobalVariableGet(GV_PREFIX+"sOppMoney"):1.00;
+   bSRTF=GlobalVariableCheck(GV_PREFIX+"bSRTF")?(ENUM_TIMEFRAMES)(int)GlobalVariableGet(GV_PREFIX+"bSRTF"):InpSRTimeframe;
+   sSRTF=GlobalVariableCheck(GV_PREFIX+"sSRTF")?(ENUM_TIMEFRAMES)(int)GlobalVariableGet(GV_PREFIX+"sSRTF"):InpSRTimeframe;
    bAutoSR=GlobalVariableCheck(GV_PREFIX+"bAutoSR")?GlobalVariableGet(GV_PREFIX+"bAutoSR")>0.5:true;
    sAutoSR=GlobalVariableCheck(GV_PREFIX+"sAutoSR")?GlobalVariableGet(GV_PREFIX+"sAutoSR")>0.5:true;
 
@@ -1733,24 +1748,53 @@ void RefreshInputs()
 //==========================================================================
 //  AUTO SUPPORT/RESISTANCE
 //==========================================================================
-// Nearest confirmed swing high above `price`, scanning this chart's timeframe.
-// A swing high needs InpSRFractalWidth bars lower on both sides (classic fractal).
-// Returns 0 if none found within InpSRLookbackBars (caller should leave the
-// existing target untouched rather than treat 0 as a real price).
-double FindSwingResistanceAbove(double price)
+// Scan timeframes the panel button cycles through, in order. PERIOD_CURRENT
+// (follow the chart) is first so the default behavior is unchanged.
+ENUM_TIMEFRAMES SR_TF_CYCLE[6]={PERIOD_CURRENT,PERIOD_M5,PERIOD_M15,PERIOD_M30,PERIOD_H1,PERIOD_H4};
+
+string SRTimeframeLabel(ENUM_TIMEFRAMES tf)
+{
+   if(tf==PERIOD_CURRENT) return "CHART";
+   if(tf==PERIOD_M5)  return "M5";
+   if(tf==PERIOD_M15) return "M15";
+   if(tf==PERIOD_M30) return "M30";
+   if(tf==PERIOD_H1)  return "H1";
+   if(tf==PERIOD_H4)  return "H4";
+   return "CHART";
+}
+
+ENUM_TIMEFRAMES NextSRTimeframe(ENUM_TIMEFRAMES tf)
+{
+   for(int i=0;i<6;i++)
+      if(SR_TF_CYCLE[i]==tf) return SR_TF_CYCLE[(i+1)%6];
+   return PERIOD_CURRENT;
+}
+
+// Resolves PERIOD_CURRENT to the chart's actual timeframe for the scan itself.
+ENUM_TIMEFRAMES SRScanTimeframe(bool isBuy)
+{
+   ENUM_TIMEFRAMES tf=(isBuy?bSRTF:sSRTF);
+   return (tf==PERIOD_CURRENT)?(ENUM_TIMEFRAMES)_Period:tf;
+}
+
+// Nearest confirmed swing high above `price` on timeframe `tf`. A swing high
+// needs InpSRFractalWidth bars lower on both sides (classic fractal). Returns 0
+// if none found within InpSRLookbackBars, or if `tf` has no history loaded yet -
+// the caller leaves the existing target untouched rather than treat 0 as a price.
+double FindSwingResistanceAbove(double price,ENUM_TIMEFRAMES tf)
 {
    int width=MathMax(1,InpSRFractalWidth);
-   int bars=iBars(_Symbol,_Period);
+   int bars=iBars(_Symbol,tf);
    int maxShift=MathMin(InpSRLookbackBars,bars-1-width);
    double best=0;
    for(int shift=1+width;shift<=maxShift;shift++)
    {
-      double h=iHigh(_Symbol,_Period,shift);
+      double h=iHigh(_Symbol,tf,shift);
       if(h<=price) continue;
       bool isSwing=true;
       for(int k=1;k<=width;k++)
       {
-         if(iHigh(_Symbol,_Period,shift-k)>=h||iHigh(_Symbol,_Period,shift+k)>=h){ isSwing=false;break; }
+         if(iHigh(_Symbol,tf,shift-k)>=h||iHigh(_Symbol,tf,shift+k)>=h){ isSwing=false;break; }
       }
       if(isSwing&&(best<=0||h<best)) best=h;
    }
@@ -1758,20 +1802,20 @@ double FindSwingResistanceAbove(double price)
 }
 
 // Nearest confirmed swing low below `price`. Mirror of FindSwingResistanceAbove.
-double FindSwingSupportBelow(double price)
+double FindSwingSupportBelow(double price,ENUM_TIMEFRAMES tf)
 {
    int width=MathMax(1,InpSRFractalWidth);
-   int bars=iBars(_Symbol,_Period);
+   int bars=iBars(_Symbol,tf);
    int maxShift=MathMin(InpSRLookbackBars,bars-1-width);
    double best=0;
    for(int shift=1+width;shift<=maxShift;shift++)
    {
-      double l=iLow(_Symbol,_Period,shift);
+      double l=iLow(_Symbol,tf,shift);
       if(l>=price) continue;
       bool isSwing=true;
       for(int k=1;k<=width;k++)
       {
-         if(iLow(_Symbol,_Period,shift-k)<=l||iLow(_Symbol,_Period,shift+k)<=l){ isSwing=false;break; }
+         if(iLow(_Symbol,tf,shift-k)<=l||iLow(_Symbol,tf,shift+k)<=l){ isSwing=false;break; }
       }
       if(isSwing&&(best<=0||l>best)) best=l;
    }
@@ -1787,19 +1831,19 @@ void ApplyAutoSRSide(bool isBuy)
    {
       if(!bAutoSR) return;
       double bid=SymbolInfoDouble(_Symbol,SYMBOL_BID);
-      double r=FindSwingResistanceAbove(bid);
+      double r=FindSwingResistanceAbove(bid,SRScanTimeframe(true));
       bStart=0;
       if(r>0) bTarget=NormalizeDouble(r,_Digits);
-      if(InpVerboseLog) PrintFormat("[AUTOSR] BUY bid=%.2f -> %s bTarget=%.2f",bid,r>0?"found":"none, keeping",bTarget);
+      if(InpVerboseLog) PrintFormat("[AUTOSR] BUY tf=%s bid=%.2f -> %s bTarget=%.2f",SRTimeframeLabel(bSRTF),bid,r>0?"found":"none, keeping",bTarget);
    }
    else
    {
       if(!sAutoSR) return;
       double ask=SymbolInfoDouble(_Symbol,SYMBOL_ASK);
-      double s=FindSwingSupportBelow(ask);
+      double s=FindSwingSupportBelow(ask,SRScanTimeframe(false));
       sStart=0;
       if(s>0) sTarget=NormalizeDouble(s,_Digits);
-      if(InpVerboseLog) PrintFormat("[AUTOSR] SELL ask=%.2f -> %s sTarget=%.2f",ask,s>0?"found":"none, keeping",sTarget);
+      if(InpVerboseLog) PrintFormat("[AUTOSR] SELL tf=%s ask=%.2f -> %s sTarget=%.2f",SRTimeframeLabel(sSRTF),ask,s>0?"found":"none, keeping",sTarget);
    }
    RefreshInputs();
    SaveState();
@@ -2396,6 +2440,48 @@ void ManageSellLevel(int level,double ask,double bid,datetime now)
    }
 }
 
+//==========================================================================
+//  RANGE RE-ARM AFTER A TARGET HIT (REP)
+//==========================================================================
+// The legacy re-arm shifted the range forward by its own width:
+//   d = |Target - Start|;  Start = price;  Target = Start +/- d
+// which assumes Start is the real bottom/top of a price range. Auto S/R
+// deliberately sets Start = 0 ("start at market"), so d became the ENTIRE price
+// and the new Target landed at ~2x price on BUY (4343.96 -> 8687.92) or ~0 on
+// SELL - unreachable either way, silently killing the Target for the rest of the
+// run. Target ownership now decides how the range is re-armed.
+void ReArmBuyRange(double bid)
+{
+   if(bAutoSR)
+   {
+      ApplyAutoSRSide(true);                  // Auto S/R owns Target: recompute from swing S/R
+      if(bTarget>0&&bid>=bTarget) bTarget=0;  // no confirmed swing above yet - unlimited until the next bar sets one
+   }
+   else if(bStart>0)
+   {
+      double d=MathAbs(bTarget-bStart);       // manual range: shift it forward, as before
+      bStart=bid;bTarget=bStart+d;
+   }
+   else bTarget=0;                            // manual, but started at market: no width to shift
+   bStartReached=true;
+}
+
+void ReArmSellRange(double ask)
+{
+   if(sAutoSR)
+   {
+      ApplyAutoSRSide(false);
+      if(sTarget>0&&ask<=sTarget) sTarget=0;
+   }
+   else if(sStart>0)
+   {
+      double d=MathAbs(sStart-sTarget);
+      sStart=ask;sTarget=sStart-d;
+   }
+   else sTarget=0;
+   sStartReached=true;
+}
+
 void ManageBuy(double ask,double bid)
 {
    datetime now=TimeCurrent();
@@ -2413,14 +2499,13 @@ void ManageBuy(double ask,double bid)
    if(bTarget>0&&bid>=bTarget)
    {
       int left=CloseProfitableEnginePositions(1);
-      double d=MathAbs(bTarget-bStart);
       if(left==0)
       {
          gLastErrorText="BUY target price reached. All BUY EA positions closed.";
          if(bRepeat)
          {
             currBuyM++;ResetBuyRunState();
-            bStart=bid;bTarget=bStart+d;bStartReached=true;RefreshInputs();
+            ReArmBuyRange(bid);RefreshInputs();
          }
          else{ bOn=false;ResetBuyRunState(); }
       }
@@ -2430,7 +2515,7 @@ void ManageBuy(double ask,double bid)
          // trailing them to a profit-lock. No magic bump / run-state reset here:
          // that would orphan them (unmanaged, invisible to every helper).
          gLastErrorText="BUY target reached: profitable legs closed, "+(string)left+" losing leg(s) left open to recover.";
-         if(bRepeat){ bStart=bid;bTarget=bStart+d;bStartReached=true; }
+         if(bRepeat) ReArmBuyRange(bid);
          else bTarget=0;
          RefreshInputs();
       }
@@ -2468,21 +2553,20 @@ void ManageSell(double ask,double bid)
    if(sTarget>0&&ask<=sTarget)
    {
       int left=CloseProfitableEnginePositions(-1);
-      double d=MathAbs(sStart-sTarget);
       if(left==0)
       {
          gLastErrorText="SELL target price reached. All SELL EA positions closed.";
          if(sRepeat)
          {
             currSellM++;ResetSellRunState();
-            sStart=ask;sTarget=sStart-d;sStartReached=true;RefreshInputs();
+            ReArmSellRange(ask);RefreshInputs();
          }
          else{ sOn=false;ResetSellRunState(); }
       }
       else
       {
          gLastErrorText="SELL target reached: profitable legs closed, "+(string)left+" losing leg(s) left open to recover.";
-         if(sRepeat){ sStart=ask;sTarget=sStart-d;sStartReached=true; }
+         if(sRepeat) ReArmSellRange(ask);
          else sTarget=0;
          RefreshInputs();
       }
@@ -2758,7 +2842,8 @@ void CreateInterface()
    ObjButton("UI_B_SUBMIT_SL",lx+214,by-1,54,22,"SL OFF",7,"BUY market-price SL ON/OFF");
    ObjEdit("UI_B_SL_LOCK",lx+274,by,58,20,C'29,41,58');
    by+=25;
-   ObjButton("UI_B_AUTOSR",lx,by,150,20,"AUTO S/R: OFF",7,"Auto-set Target from swing S/R on this chart's timeframe (recomputed each new bar). Start is forced to 0/market while ON.");
+   ObjButton("UI_B_AUTOSR",lx,by,150,20,"AUTO S/R: OFF",7,"Auto-set Target from swing S/R (recomputed each new bar). Start is forced to 0/market while ON.");
+   ObjButton("UI_B_SRTF",lx+154,by,74,20,"S/R: CHART",7,"Timeframe Auto S/R scans for swings. Click to cycle CHART/M5/M15/M30/H1/H4. Higher timeframe = swings further apart = Target further away = range re-arms less often.");
    by+=30;
    ObjLabel("UI_BH1",lx+36,by+3,"Gap/St",C'255,215,0',8,"Arial Bold");
    ObjLabel("UI_BH2",lx+88,by+3,"Lot",C'180,210,235',8,"Arial Bold");
@@ -2810,7 +2895,8 @@ void CreateInterface()
    ObjButton("UI_S_SUBMIT_SL",slx+214,sy-1,54,22,"SL OFF",7,"SELL market-price SL ON/OFF");
    ObjEdit("UI_S_SL_LOCK",slx+274,sy,58,20,C'48,32,36');
    sy+=25;
-   ObjButton("UI_S_AUTOSR",slx,sy,150,20,"AUTO S/R: OFF",7,"Auto-set Target from swing S/R on this chart's timeframe (recomputed each new bar). Start is forced to 0/market while ON.");
+   ObjButton("UI_S_AUTOSR",slx,sy,150,20,"AUTO S/R: OFF",7,"Auto-set Target from swing S/R (recomputed each new bar). Start is forced to 0/market while ON.");
+   ObjButton("UI_S_SRTF",slx+154,sy,74,20,"S/R: CHART",7,"Timeframe Auto S/R scans for swings. Click to cycle CHART/M5/M15/M30/H1/H4. Higher timeframe = swings further apart = Target further away = range re-arms less often.");
    sy+=30;
    ObjLabel("UI_SH1",slx+36,sy+3,"Gap/St",C'255,215,0',8,"Arial Bold");
    ObjLabel("UI_SH2",slx+88,sy+3,"Lot",C'255,185,190',8,"Arial Bold");
@@ -2870,6 +2956,9 @@ void UpdateDisplay()
    SetButton("UI_S_MAXLOSS_ON",sMaxLossOn,C'190,60,60',C'75,75,75',sMaxLossOn?"MAXLOSS: ON":"MAXLOSS: OFF");
    SetButton("UI_B_AUTOSR",bAutoSR,C'45,150,80',C'75,75,75',bAutoSR?"AUTO S/R: ON":"AUTO S/R: OFF");
    SetButton("UI_S_AUTOSR",sAutoSR,C'45,150,80',C'75,75,75',sAutoSR?"AUTO S/R: ON":"AUTO S/R: OFF");
+   // Greyed while Auto S/R is off - the timeframe has no effect until it's on.
+   SetButton("UI_B_SRTF",bAutoSR,C'55,110,160',C'75,75,75',"S/R: "+SRTimeframeLabel(bSRTF));
+   SetButton("UI_S_SRTF",sAutoSR,C'160,90,90',C'75,75,75',"S/R: "+SRTimeframeLabel(sSRTF));
    SetButtonColor("UI_B_RESTART",bBasketOn?(bBasketClosed?C'40,170,75':C'105,90,170'):C'45,45,45',bBasketOn?clrWhite:C'120,120,120',RESTART_BTN_TEXT);
    SetButtonColor("UI_S_RESTART",sBasketOn?(sBasketClosed?C'40,170,75':C'105,90,170'):C'45,45,45',sBasketOn?clrWhite:C'120,120,120',RESTART_BTN_TEXT);
    SetButton("UI_B_OPP_ON",bOppOn,C'35,150,210',C'75,75,75',"B+S");
@@ -3190,6 +3279,22 @@ void OnChartEvent(const int id,const long &lparam,const double &dparam,const str
    {
       SyncControlInputs();
       sAutoSR=!sAutoSR;
+      if(sAutoSR) ApplyAutoSRSide(false);
+      else SaveState();
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
+   }
+   if(sparam=="UI_B_SRTF")
+   {
+      SyncControlInputs();
+      bSRTF=NextSRTimeframe(bSRTF);
+      if(bAutoSR) ApplyAutoSRSide(true);   // re-target immediately on the new timeframe
+      else SaveState();
+      ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
+   }
+   if(sparam=="UI_S_SRTF")
+   {
+      SyncControlInputs();
+      sSRTF=NextSRTimeframe(sSRTF);
       if(sAutoSR) ApplyAutoSRSide(false);
       else SaveState();
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);UpdateDisplay();return;
